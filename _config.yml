@@ -7,8 +7,6 @@ google_analytics: UA-26470475-6
 markdown: kramdown
 highlighter: rouge
 baseurl: "/paellaplayer.upv.es"
-#baseurl: "/_site"
-#url: "http://127.0.0.1:5500"
 plugins:
   - jekyll-seo-tag
   - jekyll-redirect-from
