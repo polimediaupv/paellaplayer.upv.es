@@ -405,7 +405,7 @@
     }
   },
   "standalone": {
-    "repository": "//paellaplayer.upv.es/demo/repository/"
+    "repository": "//repository.paellaplayer.upv.es/"
   },
   "skin": {
     "available": [
