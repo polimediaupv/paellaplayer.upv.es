@@ -33,10 +33,30 @@ div {
   -ms-user-select: none;
   user-select: none;
 }
-i.button-icon {
+.buttonPlugin {
+  cursor: pointer;
+  padding-right: 0px;
+  padding-left: 0px;
+  background-origin: border-box;
+  position: relative;
+  display: block;
+  float: left;
+  align-items: stretch;
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  color: white;
+  text-align: center;
+}
+button,
+div i.button-icon {
   color: black;
   font-size: 12px;
-  padding-left: 3px;
   line-height: 20px;
 }
 .buttonPlugin {
@@ -131,18 +151,6 @@ i.button-icon.icon-screen {
 }
 .playbackBarFull.disabled {
   opacity: 0.2;
-}
-.buttonPlugin {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  /*background-image: @paella_icons_image;
-    background-size: @paella_icons_bkg_size;
-    background-position: 0px 0px;*/
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 0px;
-  color: white;
 }
 .buttonPlugin.left {
   float: left;
