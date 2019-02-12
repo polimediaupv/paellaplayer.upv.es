@@ -6,7 +6,6 @@ show_downloads: true
 google_analytics: UA-26470475-6
 markdown: kramdown
 highlighter: rouge
-baseurl: "/paellaplayer.upv.es"
 plugins:
   - jekyll-seo-tag
   - jekyll-redirect-from
