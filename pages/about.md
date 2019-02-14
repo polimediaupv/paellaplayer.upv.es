@@ -28,9 +28,9 @@ ABOUT
 
 # Opencast Support
 
-Paella Player works as an standalone JavaScript player, but you can also use the [Opencast](http://opencast.org/) port
-to install Paella in Opencast. Have a look to the detailed instructions on the [downloads page](../download).
-
+Paella Player works BOTH as an standalone JavaScript player and as an [Opencast](http://opencast.org/) video player. So:
+  - If you are using Opencast >5.0 you have already Paella in your system. 
+  - If you have an old Opencast version you should use the [paella-opencast](https://github.com/polimediaupv/paella-opencast) project  
 
 # License
 
@@ -40,9 +40,9 @@ and all of it is [provided under the terms of the Educational Community License]
 
 Paella Player and its documentation are distributed in the hope that they will be useful,
 but without any warranty; without even the implied warranty of merchantability or fitness for 
-a particular purpose. See the GNU General Public License for more details.
+a particular purpose. See the License for more details.
 
-# Drop a line
+# Drop us a line
 
-If you find Paella useful we would like to hear from your experience, please [drop us a line](../contact).
-
+If you find Paella useful we would like to hear from your experience. You may join the [Paella Player mailing list](https://listas.upv.es/mailman/listinfo/paellaplayer) and 
+send your messages to [paellaplayer@upv.es](mailto:paellaplayer@upv.es). Feel free to subscribe to that list. 
