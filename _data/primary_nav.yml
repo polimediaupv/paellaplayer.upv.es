@@ -1,8 +1,8 @@
 - title: Home
   link: /
   show_on_mobile: true
-- title: About
-  link: /about/
+- title: Features
+  link: /features/
   show_on_mobile: true
 - title: Demos
   link: /demos/
@@ -13,6 +13,6 @@
 - title: Docs
   link: /docs/
   show_on_mobile: true  
-- title: Contact
-  link: /contact/
+- title: About
+  link: /about/
   show_on_mobile: true

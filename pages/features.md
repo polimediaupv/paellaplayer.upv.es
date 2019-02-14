@@ -1,3 +1,9 @@
+---
+layout: page
+title: About
+permalink: /features/
+---
+
 # Paella Main features
 
 - Split-screen player for viewing video and slide content simultaneously
