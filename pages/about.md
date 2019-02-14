@@ -36,7 +36,7 @@ Paella Player works BOTH as an standalone JavaScript player and as an [Opencast]
 
 Paella Player has been mainly developed by the [Universitat Politécnica de Valencia](http://www.upv.es),
 with portions contributed/copyrighted by others (see the developer credits in the source code itself)
-and all of it is [provided under the terms of the Educational Community License](../license)
+and all of it is provided under the terms of the [Educational Community License](../license)
 
 Paella Player and its documentation are distributed in the hope that they will be useful,
 but without any warranty; without even the implied warranty of merchantability or fitness for 
