@@ -23,7 +23,7 @@ ABOUT
 - Easy customization and localization of the player interface
 - ARIA support
 
-... and many more. See the [CHANGELOG](https://github.com/polimediaupv/paella/blob/develop/CHANGELOG) file or browse the [demos](demos)
+... and many more. See the [CHANGELOG](https://github.com/polimediaupv/paella/blob/develop/CHANGELOG) file in out [GitHub Paella site](https://github.com/polimediaupv/paella) or browse the [demos](demos) .
 
 
 # Opencast Support
