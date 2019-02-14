@@ -7,35 +7,23 @@ permalink: /about/
 ABOUT
 =========
 
-The Paella `(pronounced 'paeja')` Player is a HTML5 multistream video player capable of 
-playing multiple audio & video streams synchronously and supporting a number of user plugins. 
-It is specially designed for lecture recordings, like Opencast Lectures or Polimedia pills.
-
-By using Paella:
-
-*	Students can view both the lecture hall and the teacher's screen, get info 
-	about the lecture (slides, OCR, series videos, footprints) and interact with the lecture
-	(views, comments).
-*	Teachers can also soft edit the lecture to set the start and end point or make breaks 
-	in the recording. 
-
-
-You can take your first contact with Paella looking at the next video, or by going to our [demo page](demos.md).
-
-Paella works with all HTML5 browsers (Chrome, Firefox, Safari and Edge) and in iPad and Android phones. Paella uses Adobe Flash as a fallback method in case that your browser can not play the video files.
 
 # Paella Main features
 
-- Multistream HTML5 video player
-- Support of Chrome, Firefox, Safari and Edge browsers
-- Compatible with iOS (iPad) and Android 4.X
-- Multiple quality video support
-- Mpeg-Dash support
+- Split-screen player for viewing video and slide content simultaneously
+- Unlimited number of simultaneous video streams
+- Zoom in any video window
+- Automatic slide index
+- Heat maps indicate sections of content most often watched
+- Multiple quality adaptive Streaming support with HTTP Live Streaming (HLS) or MPEG-DASH
 - Live Streaming support
 - Multiple language captions
-- Plugin System support to let you develop your own features easily
-- Skinnable
+- Support for multiple audio tracks
+- REST APIs make it easy to extend to or integrate
+- Easy customization and localization of the player interface
 - ARIA support
+
+... and many more. See the [CHANGELOG](https://github.com/polimediaupv/paella/blob/develop/CHANGELOG) file or browse the [demos](demos)
 
 
 # Opencast Support
