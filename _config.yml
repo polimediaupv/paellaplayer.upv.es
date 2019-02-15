@@ -36,6 +36,9 @@ defaults:
 kramdown:
   input: GFM
   syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    default_lang: javascript
+    css_class: 'highlight'
 relative_links:
   enabled:     true
   collections: true
