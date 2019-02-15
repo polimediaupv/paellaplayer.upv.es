@@ -36,15 +36,6 @@ layout: default
                     <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span> &nbsp;Open the video in full page
                 </a>
             </div>
-
-            <h4> data.json file </h4>
-            {% assign url="http://repository.paellaplayer.upv.es/" | append: page.videoid | append: "/data.json" %}
-{% capture md %}
-```javascript
-{% remote_include url %}
-```
-{% endcapture %}
-            {{ md | markdownify }}
         {% else %}
             <div style="padding-top: 10px;"></div>
         {% endif %}
