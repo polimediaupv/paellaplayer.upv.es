@@ -2,6 +2,7 @@ version: 6.0.4
 title: Paella Player
 description: the multistream player for lectures
 paella_repository: https://github.com/polimediaupv/paella
+timezone: Europe/Madrid
 show_downloads: true
 google_analytics: UA-26470475-6
 markdown: kramdown
@@ -12,10 +13,14 @@ plugins:
   - jekyll-redirect-from
   - jekyll-relative-links
   - jekyll-sitemap
+  - jekyll-mentions
   - rouge
 collections:
   docs:
     permalink: "/:collection/:path:output_ext"
+    output: true   
+  demos:
+    permalink: "/demos/:title/"
     output: true   
 defaults:
   - scope:
@@ -23,6 +28,11 @@ defaults:
       type: docs
     values:
       layout: docs
+  - scope:
+      path: "_demos/*"
+      type: demos
+    values:
+      layout: demo
 kramdown:
   input: GFM
   syntax_highlighter: rouge

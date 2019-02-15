@@ -1,0 +1,37 @@
+---
+layout: default
+---
+
+{% assign player_url = '/paella/player-' | append: site.version | append: '/' | relative_url %}
+
+<div class="row" style="margin-bottom: -100px;">
+    <div class="col-md-3">        
+        {% for section in site.data.demos %}
+        {% assign sitem = section | first %}
+            <h4>{{ sitem[0] }}</h4>            
+            {% for link in sitem[1] %}
+                <li>
+                    {% assign slink = link | first %}
+                    {% assign docspath = "_demos/" | append: slink[1] %}
+                    {% assign p = site.documents | where: "path", docspath | first %}        
+                    <a href="{{ p.url | relative_url}}">{{ slink[0] }}</a>
+                </li>
+            {% endfor %}
+        {% endfor %}
+    </div>    
+    <div class="col-md-9">        
+        {{ content}}
+
+        {% if page.videoid %} 
+            {% include paella.html width="900" height="500" id=page.videoid %}
+
+            <div style="padding-bottom: 10px; padding-top: 10px;">
+                <a class="btn btn-danger btn-xs" style="color: #ffffff !important;" href="{{player_url}}?id={{page.videoid}}">
+                    <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span> &nbsp;Open the video in full page
+                </a>
+            </div>
+        {% else %}
+            <div style="padding-top: 10px;"></div>
+        {% endif %}
+    </div>
+</div>
