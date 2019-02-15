@@ -19,11 +19,17 @@ layout: default
             {% endfor %}
         {% endfor %}
     </div>    
-    <div class="col-md-9">        
+    <div class="col-md-9">
+
         {{ content}}
 
         {% if page.videoid %} 
-            {% include paella.html width="900" height="500" id=page.videoid %}
+            {% if page.use_paella_version %}
+                <div class="alert alert-info" role="alert">
+                    <strong>NOTE:</strong> This demos is using Paella Player '{{page.use_paella_version}}' version.
+                </div>
+            {% endif %}        
+            {% include paella.html width="900" height="500" id=page.videoid version=page.use_paella_version %}
 
             <div style="padding-bottom: 10px; padding-top: 10px;">
                 <a class="btn btn-danger btn-xs" style="color: #ffffff !important;" href="{{player_url}}?id={{page.videoid}}">
