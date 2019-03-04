@@ -23,14 +23,6 @@ body {
 	background-repeat: no-repeat;
 }
 
-#logo {
-	background-image: url("../images/logo_paella.png");
-	width: 200px;
-	height: 200px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
 .pageHeader {
 	background-color: white;
 	padding: 20px;
