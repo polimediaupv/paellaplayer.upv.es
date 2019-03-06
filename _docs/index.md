@@ -10,7 +10,7 @@ It is specially designed for lecture recordings, like Opencast Lectures or Polim
 
 ## Select a version 
 
-{% for p in site.data.docs %}
+{% for p in (site.data.docs | sort) %}
 {% assign docspath = "_docs/" | append: p[1].version | append: "/" | append: p[1].index %}
 {% assign page = site.documents | where: "path", docspath | first %}
 - [ {{p[1].version}} ]({{page.url | relative_url}})
