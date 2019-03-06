@@ -16,5 +16,5 @@
   - 360º Video: '360-video.md'
   - Youtube Video: 'youtube-video.md'
 
-#- Develop version demos:
-#  - Audio + slides (no video): 'audio-plus-slides.md'
+- 6.1.x version demos:
+  - Audio + slides (no video): 'audio-and-images.md'
