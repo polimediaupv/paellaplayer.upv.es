@@ -8,6 +8,7 @@ CHANGELOG
 * Paella 6.0.5
 
   * Improved video stability on slow networks.
+  * Bug fixed on first video layout load.
 
 * Paella 6.0.4
 
