@@ -2397,6 +2397,7 @@ a.btn {
   background: url(../images/paella_icons_light.png);
   background-position: -400% -100%;
   background-size: 2000% 1000%;
+  position: static;
 }
 .captionsBar button:hover {
   background-color: #cc0000;
