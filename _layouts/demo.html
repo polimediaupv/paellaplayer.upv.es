@@ -26,7 +26,7 @@ layout: default
         {% if page.videoid %} 
             {% if page.use_paella_version %}
                 <div class="alert alert-info" role="alert">
-                    <strong>NOTE:</strong> This demos is using Paella Player '{{page.use_paella_version}}' version.
+                    <strong>NOTE:</strong> These demos are using Paella Player '{{page.use_paella_version}}' version.
                 </div>
             {% endif %}        
             {% include paella.html width="768" height="432" id=page.videoid version=page.use_paella_version %}
