@@ -76,7 +76,7 @@ span.expandable-content {
 }
 .button-text {
   position: absolute;
-  left: 5px;
+  left: 0px;
   right: 0px;
   top: 0px;
   bottom: 0px;
@@ -2771,9 +2771,9 @@ textarea {
 }*/
 .buttonPlugin.showMultipleQualitiesPlugin {
   text-align: center;
-  background-position: -600% -100%;
   font-size: 0.8em;
   line-height: 30px;
+  min-width: 36px;
 }
 .buttonPluginPopUp.showMultipleQualitiesPlugin {
   background-image: none;
@@ -2838,6 +2838,9 @@ textarea {
 }
 .playbackRateItem.selected:hover {
   color: white;
+}
+.buttonPlugin.showPlaybackRateButton {
+  min-width: 36px;
 }
 .buttonPlugin.rateButtonPlugin {
   text-align: center;
