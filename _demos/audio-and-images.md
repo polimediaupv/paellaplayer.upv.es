@@ -1,8 +1,7 @@
 ---
 videoid: audio-and-images
-use_paella_version: 6.1.x
 ---
 
 # Audio + Slides
 
-
+This is a carrousel of images simulating a video and an audio track.
