@@ -3475,6 +3475,27 @@ input[type=range]:focus::-ms-fill-upper {
 .buttonPlugin.AirPlayButton.not-available {
   opacity: 0.4;
 }
+.buttonPlugin.PIPModeButton {
+  background-position: -1000% -100%;
+}
+.buttonPlugin.showEditorButton {
+  pointer-events: all;
+}
+.buttonPluginPopUp.videoZoomToolbar {
+  width: 50px;
+  text-align: center;
+}
+.buttonPlugin.right.videoZoomToolbar i.button-icon.icon-mini-videocamera {
+  font-size: 27px;
+  margin-left: -2px;
+}
+.buttonPlugin.right.videoZoomToolbar i.button-icon.icon-mini-zoom-in {
+  font-size: 29px;
+  margin-left: -6px;
+}
+.autoTrackingActivated {
+  color: red !important;
+}
 .buttonPlugin.legal {
   pointer-events: all;
   padding-right: 5px;
@@ -3497,27 +3518,6 @@ input[type=range]:focus::-ms-fill-upper {
 }
 .buttonPlugin.legal:hover {
   background-color: transparent !important;
-}
-.buttonPlugin.PIPModeButton {
-  background-position: -1000% -100%;
-}
-.buttonPlugin.showEditorButton {
-  pointer-events: all;
-}
-.buttonPluginPopUp.videoZoomToolbar {
-  width: 50px;
-  text-align: center;
-}
-.buttonPlugin.right.videoZoomToolbar i.button-icon.icon-mini-videocamera {
-  font-size: 27px;
-  margin-left: -2px;
-}
-.buttonPlugin.right.videoZoomToolbar i.button-icon.icon-mini-zoom-in {
-  font-size: 29px;
-  margin-left: -6px;
-}
-.autoTrackingActivated {
-  color: red !important;
 }
 html {
   margin: 0px;
