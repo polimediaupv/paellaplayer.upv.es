@@ -231,7 +231,10 @@
       },
       "es.upv.paella.arrowSlidesNavigatorPlugin": {
         "enabled": true,
-        "showArrowsIn": "slave"
+        "content": [
+          "presentation",
+          "presenter"
+        ]
       },
       "es.upv.paella.videoDataPlugin": {
         "enabled": true,

@@ -329,12 +329,8 @@ Reflect.defineProperty = Reflect.defineProperty || Object.defineProperty;
     function Resource() {}
     return ($traceurRuntime.createClass)(Resource, {}, {
       GetExtension: function(url) {
-        var filename = url.substring(url.lastIndexOf("/") + 1).split("?")[0].toLowerCase();
-        if (filename.indexOf(".") > 0) {
-          return filename.split(".").pop().toLowerCase();
-        } else {
-          return "";
-        }
+        var match = /\.([a-z0-9-_]*)$/i.exec(url);
+        return (match && match[1].toLowerCase()) || "";
       },
       IsFormat: function(url, formats) {
         return formats.find(function(fmt) {
@@ -11811,6 +11807,12 @@ bg.webgl1 = {};
       },
       destroy: function(context, texture) {
         context.deleteTexture(this._texture);
+      }
+    }, {}, $__super);
+  }(bg.base.TextureImpl);
+  bg.webgl1.TextureImpl = TextureImpl;
+})();
+.deleteTexture(this._texture);
       }
     }, {}, $__super);
   }(bg.base.TextureImpl);
