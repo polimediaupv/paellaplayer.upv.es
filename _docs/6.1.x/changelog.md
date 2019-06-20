@@ -5,6 +5,10 @@
 CHANGELOG
 =========
 
+* Paella 6.1.4
+
+  * Some bug fixes and improvements in audo tags
+
 * Paella 6.1.3
 
   * Some obsolete plugins removed
