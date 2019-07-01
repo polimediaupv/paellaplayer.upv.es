@@ -5,6 +5,20 @@
 CHANGELOG
 =========
 
+* Paella 6.1.4
+
+  * Some bug fixes and improvements in audo tags
+
+* Paella 6.1.3
+
+  * Some obsolete plugins removed
+  * Added an option to configure the maximum numbmer of simultaneous HLS streams.
+  * Bug fixed in trimmed videos.
+
+* Paella 6.1.2
+
+  * Support for n-streams implemented in arrow slide navigation plugin (Fix #406)
+
 * Paella 6.1.1
 
   * Bug fixed in volume range plugin

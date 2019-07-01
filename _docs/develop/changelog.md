@@ -11,6 +11,16 @@ CHANGELOG
     - Monostream profile APIs removed. This may break monostream videos if the streams
       in `data.json` does not include the `content` attribute.
       
+* Paella 6.1.3
+
+  * Some obsolete plugins removed
+  * Added an option to configure the maximum numbmer of simultaneous HLS streams.
+  * Bug fixed in trimmed videos.
+
+* Paella 6.1.2
+
+  * Support for n-streams implemented in arrow slide navigation plugin (Fix #406)
+
 * Paella 6.1.1
 
   * Bug fixed in volume range plugin
