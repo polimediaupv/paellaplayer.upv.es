@@ -416,6 +416,13 @@ video::-webkit-media-controls-panel {
   width: calc(100% + 8px);
   /* Adjust as needed */
 }
+#lazyLoadThumbnailContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+}
 /* TODO: Extract this CSS to editor plugins */
 .editorTrackItem.mainTrackTrim {
   background-image: url(../images/main_track_bkg.png);
