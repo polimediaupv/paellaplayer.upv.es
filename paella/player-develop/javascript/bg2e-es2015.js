@@ -1,6 +1,6 @@
 
 const bg = {};
-bg.version = "1.3.21 - build: b1abb92";
+bg.version = "1.3.26 - build: a4e6494";
 bg.utils = {};
 
 Reflect.defineProperty = Reflect.defineProperty || Object.defineProperty;
@@ -702,10 +702,21 @@ Reflect.defineProperty = Reflect.defineProperty || Object.defineProperty;
 	class LifeCycle {
 		init() {}
 		frame(delta) {}
+
+		displayGizmo(pipeline,matrixState) {}
+		
+		////// Direct rendering methods: will be deprecated soon
 		willDisplay(pipeline,matrixState) {}
 		display(pipeline,matrixState,forceDraw=false) {}
-		displayGizmo(pipeline,matrixState) {}
 		didDisplay(pipeline,matrixState) {}
+		////// End direct rendering methods
+
+		////// Render queue methods
+		willUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {}
+		draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack) {}
+		didUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {}
+		////// End render queue methods
+
 		reshape(pipeline,matrixState,width,height) {}
 		keyDown(evt) {}
 		keyUp(evt) {}
@@ -1013,9 +1024,13 @@ bg.app = {};
 		}
 	}
 	
-	function animationLoop() {
+	let lastTime = 0;
+	function animationLoop(totalTime) {
+		totalTime = totalTime || 0;
 		requestAnimFrame(animationLoop);
-		onUpdate();
+		let elapsed = totalTime - lastTime;
+		lastTime = totalTime;
+		onUpdate(elapsed);
 	}
 
 	function initEvents() {
@@ -1102,11 +1117,12 @@ bg.app = {};
 		}
 	}
 	
-	function onUpdate() {
+	function onUpdate(elapsedTime) {
 		if (s_mainLoop.redisplay) {
-			if (s_delta==-1) s_delta = Date.now();
-			s_mainLoop.windowController.frame((Date.now() - s_delta) * 2);
-			s_delta = Date.now();
+			//if (s_delta==-1) s_delta = Date.now();
+			//s_mainLoop.windowController.frame((Date.now() - s_delta) * 2);
+			//s_delta = Date.now();
+			s_mainLoop.windowController.frame(elapsedTime);
 			if (s_mainLoop.updateMode==bg.app.FrameUpdate.AUTO) {
 				s_mainLoop._redisplayFrames = 1;
 			}
@@ -1967,7 +1983,7 @@ Object.defineProperty(bg, "isElectronApp", {
         get stream() { return this._stream; }
 
         writeUInt(number) {
-            let buffer = new Buffer(4);
+            let buffer = Buffer.alloc(4);
             buffer.writeUInt32BE(number,0);
             this.stream.write(buffer);
         }
@@ -1984,7 +2000,7 @@ Object.defineProperty(bg, "isElectronApp", {
         writeBuffer(name,arrayBuffer) {
             this.writeBlock(name);
             this.writeUInt(arrayBuffer.length);
-            let buffer = new Buffer(4 * arrayBuffer.length);
+            let buffer = Buffer.alloc(4 * arrayBuffer.length);
             if (name=="indx") {
                 arrayBuffer.forEach((d,i) => buffer.writeUInt32BE(d,i * 4));
             }
@@ -2016,7 +2032,7 @@ Object.defineProperty(bg, "isElectronApp", {
     }
 
     function writeHeader(fileData) {
-        let buffer = new Buffer(4);
+        let buffer = Buffer.alloc(4);
         [
             0,  // big endian
             1,  // major version
@@ -2047,7 +2063,7 @@ Object.defineProperty(bg, "isElectronApp", {
     }
 
     function writePolyList(fileData,plist,material,trx) {
-        //let buffer = new Buffer(4);
+        //let buffer = Buffer.alloc(4);
         //fileData.stream.write(Buffer.from("plst","utf-8")); // poly list
         fileData.writeBlock("plst");
 
@@ -2295,20 +2311,23 @@ Object.defineProperty(bg, "isElectronApp", {
 				s_fragmentSource.setMainBody(`
 					vec4 diffuseColor = samplerColor(inTexture,fsTex0Coord,inTextureOffset,inTextureScale);
 					vec4 lightmapColor = samplerColor(inLightMap,fsTex1Coord,inLightMapOffset,inLightMapScale);
+
 					if (inUnlit && diffuseColor.a>=inAlphaCutoff) {
 						gl_FragColor = diffuseColor * lightmapColor;
 					}
 					else if (diffuseColor.a>=inAlphaCutoff) {
 						vec3 normalMap = samplerNormal(inNormalMap,fsTex0Coord,inNormalMapOffset,inNormalMapScale);
-						vec3 frontFacingNormal = fsNormal;
-						if (!gl_FrontFacing) {
-							frontFacingNormal *= -1.0;
-						}
-						normalMap = combineNormalWithMap(frontFacingNormal,fsTangent,fsBitangent,normalMap);
+						// This doesn't work on many Mac Intel GPUs
+						// vec3 frontFacingNormal = fsNormal;
+						// if (!gl_FrontFacing) {
+						// 	frontFacingNormal *= -1.0;
+						// }
+						normalMap = combineNormalWithMap(fsNormal,fsTangent,fsBitangent,normalMap);
 						vec4 shadowColor = vec4(1.0);
 						if (inReceiveShadows) {
 							shadowColor = getShadowColor(fsVertexPosFromLight,inShadowMap,inShadowMapSize,inShadowType,inShadowStrength,inShadowBias,inShadowColor);
 						}
+
 						vec4 specular = specularColor(inSpecularColor,inShininessMask,fsTex0Coord,inTextureOffset,inTextureScale,
 															inShininessMaskChannel,inShininessMaskInvert);
 						float lightEmission = applyTextureMask(inLightEmission,
@@ -2318,14 +2337,43 @@ Object.defineProperty(bg, "isElectronApp", {
 						
 						vec4 light = vec4(0.0,0.0,0.0,1.0);
 						vec4 specularColor = vec4(0.0,0.0,0.0,1.0);
-						for (int i=0; i<${ bg.base.MAX_FORWARD_LIGHTS}; ++i) {
-							if (i>=inNumLights) break;
+						// This doesn't work on A11 and A12 chips on Apple devices.
+						// for (int i=0; i<${ bg.base.MAX_FORWARD_LIGHTS}; ++i) {
+						// 	if (i>=inNumLights) break;
+						// 	light.rgb += getLight(
+						// 		inLightType[i],
+						// 		inLightAmbient[i], inLightDiffuse[i], inLightSpecular[i],inShininess,
+						// 		inLightPosition[i],inLightDirection[i],
+						// 		inLightAttenuation[i].x,inLightAttenuation[i].y,inLightAttenuation[i].z,
+						// 		inSpotCutoff[i],inSpotExponent[i],inLightCutoffDistance[i],
+						// 		fsPosition,normalMap,
+						// 		diffuseColor,specular,shadowColor,
+						// 		specularColor
+						// 	).rgb;
+						// 	light.rgb += specularColor.rgb;
+						// }
+
+						// Workaround for A11 and A12 chips
+						if (inNumLights>0) {
 							light.rgb += getLight(
-								inLightType[i],
-								inLightAmbient[i], inLightDiffuse[i], inLightSpecular[i],inShininess,
-								inLightPosition[i],inLightDirection[i],
-								inLightAttenuation[i].x,inLightAttenuation[i].y,inLightAttenuation[i].z,
-								inSpotCutoff[i],inSpotExponent[i],inLightCutoffDistance[i],
+								inLightType[0],
+								inLightAmbient[0], inLightDiffuse[0], inLightSpecular[0],inShininess,
+								inLightPosition[0],inLightDirection[0],
+								inLightAttenuation[0].x,inLightAttenuation[0].y,inLightAttenuation[0].z,
+								inSpotCutoff[0],inSpotExponent[0],inLightCutoffDistance[0],
+								fsPosition,normalMap,
+								diffuseColor,specular,shadowColor,
+								specularColor
+							).rgb;
+							light.rgb += specularColor.rgb;
+						}
+						if (inNumLights>1) {
+							light.rgb += getLight(
+								inLightType[1],
+								inLightAmbient[1], inLightDiffuse[1], inLightSpecular[1],inShininess,
+								inLightPosition[1],inLightDirection[1],
+								inLightAttenuation[1].x,inLightAttenuation[1].y,inLightAttenuation[1].z,
+								inSpotCutoff[0],inSpotExponent[1],inLightCutoffDistance[1],
 								fsPosition,normalMap,
 								diffuseColor,specular,shadowColor,
 								specularColor
@@ -2336,25 +2384,25 @@ Object.defineProperty(bg, "isElectronApp", {
 						vec3 cameraPos = vec3(0.0);
 						vec3 cameraVector = fsPosition - cameraPos;
 						vec3 lookup = reflect(cameraVector,normalMap);
-						float dist = distance(fsPosition,cameraPos);
-						float maxRough = 50.0;
-						float rough = max(inRoughness * 10.0,1.0);
-						rough = max(rough*dist,rough);
-						float blur = min(rough,maxRough);
-						vec3 cubemapColor = blurCube(inCubeMap,lookup,int(blur),vec2(10),dist).rgb;
+
+						// Roughness using gaussian blur has been deactivated because it is very inefficient
+						//float dist = distance(fsPosition,cameraPos);
+						//float maxRough = 50.0;
+						//float rough = max(inRoughness * 10.0,1.0);
+						//rough = max(rough*dist,rough);
+						//float blur = min(rough,maxRough);
+						//vec3 cubemapColor = blurCube(inCubeMap,lookup,int(blur),vec2(10),dist).rgb;
+
+						vec3 cubemapColor = textureCube(inCubeMap,lookup).rgb;
 
 						float reflectionAmount = applyTextureMask(inReflection,
 														inReflectionMask,fsTex0Coord,inTextureOffset,inTextureScale,
 														inReflectionMaskChannel,inReflectionMaskInvert);
 
 						light.rgb = clamp(light.rgb + (lightEmission * diffuseColor.rgb * 10.0), vec3(0.0), vec3(1.0));
-						vec3 finalColor = light.rgb * (1.0 - reflectionAmount);
-						finalColor += cubemapColor * reflectionAmount * diffuseColor.rgb;
-						vec4 result = colorCorrection(vec4(finalColor,1.0),inHue,inSaturation,inLightness,inBrightness,inContrast);
-						result.a = diffuseColor.a;
+						
 
-						// TODO: add specularColor
-						gl_FragColor = result;
+						gl_FragColor = vec4(light.rgb * (1.0 - reflectionAmount) + cubemapColor * reflectionAmount * diffuseColor.rgb, diffuseColor.a);
 					}
 					else {
 						discard;
@@ -2555,7 +2603,12 @@ Object.defineProperty(bg, "isElectronApp", {
 
 				let roughnessMask = this.material.roughnessMask || whiteTex;
 				this.shader.setValueFloat('inRoughness',this.material.roughness);
-				this.shader.setTexture('inRoughnessMask',roughnessMask,bg.base.TextureUnit.TEXTURE_8);
+				if (this.context.getParameter(this.context.MAX_TEXTURE_IMAGE_UNITS)<9) {
+					this.shader.setTexture('inRoughnessMask',roughnessMask,bg.base.TextureUnit.TEXTURE_7);
+				}
+				else {
+					this.shader.setTexture('inRoughnessMask',roughnessMask,bg.base.TextureUnit.TEXTURE_8);
+				}
 				this.shader.setVector4('inRoughnessMaskChannel',this.material.roughnessMaskChannelVector);
 				this.shader.setValueInt('inRoughnessMaskInvert',this.material.roughnessMaskInvert);
 
@@ -4484,6 +4537,7 @@ Object.defineProperty(bg, "isElectronApp", {
 		
 		let result = [];
 		let generatedIndexes = {};
+		let invalidUV = false;
 		if (plist.index.length%3==0) {
 			for (let i=0; i<plist.index.length - 2; i+=3) {
 				let v0i = plist.index[i] * 3;
@@ -4510,12 +4564,23 @@ Object.defineProperty(bg, "isElectronApp", {
 				let deltaU2 = t2.x - t0.x;
 				let deltaV2 = t2.y - t0.y;
 				
-				let f = 1 / (deltaU1 * deltaV2 - deltaU2 * deltaV1);
+				let den = (deltaU1 * deltaV2 - deltaU2 * deltaV1);
+				let tangent = null;
+				if (den==0) {
+					let n = new bg.Vector3(plist.normal[v0i], plist.normal[v0i + 1], plist.normal[v0i + 2]);
+
+					invalidUV = true;
+					tangent = new bg.Vector3(n.y, n.z, n.x);
+				}
+				else {
+					let f = 1 / den;
 				
-				let tangent = new bg.Vector3(f * (deltaV2 * edge1.x - deltaV1 * edge2.x),
-											   f * (deltaV2 * edge1.y - deltaV1 * edge2.y),
-											   f * (deltaV2 * edge1.z - deltaV1 * edge2.z));
-				tangent.normalize();
+					tangent = new bg.Vector3(f * (deltaV2 * edge1.x - deltaV1 * edge2.x),
+												   f * (deltaV2 * edge1.y - deltaV1 * edge2.y),
+												   f * (deltaV2 * edge1.z - deltaV1 * edge2.z));
+					tangent.normalize();
+				}
+				
 				if (generatedIndexes[v0i]===undefined) {
 					result.push(tangent.x);
 					result.push(tangent.y);
@@ -4542,6 +4607,9 @@ Object.defineProperty(bg, "isElectronApp", {
 			for (let i=0; i<plist.vertex.length; i+=3) {
 				plist._tangent.push(0,0,1);
 			}
+		}
+		if (invalidUV) {
+			console.warn("Invalid UV texture coords found. Some objects may present artifacts in the lighting, and not display textures properly.")
 		}
 		return result;
 	}
@@ -4836,6 +4904,61 @@ Object.defineProperty(bg, "isElectronApp", {
 	}
 	
 	bg.base.RedEffect = RedEffect;
+})();
+(function() {
+
+    class RenderQueue {
+        constructor() {
+            this._opaqueQueue = [];
+            this._transparentQueue = [];
+            this._worldCameraPosition = new bg.Vector3(0);
+        }
+
+        beginFrame(worldCameraPosition) {
+            this._opaqueQueue = [];
+            this._transparentQueue = [];
+            this._worldCameraPosition.assign(worldCameraPosition);
+        }
+
+        renderOpaque(plist, mat, trx, viewMatrix) {
+            this._opaqueQueue.push({
+                plist:plist,
+                material:mat,
+                modelMatrix:new bg.Matrix4(trx),
+                viewMatrix: new bg.Matrix4(viewMatrix)
+            });
+        }
+
+        renderTransparent(plist, mat, trx, viewMatrix) {
+            let pos = trx.position;
+            pos.sub(this._worldCameraPosition);
+            this._opaqueQueue.push({
+                plist:plist,
+                material:mat,
+                modelMatrix:new bg.Matrix4(trx),
+                viewMatrix: new bg.Matrix4(viewMatrix),
+                cameraDistance: pos.magnitude()
+            });
+        }
+
+        sortTransparentObjects() {
+            this._transparentQueue.sort((a,b) => {
+                return a.cameraDistance > b.cameraDistance;
+            });
+        }
+
+        get opaqueQueue() {
+            return this._opaqueQueue;
+        }
+
+        get transparentQueue() {
+            return this._transparentQueue;
+        }
+
+
+    }
+
+    bg.base.RenderQueue = RenderQueue;
 })();
 (function() {
 	
@@ -8337,6 +8460,13 @@ bg.scene = {};
 		set context(c) { this._context = c; }
 	}
 	
+	function updateComponentsArray() {
+		this._componentsArray = [];
+		for (let key in this._components) {
+			this._components[key] && this._componentsArray.push(this._components[key]);
+		}
+	}
+
 	class SceneObject extends SceneObjectLifeCycle {
 		
 		constructor(context,name="") {
@@ -8347,6 +8477,7 @@ bg.scene = {};
 			this._steady = false;
 			
 			this._components = {};
+			this._componentsArray = [];
 		}
 
 		toString() {
@@ -8379,6 +8510,7 @@ bg.scene = {};
 			c._node = this;
 			this._components[c.typeId] = c;
 			c.addedToNode(this);
+			updateComponentsArray.apply(this);
 		}
 		
 		// It's possible to remove a component by typeId or by the specific object.
@@ -8396,13 +8528,15 @@ bg.scene = {};
 				typeId = findComponent.typeId;
 			}
 			
+			let status = false;
 			if (this._components[typeId]==comp && comp!=null) {
 				delete this._components[typeId];
 				comp.removedFromNode(this);
-				return true;
+				status = true;
 			}
 
-			return false;
+			updateComponentsArray.apply(this);
+			return status;
 		}
 		
 		component(typeId) {
@@ -8419,30 +8553,15 @@ bg.scene = {};
 		get transform() { return this.component("bg.scene.Transform"); }
 		
 		forEachComponent(callback) {
-			let keys = Object.keys(this._components);
-			for (let key of keys) {
-				callback(this._components[key],key,this._components);
-			}
+			this._componentsArray.forEach(callback);
 		}
 		
 		someComponent(callback) {
-			let keys = Object.keys(this._components);
-			for (let key of keys) {
-				if (callback(this._components[key],key,this._components)) {
-					return true;
-				}
-			}
-			return false;
+			return this._componentsArray.some(callback);
 		}
 		
 		everyComponent(callback) {
-			let keys = Object.keys(this._components);
-			for (let key of keys) {
-				if (!callback(this._components[key],key,this._components)) {
-					return false;
-				}
-			}
-			return true;
+			return this._componentsArray.every(callback);
 		}
 		
 		destroy() {
@@ -8451,16 +8570,17 @@ bg.scene = {};
 			});
 			
 			this._components = {};
+			this._componentsArray = [];
 		}
 		
 		init() {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.init();
 			});
 		}
 		
 		frame(delta) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				if (!comp._initialized_) {
 					comp.init();
 					comp._initialized_ = true;
@@ -8469,98 +8589,123 @@ bg.scene = {};
 			});
 		}
 		
+		displayGizmo(pipeline,matrixState) {
+			this._componentsArray.forEach((comp) => {
+				if (comp.draw3DGizmo) comp.displayGizmo(pipeline,matrixState);
+			});
+		}
+
+		/////// Direct rendering methods: will be deprecated soon
 		willDisplay(pipeline,matrixState) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.willDisplay(pipeline,matrixState);
 			});
 		}
 		
 		display(pipeline,matrixState,forceDraw=false) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.display(pipeline,matrixState,forceDraw);
 			});
 		}
 
-		displayGizmo(pipeline,matrixState) {
-			this.forEachComponent((comp) => {
-				if (comp.draw3DGizmo) comp.displayGizmo(pipeline,matrixState);
-			});
-		}
 		
 		didDisplay(pipeline,matrixState) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.didDisplay(pipeline,matrixState);
 			});
 		}
+		//////// End direct rendering methods
+
+
+		////// Render queue methods
+		willUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			this._componentsArray.forEach((comp) => {
+				comp.willUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack);
+			});
+		}
+
+		draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			this._componentsArray.forEach((comp) => {
+				comp.draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack);
+			});
+		}
+
+		didUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			this._componentsArray.forEach((comp) => {
+				comp.didUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack);
+			});
+		}
+		////// End render queue methods
+
 		
 		reshape(pipeline,matrixState,width,height) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.reshape(width,height);
 			});
 		}
 		
 		keyDown(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.keyDown(evt);
 			});
 		}
 		
 		keyUp(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.keyUp(evt);
 			});
 		}
 		
 		mouseUp(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseUp(evt);
 			});
 		}
 		
 		mouseDown(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseDown(evt);
 			});
 		}
 		
 		mouseMove(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseMove(evt);
 			});
 		}
 		
 		mouseOut(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseOut(evt);
 			});
 		}
 		
 		mouseDrag(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseDrag(evt);
 			});
 		}
 		
 		mouseWheel(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.mouseWheel(evt);
 			});
 		}
 		
 		touchStart(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.touchStart(evt);
 			});
 		}
 		
 		touchMove(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.touchMove(evt);
 			});
 		}
 		
 		touchEnd(evt) {
-			this.forEachComponent((comp) => {
+			this._componentsArray.forEach((comp) => {
 				comp.touchEnd(evt);
 			});
 		}
@@ -8952,6 +9097,9 @@ bg.scene = {};
 			
 			this._visitor = new bg.scene.TransformVisitor();
 			this._rebuildTransform = true;
+
+			this._position = new bg.Vector3(0);
+			this._rebuildPosition = true;
 			
 			this._clearBuffers = bg.base.ClearBuffers.COLOR_DEPTH;
 			
@@ -9023,6 +9171,15 @@ bg.scene = {};
 			return this._viewMatrix;
 		}
 
+		get worldPosition() {
+			if (this._rebuildPosition) {
+				this._position = this.modelMatrix.multVector(new bg.Vector3(0)).xyz
+				this._rebuildPosition = false;
+				this._rebuildTransform = true;
+			}
+			return this._position;
+		}
+
 		recalculateGizmo() {
 			if (this._gizmo) {
 				this._gizmo.destroy();
@@ -9031,6 +9188,7 @@ bg.scene = {};
 		}
 		
 		frame(delta) {
+			this._rebuildPosition = true;
 			this._rebuildTransform = true;
 		}
 
@@ -9106,6 +9264,32 @@ bg.scene = {};
 		return this._gizmo;
 	}
 	
+	function updateJointTransforms() {
+		if (this.node) {
+			let matrix = bg.Matrix4.Identity();
+			this.node.children.forEach((child, index) => {
+				let trx = child.component("bg.scene.Transform");
+				let inJoint = child.component("bg.scene.InputChainJoint");
+				let outJoint = child.component("bg.scene.OutputChainJoint");
+				
+				if (index>0 && inJoint) {
+					inJoint.joint.applyTransform(matrix);
+				}
+				else {
+					matrix.identity();
+				}
+				
+				if (trx) {
+					trx.matrix.assign(matrix);
+				}
+				
+				if (outJoint) {
+					outJoint.joint.applyTransform(matrix);
+				}
+			});
+		}
+	}
+
 	class Chain extends bg.scene.Component {
 		constructor() {
 			super();
@@ -9114,31 +9298,16 @@ bg.scene = {};
 		clone() {
 			return new bg.scene.Chain();
 		}
-		
-		willDisplay(pipeline,matrixState) {
-			if (this.node) {
-				let matrix = bg.Matrix4.Identity();
-				this.node.children.forEach((child, index) => {
-					let trx = child.component("bg.scene.Transform");
-					let inJoint = child.component("bg.scene.InputChainJoint");
-					let outJoint = child.component("bg.scene.OutputChainJoint");
-					
-					if (index>0 && inJoint) {
-						inJoint.joint.applyTransform(matrix);
-					}
-					else {
-						matrix.identity();
-					}
-					
-					if (trx) {
-						trx.matrix.assign(matrix);
-					}
-					
-					if (outJoint) {
-						outJoint.joint.applyTransform(matrix);
-					}
-				});
-			}
+
+
+		////// Direct rendering functions: will be deprecated soon
+		willDisplay(pipeline,matrixState,projectionMatrixStack) {
+			updateJointTransforms.apply(this);
+		}
+
+		////// Render queue functions
+		willUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			updateJointTransforms.apply(this);
 		}
 	}
 	
@@ -9389,6 +9558,30 @@ bg.scene = {};
 })();
 (function() {
 
+	function escapePathCharacters(name) {
+		if (!name) {
+			return bg.utils.generateUUID();
+		}
+		else {
+			var illegalRe = /[\/\?<>\\:\*\|":\[\]\(\)\{\}]/g;
+			var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+			var reservedRe = /^\.+$/;
+			var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+			var windowsTrailingRe = /[\. ]+$/;
+
+			function sanitize(input, replacement) {
+				var sanitized = input
+					.replace(illegalRe, replacement)
+					.replace(controlRe, replacement)
+					.replace(reservedRe, replacement)
+					.replace(windowsReservedRe, replacement)
+					.replace(windowsTrailingRe, replacement);
+				return sanitized;
+			}
+
+			return sanitize(name,'-');
+		}
+	}
 	class Drawable extends bg.scene.Component {
 				
 		// It creates a copy of the node with all its components, except the drawable
@@ -9576,6 +9769,7 @@ bg.scene = {};
 			return true;
 		}
 		
+		////// Direct rendering method: will be deprecated soon
 		display(pipeline,matrixState,forceDraw=false) {
 			if (!pipeline.effect) {
 				throw new Error("Could not draw component: invalid effect found.");
@@ -9607,6 +9801,31 @@ bg.scene = {};
 					}
 				});
 			}
+		}
+
+		//// Render queue method
+		draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			if (!this.node.enabled) {
+				return;
+			}
+
+			this.forEach((plist,mat,trx) => {
+				if (trx) {
+					modelMatrixStack.push();
+					modelMatrixStack.mult(trx);
+				}
+
+				if (mat.isTransparent) {
+					renderQueue.renderTransparent(plist,mat,modelMatrixStack.matrix,viewMatrixStack.matrix);
+				}
+				else {
+					renderQueue.renderOpaque(plist,mat,modelMatrixStack.matrix,viewMatrixStack.matrix);
+				}
+
+				if (trx) {
+					modelMatrixStack.pop(trx);
+				}
+			});
 		}
 		
 		setGroupVisible(groupName,visibility=true) {
@@ -9656,9 +9875,8 @@ bg.scene = {};
 				return;
 			}
 			super.serialize(componentData,promises,url);
-			if (!this.name) {
-				this.name = bg.utils.generateUUID();
-			}
+			this.name = escapePathCharacters(this.name);
+		
 			componentData.name = this.name;
 			const path = require('path');
 			let dst = path.join(url.path,componentData.name + ".vwglb");
@@ -10989,6 +11207,32 @@ bg.scene = {};
             }
         }
 
+        draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+            if (this._textures.length==6) {
+                viewMatrixStack.push();
+                modelMatrixStack.push();
+
+                viewMatrixStack.matrix.setPosition(0,0,0);
+
+                let projectionMatrix = projectionMatrixStack.matrix;
+                let m22 = -projectionMatrix.m22;
+                let m32 = -projectionMatrix.m32;
+                let far = (2.0*m32)/(2.0*m22-2.0);
+                
+                let offset = 1;
+                let scale = bg.Math.sin(bg.Math.PI_4) * far - offset;
+                modelMatrixStack.scale(scale,scale,scale);
+
+                this._plist.forEach((pl,index) => {
+                    this._material.texture = this._textures[index];
+                    renderQueue.renderOpaque(pl,this._material.clone(),modelMatrixStack.matrix,viewMatrixStack.matrix);
+                })
+
+                viewMatrixStack.pop();
+                modelMatrixStack.pop();
+            }
+        }
+
         removedFromNode() {
             this._plist.forEach((pl) => {
                 pl.destroy();
@@ -11153,6 +11397,7 @@ bg.scene = {};
             }
         }
 
+        ////// Direct rendering functions: will be deprecated soon
         display(pipeline,matrixState) {
             if (!pipeline.effect) {
                 throw new Error("Could not draw TextRect: invalid effect");
@@ -11174,6 +11419,23 @@ bg.scene = {};
                     matrixState.modelMatrixStack.pop();
                     pipeline.effect.material = curMaterial;
                 }
+            }
+        }
+
+        ///// Render queue functions
+        draw(renderQueue,modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+            if (this._sprite && this._material) {
+                modelMatrixStack.push();
+                modelMatrixStack.mult(this._sizeMatrix);
+
+                if (this._material.isTransparent) {
+					renderQueue.renderTransparent(this._sprite,this._material,modelMatrixStack.matrix,viewMatrixStack.matrix);
+				}
+				else {
+					renderQueue.renderOpaque(this._sprite,this._material,modelMatrixStack.matrix,viewMatrixStack.matrix);
+				}
+
+                modelMatrixStack.pop();
             }
         }
 
@@ -11289,6 +11551,8 @@ bg.scene = {};
 			componentData.transformMatrix = this._matrix.toArray();
 		}
 		
+		// The direct render methods will be deprecated soon
+		////// Direct render methods
 		willDisplay(pipeline,matrixState) {
 			if (this.node && this.node.enabled) {
 				matrixState.modelMatrixStack.push();
@@ -11302,6 +11566,24 @@ bg.scene = {};
 			}
 			this._globalMatrixValid = false;
 		}
+		////// End direct render methods
+
+
+		////// Render queue methods
+		willUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			if (this.node && this.node.enabled) {
+				modelMatrixStack.push();
+				modelMatrixStack.mult(this.matrix);
+			}
+		}
+
+		didUpdate(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			if (this.node && this.node.enabled) {
+				modelMatrixStack.pop();
+			}
+			this._globalMatrixValid = false;
+		}
+		////// End render queue methods
 		
 	}
 	
@@ -11335,6 +11617,38 @@ bg.scene = {};
 	}
 	
 	bg.scene.DrawVisitor = DrawVisitor;
+
+	class RenderQueueVisitor extends bg.scene.NodeVisitor {
+		constructor(modelMatrixStack,viewMatrixStack,projectionMatrixStack) {
+			super();
+			this._modelMatrixStack = modelMatrixStack || new bg.base.MatrixStack();
+			this._viewMatrixStack = viewMatrixStack || new bg.base.MatrixStack();
+			this._projectionMatrixStack = projectionMatrixStack || new bg.base.MatrixStack();
+			this._renderQueue = new bg.base.RenderQueue();
+		}
+
+		get modelMatrixStack() { return this._modelMatrixStack; }
+		set modelMatrixStack(m) { this._modelMatrixStack = m; }
+
+		get viewMatrixStack() { return this._viewMatrixStack; }
+		set viewMatrixStack(m) { this._viewMatrixStack = m; }
+
+		get projectionMatrixStack() { return this._projectionMatrixStack }
+		set projectionMatrixStack(m) { this._projectionMatrixStack = m; }
+
+		get renderQueue() { return this._renderQueue; }
+
+		visit(node) {
+			node.willUpdate(this._modelMatrixStack);
+			node.draw(this._renderQueue,this._modelMatrixStack, this._viewMatrixStack, this._projectionMatrixStack);
+		}
+
+		didVisit(node) {
+			node.didUpdate(this._modelMatrixStack, this._viewMatrixStack, this._projectionMatrixStack);
+		}
+	}
+
+	bg.scene.RenderQueueVisitor = RenderQueueVisitor;
 	
 	class FrameVisitor extends bg.scene.NodeVisitor {
 		constructor() {
@@ -11734,7 +12048,7 @@ bg.scene = {};
 					break;
 				case 'plst':
 				case 'endf':
-					if (block=='endf') {
+					if (block=='endf' && (offset + 4)<data.byteLength) {
 						try {
 							block = readBlock(data,offset);
 							offset += 4;
@@ -11752,6 +12066,9 @@ bg.scene = {};
 						catch (err) {
 							console.error(err.message);
 						}
+						done = true;
+					}
+					else if ((offset + 4)>=data.byteLength) {
 						done = true;
 					}
 
@@ -13611,6 +13928,8 @@ bg.manipulation = {};
             
             let texture = this._offscreenPipeline.renderSurface.getTexture(0);
             bg.base.Pipeline.SetCurrent(this._pipeline);
+            this._pipeline.blend = true;
+            this._pipeline.blendMode = bg.base.BlendMode.ADD;
             this._pipeline.drawTexture(texture);
 
             if (restorePipeline) {
@@ -14596,17 +14915,17 @@ bg.render = {
 					vec4 material = texture2D(inMaterial,fsTexCoord);
 
 					vec4 specular = texture2D(inSpecularMap,fsTexCoord);	// The roughness parameter is stored on A component, inside specular map
-
-					float roughness = specular.a;
-					float ssrtScale = inSSRTScale;
-					roughness *= 250.0 * ssrtScale;
-					vec4 reflect = blur(inReflection,fsTexCoord,int(roughness),inViewSize * ssrtScale);
-
+					
 					vec4 opaqueDepth = texture2D(inOpaqueDepthMap,fsTexCoord);
 					if (pos.z<opaqueDepth.z && opaqueDepth.w<1.0) {
 						discard;
 					}
 					else {
+						float roughness = specular.a;
+						float ssrtScale = inSSRTScale;
+						roughness *= 250.0 * ssrtScale;
+						vec4 reflect = blur(inReflection,fsTexCoord,int(roughness),inViewSize * ssrtScale);
+
 						float reflectionAmount = material.b;
 						vec3 finalColor = lighting.rgb * (1.0 - reflectionAmount);
 						finalColor += reflect.rgb * reflectionAmount * diffuse.rgb + shin.rgb;
@@ -14873,7 +15192,9 @@ bg.render = {
 		get pipeline() { return this._mix; }
 		get texture() { return this.maps.mix; }
 
-		draw(scene,camera) {
+		// TODO: Scene is used by the shadow map generator, but the shadow map can also be
+		// modified to use the render queue
+		draw(renderQueue,scene,camera) {
 			g_ssaoScale = this.settings.ambientOcclusion.scale || 1;
 			g_ssrtScale = this.settings.raytracer.scale || 0.5;
 
@@ -14881,7 +15202,7 @@ bg.render = {
 			this.matrixState.viewMatrixStack.set(camera.viewMatrix);
 			this.matrixState.modelMatrixStack.identity();
 			
-			this.performDraw(scene,camera);
+			this.performDraw(renderQueue,scene,camera);
 		}
 		
 		get maps() { return this._surfaces; }
@@ -14894,16 +15215,31 @@ bg.render = {
 			this.maps.resize(new bg.Size2D(vp.width,vp.height));
 		}
 		
-		performDraw(scene,camera) {
+		performDraw(renderQueue,scene,camera) {
+			let activeQueue = this._opacityLayer==bg.base.OpacityLayer.OPAQUE ? renderQueue.opaqueQueue : renderQueue.transparentQueue;
+
+			let performRenderQueue = (queue,pipeline) => {
+				this.matrixState.modelMatrixStack.push();
+				this.matrixState.viewMatrixStack.push();
+				queue.forEach((objectData) => {
+					this.matrixState.modelMatrixStack.set(objectData.modelMatrix);
+					this.matrixState.viewMatrixStack.set(objectData.viewMatrix);
+					pipeline.effect.material = objectData.material;
+					pipeline.draw(objectData.plist);
+				});
+				this.matrixState.modelMatrixStack.pop();
+				this.matrixState.viewMatrixStack.pop();
+			}
+
 			bg.base.Pipeline.SetCurrent(this._gbufferUbyte);
 			this._gbufferUbyte.viewport = camera.viewport;
 			this._gbufferUbyte.clearBuffers();
-			scene.accept(this.ubyteVisitor);
+			performRenderQueue(activeQueue,this._gbufferUbyte);
 			
 			bg.base.Pipeline.SetCurrent(this._gbufferFloat);
 			this._gbufferFloat.viewport = camera.viewport;
 			this._gbufferFloat.clearBuffers();
-			scene.accept(this.floatVisitor);
+			performRenderQueue(activeQueue,this._gbufferFloat);
 
 			// Render lights
 			this._lighting.viewport = camera.viewport;
@@ -15039,6 +15375,8 @@ bg.render = {
 		create() {
 			let ctx = this.context;
 
+			this._renderQueueVisitor = new bg.scene.RenderQueueVisitor();
+
 			this._opaqueLayer = new bg.render.DeferredRenderLayer(ctx);
 			this._opaqueLayer.settings = this.settings;
 			this._opaqueLayer.createOpaque();
@@ -15113,8 +15451,18 @@ bg.render = {
 				this._transparentLayer.resize(camera);
 			}
 			
-			this._opaqueLayer.draw(scene,camera);
-			this._transparentLayer.draw(scene,camera);
+
+			// Update render queue
+			this._renderQueueVisitor.modelMatrixStack.identity();
+			this._renderQueueVisitor.projectionMatrixStack.push();
+			this._renderQueueVisitor.projectionMatrixStack.set(camera.projection);
+			this._renderQueueVisitor.viewMatrixStack.set(camera.viewMatrix);
+			this._renderQueueVisitor.renderQueue.beginFrame(camera.worldPosition);
+			scene.accept(this._renderQueueVisitor);
+			this._renderQueueVisitor.renderQueue.sortTransparentObjects();
+			this._opaqueLayer.draw(this._renderQueueVisitor.renderQueue,scene,camera);
+			this._transparentLayer.draw(this._renderQueueVisitor.renderQueue,scene,camera);
+			this._renderQueueVisitor.projectionMatrixStack.pop();
 
 			bg.base.Pipeline.SetCurrent(this._mixPipeline);
 			this._mixPipeline.viewport = camera.viewport;
@@ -15209,22 +15557,21 @@ bg.render = {
 		set shadowMap(sm) { this._shadowMap = sm; }
 		get shadowMap() { return this._shadowMap; }
 		
-		draw(scene,camera) {
+		draw(renderQueue,scene,camera) {
 			bg.base.Pipeline.SetCurrent(this._pipeline);
 			this._pipeline.viewport = camera.viewport;
 			
 			if (camera.clearBuffers!=0) {
 				this._pipeline.clearBuffers();
 			}
-			
-			this.matrixState.projectionMatrixStack.set(camera.projection);
-			this.matrixState.viewMatrixStack.set(camera.viewMatrix);
 		
+			this.matrixState.projectionMatrixStack.set(camera.projection);
+			
 			bg.base.Pipeline.SetCurrent(this._pipeline);
 			this._pipeline.viewport = camera.viewport;
 
 			this.willDraw(scene,camera);
-			this.performDraw(scene,camera);
+			this.performDraw(renderQueue,scene,camera);
 		}
 
 		willDraw(scene,camera) {
@@ -15242,9 +15589,18 @@ bg.render = {
 			}
 		}
 
-		performDraw(scene,camera) {
+		performDraw(renderQueue,scene,camera) {
 			this._pipeline.viewport = camera.viewport;
-			scene.accept(this.drawVisitor);
+
+			let activeQueue = this._pipeline.opacityLayer==bg.base.OpacityLayer.OPAQUE ? renderQueue.opaqueQueue : renderQueue.transparentQueue;
+			this.matrixState.modelMatrixStack.push();
+			activeQueue.forEach((objectData) => {
+				this.matrixState.modelMatrixStack.set(objectData.modelMatrix);
+				this.matrixState.viewMatrixStack.set(objectData.viewMatrix);
+				this._pipeline.effect.material = objectData.material;
+				this._pipeline.draw(objectData.plist);
+			});
+			this.matrixState.modelMatrixStack.pop();
 		}
 	}
 	
@@ -15268,6 +15624,8 @@ bg.render = {
 			this._shadowMap.size = new bg.Vector2(2048);
 
 			this.settings.shadows.cascade = bg.base.ShadowCascade.NEAR;
+
+			this._renderQueueVisitor = new bg.scene.RenderQueueVisitor
 		}
 
 		draw(scene,camera) {
@@ -15298,10 +15656,17 @@ bg.render = {
 				this._transparentLayer.shadowMap = this._shadowMap;
 			}
 
+			// Update render queue
+			this._renderQueueVisitor.projectionMatrixStack.set(camera.projection);
+			this._renderQueueVisitor.modelMatrixStack.identity();
+			this._renderQueueVisitor.viewMatrixStack.set(camera.viewMatrix);
+			this._renderQueueVisitor.renderQueue.beginFrame(camera.worldPosition);
+			scene.accept(this._renderQueueVisitor);
+			this._renderQueueVisitor.renderQueue.sortTransparentObjects();
 
 			this._opaqueLayer.pipeline.clearColor = this.clearColor;
-			this._opaqueLayer.draw(scene,camera);
-			this._transparentLayer.draw(scene,camera);
+			this._opaqueLayer.draw(this._renderQueueVisitor.renderQueue,scene,camera);
+			this._transparentLayer.draw(this._renderQueueVisitor.renderQueue,scene,camera);
 		}
 
 		getImage(scene,camera,width,height) {
@@ -16299,9 +16664,10 @@ bg.render = {
 							renderFrame = true;
 						}
 
-						if (renderFrame) {
+						vec4 material = texture2D(inMaterialMap,fsTexCoord);
+						if (renderFrame && material.b>0.0) {	// material[2] is reflectionAmount
 							vec3 normal = texture2D(inNormalMap,fsTexCoord).xyz * 2.0 - 1.0;
-							vec4 material = texture2D(inMaterialMap,fsTexCoord);
+							
 							vec4 specular = texture2D(inSpecularMap,fsTexCoord);
 							float roughness = specular.a * 0.3;
 							vec3 r = texture2D(inRandomTexture,fsTexCoord*200.0).xyz * 2.0 - 1.0;
@@ -16319,7 +16685,7 @@ bg.render = {
 							
 							float increment = ${q.rayIncrement};
 							vec4 result = rayFailColor;
-							if (!inBasicMode && material.b>0.0) {	// material[2] is reflectionAmount
+							if (!inBasicMode) {
 								result = rayFailColor;
 								for (float i=0.0; i<${q.maxSamples}.0; ++i) {
 									if (i==${q.maxSamples}.0) {
@@ -17953,20 +18319,18 @@ bg.webgl1 = {};
 
 		setCubemapImage(context,face,image) {
 			context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, false);
+			context.texParameteri(context.TEXTURE_CUBE_MAP, context.TEXTURE_MIN_FILTER, bg.base.TextureFilter.LINEAR);
+			context.texParameteri(context.TEXTURE_CUBE_MAP, context.TEXTURE_MAG_FILTER, bg.base.TextureFilter.LINEAR);
 			context.texImage2D(face, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-			//if (this.requireMipmaps(minFilter,magFilter)) {
-				context.generateMipmap(face);
-			//}
 		}
 
 		setCubemapRaw(context,face,rawImage,w,h) {
 			let type = context.RGBA;
 			let format = context.UNSIGNED_BYTE;
+			context.texParameteri(context.TEXTURE_CUBE_MAP, context.TEXTURE_MIN_FILTER, bg.base.TextureFilter.LINEAR);
+			context.texParameteri(context.TEXTURE_CUBE_MAP, context.TEXTURE_MAG_FILTER, bg.base.TextureFilter.LINEAR);
 			context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, false);
 			context.texImage2D(face, 0, type, w, h, 0, type, format, rawImage);
-			//if (this.requireMipmaps(minFilter,magFilter)) {
-				context.generateMipmap(face);
-			//}
 		}
 
 		setVideo(context,target,texture,video,flipY) {
