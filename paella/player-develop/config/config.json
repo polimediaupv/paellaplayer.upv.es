@@ -104,7 +104,6 @@
     "enabled": true,
     "dataDelegates": {
       "trimming": "CookieDataDelegate",
-      "visualAnnotations": "VisualAnnotationsDataDelegate",
       "metadata": "VideoManifestMetadataDataDelegate",
       "cameraTrack": "TrackCameraDataDelegate"
     }
@@ -283,7 +282,7 @@
         "enabled": true
       },
       "es.upv.paella.track4kPlugin": {
-        "enabled": true
+        "enabled": false
       },
       "//**** Video profile plugins": "",
       "es.upv.paella.singleStreamProfilePlugin": {
@@ -391,6 +390,11 @@
         "site_id": 1,
         "heartbeat": 30,
         "client_id": "Paella Player"
+      },
+      "org.opencast.usertracking.x5gonSaverPlugIn": {
+        "enabled": false,
+        "token": "X5GON_TOKEN",
+        "testing_environment": false
       },
       "es.teltek.paella.usertracking.xAPISaverPlugin": {
         "enabled": false,
