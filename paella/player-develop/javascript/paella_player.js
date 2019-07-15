@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: d2637ea";
+paella.version = "6.2.0 - build: 4625dff";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6351,7 +6351,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "getMinWindowSize",
       value: function getMinWindowSize() {
-        return 0;
+        return this.config.minWindowSize || 0;
       }
     }, {
       key: "buildContent",
@@ -10667,11 +10667,6 @@ paella.addPlugin(function () {
         return base.dictionary.translate(this.formatMessage());
       }
     }, {
-      key: "getMinWindowSize",
-      value: function getMinWindowSize() {
-        return 510;
-      }
-    }, {
       key: "checkEnabled",
       value: function checkEnabled(onSuccess) {
         onSuccess(!paella.player.isLiveStream());
@@ -12902,11 +12897,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 2040;
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 400;
         }
       }, {
         key: "getName",
@@ -15382,11 +15372,6 @@ paella.addPlugin(function () {
           return 2030;
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 550;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.extendedTabAdapterPlugin";
@@ -15820,11 +15805,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 510;
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 450;
         }
       }, {
         key: "getName",
@@ -16437,11 +16417,6 @@ paella.addPlugin(function () {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.helpPlugin";
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 650;
         }
       }, {
         key: "getDefaultToolTip",
@@ -17410,11 +17385,6 @@ paella.addPlugin(function () {
           return 2030;
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 550;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.multipleQualitiesPlugin";
@@ -17891,11 +17861,6 @@ paella.addPlugin(function () {
           return 140;
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 500;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.playbackRatePlugin";
@@ -18045,11 +18010,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 540;
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 500;
         }
       }, {
         key: "getName",
@@ -18769,11 +18729,6 @@ paella.addPlugin(function () {
           return 'icon-binoculars';
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 550;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.searchPlugin";
@@ -19137,11 +19092,6 @@ paella.addPlugin(function () {
           return 560;
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 600;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.socialPlugin";
@@ -19376,11 +19326,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 2030;
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 600;
         }
       }, {
         key: "getName",
@@ -19706,11 +19651,6 @@ paella.addDataDelegate("cameraTrack", function () {
           key: "getIndex",
           value: function getIndex() {
             return 2030;
-          }
-        }, {
-          key: "getMinWindowSize",
-          value: function getMinWindowSize() {
-            return paella.player.config.player && paella.player.config.player.videoZoom && paella.player.config.player.videoZoom.minWindowSize || 600;
           }
         }, {
           key: "getName",
@@ -21996,11 +21936,6 @@ paella.addPlugin(function () {
           return 2030;
         }
       }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return paella.player.config.player && paella.player.config.player.videoZoom && paella.player.config.player.videoZoom.minWindowSize || 600;
-        }
-      }, {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.videoZoomToolbarPlugin";
@@ -22086,11 +22021,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 540;
-        }
-      }, {
-        key: "getMinWindowSize",
-        value: function getMinWindowSize() {
-          return 300;
         }
       }, {
         key: "getName",

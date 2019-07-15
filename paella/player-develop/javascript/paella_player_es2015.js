@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: d2637ea";
+paella.version = "6.2.0 - build: 4625dff";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4859,7 +4859,7 @@ class ButtonPlugin extends paella.UIPlugin {
 	}
 
 	getMinWindowSize() {
-		return 0;
+		return this.config.minWindowSize || 0;
 	}
 
 	buildContent(domElement) {
@@ -8439,7 +8439,6 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-back-10-s'; }
 		formatMessage() { return 'Rewind 10 seconds'; }
 		getDefaultToolTip() { return base.dictionary.translate(this.formatMessage()); }
-		getMinWindowSize() { return 510; }
 	
 		checkEnabled(onSuccess) {
 			onSuccess(!paella.player.isLiveStream());
@@ -9953,7 +9952,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "audioSelector"; }
 		getIconClass() { return 'icon-headphone'; }
 		getIndex() { return 2040; }
-		getMinWindowSize() { return 400; }
 		getName() { return "es.upv.paella.audioSelector"; }
 		getDefaultToolTip() { return base.dictionary.translate("Set audio stream"); }
 
@@ -12079,7 +12077,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "extendedTabAdapterPlugin"; }
 		getIconClass() { return 'icon-folder'; }
 		getIndex() { return 2030; }
-		getMinWindowSize() { return 550; }
 		getName() { return "es.upv.paella.extendedTabAdapterPlugin"; }
 		getDefaultToolTip() { return base.dictionary.translate("Extended Tab Adapter"); }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
@@ -12321,7 +12318,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "frameControl"; }
 		getIconClass() { return 'icon-photo'; }
 		getIndex() { return 510; }
-		getMinWindowSize() { return 450; }
 		getName() { return "es.upv.paella.frameControlPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.timeLineButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Navigate by slides"); }
@@ -12775,7 +12771,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "helpButton"; }
 		getIconClass() { return 'icon-help'; }
 		getName() { return "es.upv.paella.helpPlugin"; }
-		getMinWindowSize() { return 650; }
 
 		getDefaultToolTip() { return base.dictionary.translate("Show help") + ' (' + base.dictionary.translate("Paella version:") + ' ' + paella.version + ')'; }
 
@@ -13477,7 +13472,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "showMultipleQualitiesPlugin"; }
 		getIconClass() { return 'icon-screen'; }
 		getIndex() { return 2030; }
-		getMinWindowSize() { return 550; }
 		getName() { return "es.upv.paella.multipleQualitiesPlugin"; }
 		getDefaultToolTip() { return base.dictionary.translate("Change video quality"); }
 		
@@ -13798,7 +13792,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "showPlaybackRateButton"; }
 		getIconClass() { return 'icon-screen'; }
 		getIndex() { return 140; }
-		getMinWindowSize() { return 500; }
 		getName() { return "es.upv.paella.playbackRatePlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Set playback rate"); }
@@ -13897,7 +13890,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "rateButtonPlugin"; }
 		getIconClass() { return 'icon-star'; }
 		getIndex() { return 540; }
-		getMinWindowSize() { return 500; }
 		getName() { return "es.upv.paella.ratePlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Rate this video"); }		
@@ -14473,7 +14465,6 @@ paella.addPlugin(function() {
 		getAlignment() { return 'right'; }
 		getSubclass() { return 'searchButton'; }
 		getIconClass() { return 'icon-binoculars'; }
-		getMinWindowSize() { return 550; }
 		getName() { return "es.upv.paella.searchPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }	
 		getDefaultToolTip() { return base.dictionary.translate("Search"); }
@@ -14790,7 +14781,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "showSocialPluginButton"; }
 		getIconClass() { return 'icon-social'; }
 		getIndex() { return 560; }
-		getMinWindowSize() { return 600; }
 		getName() { return "es.upv.paella.socialPlugin"; }
 		checkEnabled(onSuccess) { onSuccess(true); }
 		getDefaultToolTip() { return base.dictionary.translate("Share this video"); }
@@ -14973,7 +14963,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "themeChooserPlugin"; }
 		getIconClass() { return 'icon-paintbrush'; }
 		getIndex() { return 2030; }
-		getMinWindowSize() { return 600; }
 		getName() { return "es.upv.paella.themeChooserPlugin"; }	
 		getDefaultToolTip() { return base.dictionary.translate("Change theme"); }	
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
@@ -15208,9 +15197,6 @@ paella.addDataDelegate("cameraTrack",() => {
             getIconClass() { return 'icon-screen'; }
             closeOnMouseOut() { return true; }
             getIndex() { return 2030; }
-            getMinWindowSize() { return (paella.player.config.player &&
-                                        paella.player.config.player.videoZoom &&
-                                        paella.player.config.player.videoZoom.minWindowSize) || 600; }
             getName() { return "es.upv.paella.videoZoomTrack4kPlugin"; }
             getDefaultToolTip() { return base.dictionary.translate("Set video zoom"); }
             getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
@@ -17000,9 +16986,6 @@ paella.addPlugin(function() {
         getSubclass() { return "videoZoomToolbar"; }
         getIconClass() { return 'icon-screen'; }
         getIndex() { return 2030; }
-        getMinWindowSize() { return (paella.player.config.player &&
-                                    paella.player.config.player.videoZoom &&
-                                    paella.player.config.player.videoZoom.minWindowSize) || 600; }
         getName() { return "es.upv.paella.videoZoomToolbarPlugin"; }
         getDefaultToolTip() { return base.dictionary.translate("Set video zoom"); }
         getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
@@ -17049,7 +17032,6 @@ paella.addPlugin(function() {
 		getSubclass() { return "showViewModeButton"; }
 		getIconClass() { return 'icon-presentation-mode'; }
 		getIndex() { return 540; }
-		getMinWindowSize() { return 300; }
 		getName() { return "es.upv.paella.viewModePlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Change video layout"); }		

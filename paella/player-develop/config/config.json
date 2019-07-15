@@ -8,9 +8,8 @@
     },
     "reloadOnFullscreen": true,
     "videoZoom": {
-      "enabled": true,
-      "max": 800,
-      "minWindowSize": 500
+      "enabled": false,
+      "max": 800
     },
     "deprecated-methods": [
       {
@@ -127,7 +126,8 @@
       "edu.harvard.dce.paella.flexSkipPlugin": {
         "enabled": true,
         "direction": "Rewind",
-        "seconds": 10
+        "seconds": 10,
+        "minWindowSize": 510
       },
       "edu.harvard.dce.paella.flexSkipForwardPlugin": {
         "enabled": true,
@@ -139,7 +139,8 @@
         "searchOnCaptions": true
       },
       "es.upv.paella.extendedTabAdapterPlugin": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 400
       },
       "es.upv.paella.footprintsPlugin": {
         "enabled": false
@@ -147,7 +148,8 @@
       "es.upv.paella.frameControlPlugin": {
         "enabled": true,
         "showFullPreview": "auto",
-        "showCaptions": true
+        "showCaptions": true,
+        "minWindowSize": 450
       },
       "es.upv.paella.fullScreenButtonPlugin": {
         "enabled": true,
@@ -161,11 +163,13 @@
         "langs": [
           "en",
           "es"
-        ]
+        ],
+        "minWindowSize": 650
       },
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": true,
-        "showWidthRes": true
+        "showWidthRes": true,
+        "minWindowSize": 550
       },
       "es.upv.paella.playbackRatePlugin": {
         "enabled": true,
@@ -174,7 +178,8 @@
           1,
           1.25,
           1.5
-        ]
+        ],
+        "minWindowSize": 500
       },
       "es.upv.paella.playPauseButtonPlugin": {
         "enabled": true
@@ -182,16 +187,20 @@
       "es.upv.paella.searchPlugin": {
         "enabled": true,
         "sortType": "time",
-        "colorSearch": false
+        "colorSearch": false,
+        "minWindowSize": 550
       },
       "es.upv.paella.socialPlugin": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 600
       },
       "es.upv.paella.themeChooserPlugin": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 600
       },
       "es.upv.paella.viewModePlugin": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 300
       },
       "es.upv.paella.volumeRangePlugin": {
         "enabled": true,
@@ -202,22 +211,26 @@
         "enabled": true
       },
       "es.upv.paella.ratePlugin": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 500
       },
       "es.upv.paella.videoZoomPlugin": {
         "enabled": true
       },
       "es.upv.paella.audioSelector": {
-        "enabled": true
+        "enabled": true,
+        "minWindowSize": 400
       },
       "es.upv.paella.videoZoomToolbarPlugin": {
         "enabled": false,
-        "targetStreamIndex": 0
+        "targetStreamIndex": 0,
+        "minWindowSize": 500
       },
       "es.upv.paella.videoZoomTrack4kPlugin": {
         "enabled": true,
         "targetStreamIndex": 0,
-        "autoModeByDefault": false
+        "autoModeByDefault": false,
+        "minWindowSize": 500
       },
       "es.upv.paella.airPlayPlugin": {
         "enabled": true
