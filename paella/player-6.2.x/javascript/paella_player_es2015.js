@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: 1da22f9";
+paella.version = "6.2.0 - build: bca0402";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -47,7 +47,8 @@ paella.events = {
 	timeupdate:"paella:timeupdate",
 	timeUpdate:"paella:timeupdate",
 	seekTo:"paella:setseek",
-	endVideo:"paella:endvideo",
+	endVideo:"paella:endvideo",			// Triggered when a single video stream ends (once per video)
+	ended:"paella:ended",				// Triggered when the video ends 
 	seekToTime:"paella:seektotime",
 	setTrim:"paella:settrim",
 	setPlaybackRate:"paella:setplaybackrate",
@@ -2482,6 +2483,9 @@ class Html5Video extends paella.VideoElementBase {
 			this._resumeCurrentTime = this.video.currentTime;
 		});
 
+		$(this.video).bind('ended',(evt) => {
+			paella.events.trigger(paella.events.endVideo);
+		});
 
 		$(this.video).bind('emptied', (evt) => {
 			if (this._resumeCurrentTime && !isNaN(this._resumeCurrentTime)) {
@@ -3442,6 +3446,17 @@ class VideoContainerBase extends paella.DomNode {
 				paella.player.controls.restartHideTimer();
 			}
 		});
+
+		let endedTimer = null;
+		paella.events.bind(paella.events.endVideo,(event) => {
+			if (endedTimer) {
+				clearTimeout(endedTimer);
+				endedTimer = null;
+			}
+			endedTimer = setTimeout(() => {
+				paella.events.trigger(paella.events.ended);
+			}, 1000);
+		});
 	}
 
 	get seekDisabled() { return this._seekDisabled; }
@@ -4297,6 +4312,7 @@ class VideoContainer extends paella.VideoContainerBase {
 				})
 
 				.then(() => {
+					let endedTimer = null;
 					let eventBindingObject = this.masterVideo().video || this.masterVideo().audio;
 					$(eventBindingObject).bind('timeupdate', (evt) => {
 						this.trimming().then((trimmingData) => {
@@ -4309,6 +4325,13 @@ class VideoContainer extends paella.VideoContainerBase {
 							paella.events.trigger(paella.events.timeupdate, { videoContainer:this, currentTime:current, duration:duration });
 							if (current>=duration) {
 								this.streamProvider.callPlayerFunction('pause');
+								if (endedTimer) {
+									clearTimeout(endedTimer);
+									endedTimer = null;
+								}
+								endedTimer = setTimeout(() => {
+									paella.events.trigger(paella.events.ended);
+								}, 1000);
 							}
 						})
 					});
@@ -7574,6 +7597,7 @@ paella.ControlsContainer = ControlsContainer;
 		play() {
 			if (this.lazyLoadContainer) {
 				document.body.removeChild(this.lazyLoadContainer.domElement);
+				this.lazyLoadContainer = null;
 			}
 			return new Promise((resolve,reject) => {
 				this.videoContainer.play()
@@ -7651,7 +7675,7 @@ paella.ControlsContainer = ControlsContainer;
 		}
 
 		onLoadConfig(configData) {
-			paella.data = new paella.Data(configData);
+			//paella.data = new paella.Data(configData);
 	
 			this.config = configData;
 			this.videoIdentifier = paella.initDelegate.getId();
@@ -7677,6 +7701,7 @@ paella.ControlsContainer = ControlsContainer;
 						document.body.appendChild(this.lazyLoadContainer.domElement);
 						this.lazyLoadContainer.onClick(() => {
 							document.body.removeChild(this.lazyLoadContainer.domElement);
+							this.lazyLoadContainer = null;
 							this._onPlayClosure && this._onPlayClosure();
 						});
 						paella.events.trigger(paella.events.loadComplete);

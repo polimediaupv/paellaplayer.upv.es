@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: 1da22f9";
+paella.version = "6.2.0 - build: bca0402";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -74,6 +74,9 @@ paella.events = {
   timeUpdate: "paella:timeupdate",
   seekTo: "paella:setseek",
   endVideo: "paella:endvideo",
+  // Triggered when a single video stream ends (once per video)
+  ended: "paella:ended",
+  // Triggered when the video ends 
   seekToTime: "paella:seektotime",
   setTrim: "paella:settrim",
   setPlaybackRate: "paella:setplaybackrate",
@@ -3197,6 +3200,9 @@ function paella_DeferredNotImplemented() {
       $(_this25.video).bind('timeupdate', function (evt) {
         _this25._resumeCurrentTime = _this25.video.currentTime;
       });
+      $(_this25.video).bind('ended', function (evt) {
+        paella.events.trigger(paella.events.endVideo);
+      });
       $(_this25.video).bind('emptied', function (evt) {
         if (_this25._resumeCurrentTime && !isNaN(_this25._resumeCurrentTime)) {
           _this25.video.currentTime = _this25._resumeCurrentTime;
@@ -4464,6 +4470,17 @@ function paella_DeferredNotImplemented() {
         }
       });
 
+      var endedTimer = null;
+      paella.events.bind(paella.events.endVideo, function (event) {
+        if (endedTimer) {
+          clearTimeout(endedTimer);
+          endedTimer = null;
+        }
+
+        endedTimer = setTimeout(function () {
+          paella.events.trigger(paella.events.ended);
+        }, 1000);
+      });
       return _this60;
     }
 
@@ -5575,6 +5592,8 @@ function paella_DeferredNotImplemented() {
           }).then(function () {
             return _this82.setAudioTag(_this82.audioTag);
           }).then(function () {
+            var endedTimer = null;
+
             var eventBindingObject = _this82.masterVideo().video || _this82.masterVideo().audio;
 
             $(eventBindingObject).bind('timeupdate', function (evt) {
@@ -5595,6 +5614,15 @@ function paella_DeferredNotImplemented() {
 
                 if (current >= duration) {
                   _this82.streamProvider.callPlayerFunction('pause');
+
+                  if (endedTimer) {
+                    clearTimeout(endedTimer);
+                    endedTimer = null;
+                  }
+
+                  endedTimer = setTimeout(function () {
+                    paella.events.trigger(paella.events.ended);
+                  }, 1000);
                 }
               });
             });
@@ -9637,6 +9665,7 @@ function paella_DeferredNotImplemented() {
 
         if (this.lazyLoadContainer) {
           document.body.removeChild(this.lazyLoadContainer.domElement);
+          this.lazyLoadContainer = null;
         }
 
         return new Promise(function (resolve, reject) {
@@ -9748,7 +9777,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "onLoadConfig",
       value: function onLoadConfig(configData) {
-        paella.data = new paella.Data(configData);
+        //paella.data = new paella.Data(configData);
         this.config = configData;
         this.videoIdentifier = paella.initDelegate.getId();
 
@@ -9778,6 +9807,7 @@ function paella_DeferredNotImplemented() {
 
               _this115.lazyLoadContainer.onClick(function () {
                 document.body.removeChild(_this115.lazyLoadContainer.domElement);
+                _this115.lazyLoadContainer = null;
                 _this115._onPlayClosure && _this115._onPlayClosure();
               });
 
