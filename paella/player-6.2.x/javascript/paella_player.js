@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: bca0402";
+paella.version = "6.2.0 - build: 94ccaa4";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -3622,6 +3622,11 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "ready",
       get: function get() {
+        // Fix Firefox specific issue when video reaches the end
+        if (paella.utils.userAgent.browser.Firefox && this.video.currentTime == this.video.duration && this.video.readyState == 2) {
+          this.video.currentTime = 0;
+        }
+
         return this.video.readyState >= 3;
       }
     }]);
@@ -17667,6 +17672,13 @@ paella.addPlugin(function () {
             _this172.setToolTip(paella.dictionary.translate("Pause"));
           });
           paella.events.bind(paella.events.pause, function (event) {
+            _this172.changeIconClass(_this172.playIconClass);
+
+            _this172.changeSubclass(_this172.playSubclass);
+
+            _this172.setToolTip(paella.dictionary.translate("Play"));
+          });
+          paella.events.bind(paella.events.ended, function (event) {
             _this172.changeIconClass(_this172.playIconClass);
 
             _this172.changeSubclass(_this172.playSubclass);

@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: bca0402";
+paella.version = "6.2.0 - build: 94ccaa4";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2503,7 +2503,17 @@ class Html5Video extends paella.VideoElementBase {
 	
 	get video() { return this.domElement; }
 
-	get ready() { return this.video.readyState>=3; }
+	get ready() {
+		// Fix Firefox specific issue when video reaches the end
+		if (paella.utils.userAgent.browser.Firefox &&
+			this.video.currentTime==this.video.duration &&
+			this.video.readyState==2)
+		{
+			this.video.currentTime = 0;
+		}
+
+		return this.video.readyState>=3;
+	}
 
 
 	_deferredAction(action) {
@@ -13646,6 +13656,12 @@ paella.addPlugin(function() {
 			});
 
 			paella.events.bind(paella.events.pause,(event) => {
+				this.changeIconClass(this.playIconClass);
+				this.changeSubclass(this.playSubclass);
+				this.setToolTip(paella.dictionary.translate("Play"));
+			});
+
+			paella.events.bind(paella.events.ended,(event) => {
 				this.changeIconClass(this.playIconClass);
 				this.changeSubclass(this.playSubclass);
 				this.setToolTip(paella.dictionary.translate("Play"));
