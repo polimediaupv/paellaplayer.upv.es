@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: fba89c1";
+paella.version = "6.3.0 - build: c318f47";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2503,7 +2503,17 @@ class Html5Video extends paella.VideoElementBase {
 	
 	get video() { return this.domElement; }
 
-	get ready() { return this.video.readyState>=3; }
+	get ready() {
+		// Fix Firefox specific issue when video reaches the end
+		if (paella.utils.userAgent.browser.Firefox &&
+			this.video.currentTime==this.video.duration &&
+			this.video.readyState==2)
+		{
+			this.video.currentTime = 0;
+		}
+
+		return this.video.readyState>=3;
+	}
 
 
 	_deferredAction(action) {
@@ -4312,6 +4322,7 @@ class VideoContainer extends paella.VideoContainerBase {
 				})
 
 				.then(() => {
+					let endedTimer = null;
 					let eventBindingObject = this.masterVideo().video || this.masterVideo().audio;
 					$(eventBindingObject).bind('timeupdate', (evt) => {
 						this.trimming().then((trimmingData) => {
@@ -4324,7 +4335,13 @@ class VideoContainer extends paella.VideoContainerBase {
 							paella.events.trigger(paella.events.timeupdate, { videoContainer:this, currentTime:current, duration:duration });
 							if (current>=duration) {
 								this.streamProvider.callPlayerFunction('pause');
-								paella.events.trigger(paella.events.ended);
+								if (endedTimer) {
+									clearTimeout(endedTimer);
+									endedTimer = null;
+								}
+								endedTimer = setTimeout(() => {
+									paella.events.trigger(paella.events.ended);
+								}, 1000);
 							}
 						})
 					});
@@ -7590,6 +7607,7 @@ paella.ControlsContainer = ControlsContainer;
 		play() {
 			if (this.lazyLoadContainer) {
 				document.body.removeChild(this.lazyLoadContainer.domElement);
+				this.lazyLoadContainer = null;
 			}
 			return new Promise((resolve,reject) => {
 				this.videoContainer.play()
@@ -7667,7 +7685,7 @@ paella.ControlsContainer = ControlsContainer;
 		}
 
 		onLoadConfig(configData) {
-			paella.data = new paella.Data(configData);
+			//paella.data = new paella.Data(configData);
 	
 			this.config = configData;
 			this.videoIdentifier = paella.initDelegate.getId();
@@ -7693,6 +7711,7 @@ paella.ControlsContainer = ControlsContainer;
 						document.body.appendChild(this.lazyLoadContainer.domElement);
 						this.lazyLoadContainer.onClick(() => {
 							document.body.removeChild(this.lazyLoadContainer.domElement);
+							this.lazyLoadContainer = null;
 							this._onPlayClosure && this._onPlayClosure();
 						});
 						paella.events.trigger(paella.events.loadComplete);
@@ -13637,6 +13656,12 @@ paella.addPlugin(function() {
 			});
 
 			paella.events.bind(paella.events.pause,(event) => {
+				this.changeIconClass(this.playIconClass);
+				this.changeSubclass(this.playSubclass);
+				this.setToolTip(paella.dictionary.translate("Play"));
+			});
+
+			paella.events.bind(paella.events.ended,(event) => {
 				this.changeIconClass(this.playIconClass);
 				this.changeSubclass(this.playSubclass);
 				this.setToolTip(paella.dictionary.translate("Play"));
