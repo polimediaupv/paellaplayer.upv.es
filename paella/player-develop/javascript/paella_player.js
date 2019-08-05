@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: c318f47";
+paella.version = "6.3.0 - build: eb29582";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -4421,6 +4421,12 @@ function paella_DeferredNotImplemented() {
   }(paella.DomNode);
 
   paella.VideoWrapper = VideoWrapper;
+  paella.SeekType = {
+    FULL: 1,
+    BACKWARDS_ONLY: 2,
+    FORWARD_ONLY: 3,
+    DISABLED: 4
+  };
 
   var VideoContainerBase =
   /*#__PURE__*/
@@ -4455,6 +4461,8 @@ function paella_DeferredNotImplemented() {
       _this60._force = false;
       _this60._playOnClickEnabled = true;
       _this60._seekDisabled = false;
+      _this60._seekType = paella.SeekType.FULL;
+      _this60._seekTimeLimit = 0;
       $(_this60.domElement).click(function (evt) {
         if (_this60.firstClick && base.userAgent.browser.IsMobileVersion) return;
         if (_this60.firstClick && !_this60._playOnClickEnabled) return;
@@ -4504,6 +4512,7 @@ function paella_DeferredNotImplemented() {
           return _this61.currentTime();
         }).then(function (currentTime) {
           if (!paused || _this61._force) {
+            _this61._seekTimeLimit = currentTime > _this61._seekTimeLimit ? currentTime : _this61._seekTimeLimit;
             _this61._force = false;
             paella.events.trigger(paella.events.timeupdate, {
               videoContainer: _this61,
@@ -4566,22 +4575,56 @@ function paella_DeferredNotImplemented() {
       value: function seekTo(newPositionPercent) {
         var _this63 = this;
 
-        if (this._seekDisabled) {
-          console.log("Warning: Seek is disabled");
-          return;
-        }
+        return new Promise(function (resolve, reject) {
+          var time = 0;
+          paella.player.videoContainer.currentTime().then(function (t) {
+            time = t;
+            return paella.player.videoContainer.duration();
+          }).then(function (duration) {
+            if (_this63._seekTimeLimit > 0 && _this63._seekType == paella.SeekType.BACKWARDS_ONLY) {
+              time = _this63._seekTimeLimit;
+            }
 
-        var thisClass = this;
-        this.setCurrentPercent(newPositionPercent).then(function (timeData) {
-          thisClass._force = true;
+            var currentPercent = time / duration * 100;
 
-          _this63.triggerTimeupdate();
+            switch (_this63._seekType) {
+              case paella.SeekType.FULL:
+                break;
 
-          paella.events.trigger(paella.events.seekToTime, {
-            newPosition: timeData.time
-          });
-          paella.events.trigger(paella.events.seekTo, {
-            newPositionPercent: newPositionPercent
+              case paella.SeekType.BACKWARDS_ONLY:
+                if (newPositionPercent > currentPercent) {
+                  reject(new Error("Warning: Seek is disabled"));
+                  return;
+                }
+
+                break;
+
+              case paella.SeekType.FORWARD_ONLY:
+                if (newPositionPercent < currentPercent) {
+                  reject(new Error("Warning: Seek is disabled"));
+                  return;
+                }
+
+                break;
+
+              case paella.SeekType.DISABLED:
+                reject(new Error("Warning: Seek is disabled"));
+                return;
+            }
+
+            _this63.setCurrentPercent(newPositionPercent).then(function (timeData) {
+              _this63._force = true;
+
+              _this63.triggerTimeupdate();
+
+              paella.events.trigger(paella.events.seekToTime, {
+                newPosition: timeData.time
+              });
+              paella.events.trigger(paella.events.seekTo, {
+                newPositionPercent: newPositionPercent
+              });
+              resolve();
+            });
           });
         });
       }
@@ -4590,22 +4633,50 @@ function paella_DeferredNotImplemented() {
       value: function seekToTime(time) {
         var _this64 = this;
 
-        if (this._seekDisabled) {
-          console.log("Seek is disabled");
-          return;
-        }
+        return new Promise(function (resolve, reject) {
+          paella.player.videoContainer.currentTime().then(function (currentTime) {
+            if (_this64._seekTimeLimit && _this64._seekType == paella.SeekType.BACKWARDS_ONLY) {
+              currentTime = _this64._seekTimeLimit;
+            }
 
-        this.setCurrentTime(time).then(function (timeData) {
-          _this64._force = true;
+            switch (_this64._seekType) {
+              case paella.SeekType.FULL:
+                break;
 
-          _this64.triggerTimeupdate();
+              case paella.SeekType.BACKWARDS_ONLY:
+                if (time > currentTime) {
+                  reject(new Error("Warning: Seek is disabled"));
+                  return;
+                }
 
-          var percent = timeData.time * 100 / timeData.duration;
-          paella.events.trigger(paella.events.seekToTime, {
-            newPosition: timeData.time
-          });
-          paella.events.trigger(paella.events.seekTo, {
-            newPositionPercent: percent
+                break;
+
+              case paella.SeekType.FORWARD_ONLY:
+                if (time < currentTime) {
+                  reject(new Error("Warning: Seek is disabled"));
+                  return;
+                }
+
+                break;
+
+              case paella.SeekType.DISABLED:
+                reject(new Error("Warning: Seek is disabled"));
+                return;
+            }
+
+            _this64.setCurrentTime(time).then(function (timeData) {
+              _this64._force = true;
+
+              _this64.triggerTimeupdate();
+
+              var percent = timeData.time * 100 / timeData.duration;
+              paella.events.trigger(paella.events.seekToTime, {
+                newPosition: timeData.time
+              });
+              paella.events.trigger(paella.events.seekTo, {
+                newPositionPercent: percent
+              });
+            });
           });
         });
       }
@@ -4810,36 +4881,27 @@ function paella_DeferredNotImplemented() {
         _get(_getPrototypeOf(VideoContainerBase.prototype), "onresize", this).call(this, onresize);
       })
     }, {
-      key: "seekDisabled",
-      get: function get() {
-        return this._seekDisabled;
-      },
-      set: function set(v) {
-        var changed = v != this._seekDisabled;
-        this._seekDisabled = v;
+      key: "seekType",
+      set: function set(type) {
+        switch (type) {
+          case paella.SeekType.FULL:
+          case paella.SeekType.BACKWARDS_ONLY:
+          case paella.SeekType.FORWARD_ONLY:
+          case paella.SeekType.DISABLED:
+            this._seekType = type;
+            paella.events.trigger(paella.events.seekAvailabilityChanged, {
+              type: type,
+              enabled: type == paella.SeekType.FULL,
+              disabled: type != paella.SeekType.FULL
+            });
+            break;
 
-        if (changed) {
-          paella.events.trigger(paella.events.seekAvailabilityChanged, {
-            disabled: this._seekDisabled,
-            enabled: !this._seekDisabled
-          });
+          default:
+            throw new Error("Invalid seekType. Allowed seek types:\n\t\t\t\tpaella.SeekType.FULL\n\t\t\t\tpaella.SeekType.BACKWARDS_ONLY\n\t\t\t\tpaella.SeekType.FORWARD_ONLY\n\t\t\t\tpaella.SeekType.DISABLED");
         }
-      }
-    }, {
-      key: "seekEnabled",
-      get: function get() {
-        return !this._seekDisabled;
       },
-      set: function set(v) {
-        var changed = v == this._seekDisabled;
-        this._seekDisabled = !v;
-
-        if (changed) {
-          paella.events.trigger(paella.events.seekAvailabilityChanged, {
-            disabled: this._seekDisabled,
-            enabled: !this._seekDisabled
-          });
-        }
+      get: function get() {
+        return this._seekType;
       }
     }]);
 
@@ -7795,7 +7857,7 @@ function paella_DeferredNotImplemented() {
       }
 
       paella.events.bind(paella.events.seekAvailabilityChanged, function (e, data) {
-        if (data.enabled) {
+        if (data.type != paella.SeekType.DISABLED) {
           $(playbackFull.domElement).removeClass("disabled");
         } else {
           $(playbackFull.domElement).addClass("disabled");
