@@ -425,6 +425,9 @@ video::-webkit-media-controls-panel {
   z-index: 20;
   /* Over the video contaniner and video layout buttons, but under the play button */
 }
+.dimmed-element {
+  filter: blur(4px);
+}
 /* TODO: Extract this CSS to editor plugins */
 .editorTrackItem.mainTrackTrim {
   background-image: url(../images/main_track_bkg.png);

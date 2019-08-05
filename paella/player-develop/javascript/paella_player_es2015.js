@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: eb29582";
+paella.version = "6.3.0 - build: 33f3f1b";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3443,6 +3443,7 @@ class VideoContainerBase extends paella.DomNode {
 		this._seekDisabled =  false;
 		this._seekType = paella.SeekType.FULL;
 		this._seekTimeLimit = 0;
+		this._attenuationEnabled = false;
 		
 		$(this.domElement).click((evt) => {
 			if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
@@ -3475,6 +3476,26 @@ class VideoContainerBase extends paella.DomNode {
 				paella.events.trigger(paella.events.ended);
 			}, 1000);
 		});
+	}
+
+	set attenuationEnabled(att) {
+		this._attenuationEnabled = att;
+
+		Array.from(paella.player.videoContainer.container.domElement.children).forEach((ch) => {
+			if (ch.id == "overlayContainer") {
+				return;
+			}
+			if (att) {
+				$(ch).addClass("dimmed-element");
+			}
+			else {
+				$(ch).removeClass("dimmed-element");
+			}
+		});
+	}
+
+	get attenuationEnabled() {
+		return this._attenuationEnabled;
 	}
 
 	set seekType(type) {
@@ -14209,13 +14230,8 @@ paella.addPlugin(() => {
                 container.appendChild(getRelatedVideoLink(this._relatedVideos[1],'related-video-dual-2'));
                 break;
             }
-
-            // Blur filter
-            Array.from(paella.player.videoContainer.container.domElement.children).forEach((ch) => {
-                if (ch.id != "overlayContainer") {
-                    ch.style.filter = 'blur(8px)';
-                }
-            });            
+            
+            paella.player.videoContainer.attenuationEnabled = true;
         }
 
         hideRelatedVideos() {
@@ -14223,12 +14239,7 @@ paella.addPlugin(() => {
                 paella.player.videoContainer.overlayContainer.removeElement(this._messageContainer);
                 this._messageContainer = null;
 
-                // Remove blur filter
-                Array.from(paella.player.videoContainer.container.domElement.children).forEach((ch) => {
-                    if (ch.id != "overlayContainer") {
-                        ch.style.filter = 'none';
-                    }
-                });
+                paella.player.videoContainer.attenuationEnabled = false;
             }
         }
     }
