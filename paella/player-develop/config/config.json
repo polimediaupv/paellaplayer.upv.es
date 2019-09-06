@@ -8,7 +8,7 @@
     },
     "reloadOnFullscreen": true,
     "videoZoom": {
-      "enabled": false,
+      "enabled": true,
       "max": 800
     },
     "deprecated-methods": [

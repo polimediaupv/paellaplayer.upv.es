@@ -1,6 +1,6 @@
 
 const bg = {};
-bg.version = "1.3.26 - build: a4e6494";
+bg.version = "1.3.29 - build: eb4807e";
 bg.utils = {};
 
 Reflect.defineProperty = Reflect.defineProperty || Object.defineProperty;
@@ -9810,6 +9810,9 @@ bg.scene = {};
 			}
 
 			this.forEach((plist,mat,trx) => {
+				if (!plist.visible) {
+					return;
+				}
 				if (trx) {
 					modelMatrixStack.push();
 					modelMatrixStack.mult(trx);
@@ -16923,7 +16926,7 @@ bg.webgl1 = {};
 		
 		clearBuffers(context,color,buffers) {
 			context.clearColor(color.r,color.g,color.b,color.a);
-			context.clear(buffers);
+			if (buffers) context.clear(buffers);
 		}
 		
 		setDepthTestEnabled(context,e) {
