@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: 2f0d170";
+paella.version = "6.2.0 - build: 42260c1";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -5250,7 +5250,7 @@ function paella_DeferredNotImplemented() {
 
       _this73.setVideoQualityStrategy(paella.VideoQualityStrategy.Factory());
 
-      _this73._audioTag = paella.dictionary.currentLanguage();
+      _this73._audioTag = paella.player.config.player.defaultAudioTag || paella.dictionary.currentLanguage();
       _this73._audioPlayer = null;
       _this73._volume = 1;
       return _this73;

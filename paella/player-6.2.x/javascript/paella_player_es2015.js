@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.0 - build: 2f0d170";
+paella.version = "6.2.0 - build: 42260c1";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4005,7 +4005,8 @@ class VideoContainer extends paella.VideoContainerBase {
 		this.setProfileFrameStrategy(paella.ProfileFrameStrategy.Factory());
 		this.setVideoQualityStrategy(paella.VideoQualityStrategy.Factory());
 
-		this._audioTag = paella.dictionary.currentLanguage();
+		this._audioTag = paella.player.config.player.defaultAudioTag ||
+						 paella.dictionary.currentLanguage();
 		this._audioPlayer = null;
 		this._volume = 1;
 	}
