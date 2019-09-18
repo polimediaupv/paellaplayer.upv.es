@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 6eb8db0";
+paella.version = "6.3.0 - build: 900147a";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6165,6 +6165,7 @@ class SearchServicePlugIn extends paella.FastLoadPlugin {
 }
 
 paella.SearchServicePlugIn = SearchServicePlugIn;
+searchServiceManager.initialize();
 
 }());
 /*  
