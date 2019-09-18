@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 2aab10f";
+paella.version = "6.3.0 - build: 6eb8db0";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -7648,12 +7648,7 @@ function paella_DeferredNotImplemented() {
       this._format = format;
       this._url = url;
       this._captions = undefined;
-      this._index = lunr(function () {
-        this.ref('id');
-        this.field('content', {
-          boost: 10
-        });
-      });
+      this._index = undefined;
 
       if (typeof lang == "string") {
         lang = {
@@ -7706,11 +7701,18 @@ function paella_DeferredNotImplemented() {
             parser.parse(dataRaw, self._lang.code, function (err, c) {
               if (!err) {
                 self._captions = c;
+                self._index = lunr(function () {
+                  var thisLunr = this;
+                  thisLunr.ref('id');
+                  thisLunr.field('content', {
+                    boost: 10
+                  });
 
-                self._captions.forEach(function (cap) {
-                  self._index.add({
-                    id: cap.id,
-                    content: cap.content
+                  self._captions.forEach(function (cap) {
+                    thisLunr.add({
+                      id: cap.id,
+                      content: cap.content
+                    });
                   });
                 });
               }
