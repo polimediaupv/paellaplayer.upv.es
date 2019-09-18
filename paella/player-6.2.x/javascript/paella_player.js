@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.1 - build: 67ce9cb";
+paella.version = "6.2.1 - build: 1aadd0d";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -7128,12 +7128,7 @@ function paella_DeferredNotImplemented() {
       this._format = format;
       this._url = url;
       this._captions = undefined;
-      this._index = lunr(function () {
-        this.ref('id');
-        this.field('content', {
-          boost: 10
-        });
-      });
+      this._index = undefined;
 
       if (typeof lang == "string") {
         lang = {
@@ -7186,11 +7181,18 @@ function paella_DeferredNotImplemented() {
             parser.parse(dataRaw, self._lang.code, function (err, c) {
               if (!err) {
                 self._captions = c;
+                self._index = lunr(function () {
+                  var thisLunr = this;
+                  thisLunr.ref('id');
+                  thisLunr.field('content', {
+                    boost: 10
+                  });
 
-                self._captions.forEach(function (cap) {
-                  self._index.add({
-                    id: cap.id,
-                    content: cap.content
+                  self._captions.forEach(function (cap) {
+                    thisLunr.add({
+                      id: cap.id,
+                      content: cap.content
+                    });
                   });
                 });
               }
@@ -7443,6 +7445,7 @@ function paella_DeferredNotImplemented() {
   }(paella.FastLoadPlugin);
 
   paella.SearchServicePlugIn = SearchServicePlugIn;
+  searchServiceManager.initialize();
 })();
 /*  
 	Paella HTML 5 Multistream Player
