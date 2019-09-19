@@ -9,6 +9,9 @@ CHANGELOG
 
   * New feature: video canvas
 
+* Paella 6.2.2
+
+  * Fix a bug in the search service
 
 * Paella 6.2.1
 
