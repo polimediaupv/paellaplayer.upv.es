@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 1d3943d";
+paella.version = "6.3.0 - build: c916230";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -18798,7 +18798,9 @@ paella.addPlugin(function () {
       return RatePlugin;
     }(paella.ButtonPlugin)
   );
-});
+}); // Change this data delegate to read the related videos form an external source
+// Default behaviour is to get the related videos from the data.json file
+
 paella.addDataDelegate("relatedVideos", function () {
   return (
     /*#__PURE__*/
