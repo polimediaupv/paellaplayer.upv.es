@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.2 - build: 80f4493";
+paella.version = "6.2.2 - build: fc53599";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -16767,14 +16767,17 @@ paella.addPlugin(function () {
                 }));
               });
 
-              _This2._qualities.push(_This2._getQualityObject(_This2._qualities.length, {
-                index: _This2._qualities.length,
-                res: {
-                  w: 0,
-                  h: 0
-                },
-                bitrate: 0
-              }));
+              if (_this156._qualities.length > 1) {
+                // If there is only one quality level, don't add the "auto" option
+                _This2._qualities.push(_This2._getQualityObject(_This2._qualities.length, {
+                  index: _This2._qualities.length,
+                  res: {
+                    w: 0,
+                    h: 0
+                  },
+                  bitrate: 0
+                }));
+              }
             }
 
             _This2.qualityIndex = _This2._qualities.length - 1;
@@ -17971,7 +17974,7 @@ paella.addPlugin(function () {
           this._domElement = null;
           this.available_rates = null;
           var enabled = !base.userAgent.browser.IsMobileVersion && paella.player.videoContainer.masterVideo() instanceof paella.Html5Video;
-          onSuccess(enabled);
+          onSuccess(enabled && !paella.player.videoContainer.streamProvider.isLiveStreaming);
         }
       }, {
         key: "closeOnMouseOut",
@@ -22328,7 +22331,7 @@ paella.addPlugin(function () {
       }, {
         key: "getIndex",
         value: function getIndex() {
-          return 120;
+          return 9999;
         }
       }, {
         key: "getAriaLabel",

@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.2 - build: 80f4493";
+paella.version = "6.2.2 - build: fc53599";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -13084,14 +13084,17 @@ paella.addPlugin(function() {
 								index: index,
 								res: { w:q.width, h:q.height },
 								bitrate: q.bitrate
-							}));						
-						});					
-						This._qualities.push(
-							This._getQualityObject(This._qualities.length, {
-								index:This._qualities.length,
-								res: { w:0, h:0 },
-								bitrate: 0
-							}));
+							}));					
+						});
+						if (this._qualities.length>1) {
+							// If there is only one quality level, don't add the "auto" option
+							This._qualities.push(
+								This._getQualityObject(This._qualities.length, {
+									index:This._qualities.length,
+									res: { w:0, h:0 },
+									bitrate: 0
+								}));
+						}
 					}
 					This.qualityIndex = This._qualities.length - 1;
 					resolve(This._qualities);
@@ -13898,7 +13901,7 @@ paella.addPlugin(function() {
 			this._domElement = null;
 			this.available_rates =  null;
 			var enabled = (!base.userAgent.browser.IsMobileVersion && paella.player.videoContainer.masterVideo() instanceof paella.Html5Video);
-			onSuccess(enabled);
+			onSuccess(enabled && !paella.player.videoContainer.streamProvider.isLiveStreaming);
 		}
 
 		closeOnMouseOut() { return true; }
@@ -17273,7 +17276,7 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.volumeRangePlugin"; }
 		//getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Volume"); }
-		getIndex() {return 120;}
+		getIndex() {return 9999;}
 		getAriaLabel() { return base.dictionary.translate("Volume"); }
 
 		
