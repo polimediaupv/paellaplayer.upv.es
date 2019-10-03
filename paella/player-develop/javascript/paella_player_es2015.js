@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 38ba105";
+paella.version = "6.3.0 - build: ea1d00a";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -8119,6 +8119,63 @@ paella.ControlsContainer = ControlsContainer;
 			super('img','lazyLoadThumbnailContainer',{});
 			this.domElement.src = src;
 			this.domElement.alt = "";
+
+			var thisClass = this;
+			let container = document.createElement('div');
+			container.className = "playButtonOnScreen";
+			container.style.width = "100%";
+			container.style.height = "100%";
+			container.style.pointerEvents = "none";
+			document.body.appendChild(container);
+			this.container = container;
+	
+			var icon = document.createElement('canvas');
+			icon.style.width = "100%";
+			icon.style.height = "300px";
+			icon.style.display = "block";
+			icon.style.cursor = "pointer"
+			container.appendChild(icon);
+	
+			function repaintCanvas(){
+				var width = jQuery(container).innerWidth();
+				var height = jQuery(container).innerHeight();
+				icon.style.marginTop = `${ window.innerHeight / 2 - 150 }px`;
+	
+				icon.width = width;
+				icon.height = height;
+	
+				let ratio = width/height;
+				var iconWidth = (width<height) ? width/3 : height/3;
+				let iconHeight = iconWidth;
+	
+				var ctx = icon.getContext('2d');
+				// Play Icon size: 300x300
+				ctx.translate((width-iconWidth)/2, (height-iconHeight)/2);
+	
+				ctx.beginPath();
+				ctx.arc(iconWidth/2, iconHeight/2 ,iconWidth/2, 0, 2*Math.PI, true);
+				ctx.closePath();
+	
+				ctx.strokeStyle = 'white';
+				ctx.lineWidth = 10;
+				ctx.stroke();
+				ctx.fillStyle = '#8f8f8f';
+				ctx.fill();
+	
+				ctx.beginPath();
+				ctx.moveTo(iconWidth/3, iconHeight/4);
+				ctx.lineTo(3*iconWidth/4, iconHeight/2);
+				ctx.lineTo(iconWidth/3, 3*iconHeight/4);
+				ctx.lineTo(iconWidth/3, iconHeight/4);
+	
+				ctx.closePath();
+				ctx.fillStyle = 'white';
+				ctx.fill();
+	
+				ctx.stroke();
+			}
+			//paella.events.bind(paella.events.resize,repaintCanvas);
+			repaintCanvas();
 		}
 
 		setImage(url) {
@@ -8127,6 +8184,11 @@ paella.ControlsContainer = ControlsContainer;
 
 		onClick(closure) {
 			this.domElement.onclick = closure;
+		}
+
+		destroyElements() {
+			document.body.removeChild(this.domElement);
+			document.body.removeChild(this.container);
 		}
 	}
 
@@ -8172,7 +8234,7 @@ paella.ControlsContainer = ControlsContainer;
 						this.lazyLoadContainer = new LazyThumbnailContainer(loader.metadata.preview);
 						document.body.appendChild(this.lazyLoadContainer.domElement);
 						this.lazyLoadContainer.onClick(() => {
-							document.body.removeChild(this.lazyLoadContainer.domElement);
+							this.lazyLoadContainer.destroyElements();
 							this.lazyLoadContainer = null;
 							this._onPlayClosure && this._onPlayClosure();
 						});
@@ -13382,12 +13444,8 @@ paella.addPlugin(function() {
 			});
 		}
 	
-		webGlDidLoad() {
-			// Register a new video loader in the webgl engine, to enable the
-			// hls compatibility in webgl canvas
-			bg.utils.HTTPResourceProvider.AddVideoLoader('m3u8', (url,onSuccess,onFail) => {
-				var video = document.createElement("video");
-				s_preventVideoDump.push(video);
+		setupHls(video,url) {
+			return new Promise((resolve,reject) => {
 				this._loadDeps()
 					.then((Hls) => {
 						if (Hls.isSupported()) {
@@ -13418,7 +13476,7 @@ paella.addPlugin(function() {
 									default:
 										console.error("paella.HLSPlayer: Fatal error. Can not recover");
 										this._hls.destroy();
-										onFail(new Errro("Invalid media"));
+										reject(new Errro("Invalid media"));
 										break;
 									}
 								}
@@ -13426,68 +13484,33 @@ paella.addPlugin(function() {
 
 							this._hls.on(Hls.Events.MANIFEST_PARSED, () => {
 								//this._deferredAction(function() {
-									onSuccess(video);
+									resolve(video);
 								//});
 							});
 						}
 						else {
-							onFail(new Error("HLS not supported"));
+							reject(new Error("HLS not supported"));
 						}
 					})
+			});
+		}
+
+		webGlDidLoad() {
+			// Register a new video loader in the webgl engine, to enable the
+			// hls compatibility in webgl canvas
+			bg.utils.HTTPResourceProvider.AddVideoLoader('m3u8', (url,onSuccess,onFail) => {
+				var video = document.createElement("video");
+				s_preventVideoDump.push(video);
+				this.setupHls(video,url)
+					.then(() => onSuccess(video))
+					.catch(() => onFail());
 			});
 			return Promise.resolve();
 		}
 
 		loadVideoStream(canvasInstance,stream) {
 			return canvasInstance.loadVideo(this,stream,(videoElem) => {
-				return new Promise((resolve,reject) => {
-					this._loadDeps()
-						.then((Hls) => {
-							if (Hls.isSupported()) {
-								let cfg = this.config;
-								this._hls = new Hls(cfg);
-								this._hls.loadSource(stream.src);
-								this._hls.attachMedia(videoElem);
-								this.autoQuality = true;
-
-								this._hls.on(Hls.Events.LEVEL_SWITCHED, (ev,data) => {
-									this._qualities = this._qualities || [];
-									this._qualityIndex = this.autoQuality ? this._qualities.length - 1 : data.level;
-									paella.events.trigger(paella.events.qualityChanged,{});
-									if (console && console.log) console.log(`HLS: quality level changed to ${ data.level }`);
-								});
-
-								this._hls.on(Hls.Events.ERROR, (event, data) => {
-									if (data.fatal) {
-										switch (data.type) {
-										case Hls.ErrorTypes.NETWORK_ERROR:
-											console.error("paella.HLSPlayer: Fatal network error encountered, try to recover");
-											this._hls.startLoad();
-											break;
-										case Hls.ErrorTypes.MEDIA_ERROR:
-											console.error("paella.HLSPlayer: Fatal media error encountered, try to recover");
-											this._hls.recoverMediaError();
-											break;
-										default:
-											console.error("paella.HLSPlayer: Fatal error. Can not recover");
-											this._hls.destroy();
-											reject(new Errro("Invalid media"));
-											break;
-										}
-									}
-								});
-
-								this._hls.on(Hls.Events.MANIFEST_PARSED, () => {
-									this._deferredAction(function() {
-										resolve();
-									});
-								});
-							}
-							else {
-								reject(new Error("HLS not supported"));
-							}
-						})
-				});
+				return this.setupHls(videoElem,stream.src);
 			});
 		}
 	
@@ -13518,14 +13541,17 @@ paella.addPlugin(function() {
 								index: index,
 								res: { w:q.width, h:q.height },
 								bitrate: q.bitrate
-							}));						
-						});					
-						This._qualities.push(
-							This._getQualityObject(This._qualities.length, {
-								index:This._qualities.length,
-								res: { w:0, h:0 },
-								bitrate: 0
-							}));
+							}));					
+						});
+						if (this._qualities.length>1) {
+							// If there is only one quality level, don't add the "auto" option
+							This._qualities.push(
+								This._getQualityObject(This._qualities.length, {
+									index:This._qualities.length,
+									res: { w:0, h:0 },
+									bitrate: 0
+								}));
+						}
 					}
 					This.qualityIndex = This._qualities.length - 1;
 					resolve(This._qualities);
@@ -13796,7 +13822,7 @@ paella.addPlugin(function() {
 class MpegDashVideo extends paella.Html5Video {
 
 	constructor(id,stream,left,top,width,height) {
-		super(id,stream,left,top,width,height);
+		super(id,stream,left,top,width,height,'mpd');
 		this._posterFrame = null;
 		this._player = null;
 	}
@@ -13830,37 +13856,79 @@ class MpegDashVideo extends paella.Html5Video {
 		};
 	}
 
-	load() {
+	webGlDidLoad() {
+		// Register a new video loader in the webgl engine, to enable the
+		// hls compatibility in webgl canvas
+		bg.utils.HTTPResourceProvider.AddVideoLoader('mpd', (url,onSuccess,onFail) => {
+			var video = document.createElement("video");
+			s_preventVideoDump.push(video);
+			// this.setupHls(video,url)
+			// 	.then(() => onSuccess(video))
+			// 	.catch(() => onFail());
+		});
+		return Promise.resolve();
+	}
+
+	loadVideoStream(canvasInstance,stream) {
 		let This = this;
-		return new Promise((resolve,reject) => {
-			var source = this._stream.sources.mpd;
-			if (source && source.length>0) {
-				source = source[0];
+		return canvasInstance.loadVideo(this,stream,(videoElem) => {
+			return new Promise((resolve,reject) => {
 				this._loadDeps()
-					.then(function() {
-						var context = dashContext;
+					.then(() => {
+						
 						var player = dashjs.MediaPlayer().create();
-						var dashContext = context;
-						player.initialize(This.video,source.src,true);
+						player.initialize(videoElem,stream.src,true);
 						player.getDebug().setLogToBrowserConsole(false);
-						This._player = player;
-						player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED,function(a,b) {
+						this._player = player;
+
+						
+						player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function(a,b) {
 							var bitrates = player.getBitrateInfoListFor("video");
 							This._deferredAction(function() {
 								if (!This._firstPlay) {
 									This._player.pause();
-									This._firstPlay = true;	
+									This._firstPlay = true;
 								}
 								resolve();
 							});
 						});
+				
 					});
-			}
-			else {
-				reject(new Error("Invalid source"));
-			}
-		});
+				});
+		}); 
 	}
+
+	// load() {
+	// 	let This = this;
+	// 	return new Promise((resolve,reject) => {
+	// 		var source = this._stream.sources.mpd;
+	// 		if (source && source.length>0) {
+	// 			source = source[0];
+	// 			this._loadDeps()
+	// 				.then(function() {
+	// 					var context = dashContext;
+	// 					var player = dashjs.MediaPlayer().create();
+	// 					var dashContext = context;
+	// 					player.initialize(This.video,source.src,true);
+	// 					player.getDebug().setLogToBrowserConsole(false);
+	// 					This._player = player;
+	// 					player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED,function(a,b) {
+	// 						var bitrates = player.getBitrateInfoListFor("video");
+	// 						This._deferredAction(function() {
+	// 							if (!This._firstPlay) {
+	// 								This._player.pause();
+	// 								This._firstPlay = true;	
+	// 							}
+	// 							resolve();
+	// 						});
+	// 					});
+	// 				});
+	// 		}
+	// 		else {
+	// 			reject(new Error("Invalid source"));
+	// 		}
+	// 	});
+	// }
 
 	supportAutoplay() {
 		return true;
@@ -14333,7 +14401,7 @@ paella.addPlugin(function() {
 			this._domElement = null;
 			this.available_rates =  null;
 			var enabled = (!base.userAgent.browser.IsMobileVersion && paella.player.videoContainer.masterVideo() instanceof paella.Html5Video);
-			onSuccess(enabled);
+			onSuccess(enabled && !paella.player.videoContainer.streamProvider.isLiveStreaming);
 		}
 
 		closeOnMouseOut() { return true; }
@@ -17477,7 +17545,7 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.volumeRangePlugin"; }
 		//getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Volume"); }
-		getIndex() {return 120;}
+		getIndex() {return 9999;}
 		getAriaLabel() { return base.dictionary.translate("Volume"); }
 
 		
