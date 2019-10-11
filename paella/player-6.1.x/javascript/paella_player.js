@@ -5,7 +5,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.1.5 - build: 195b113";
+paella.version = "6.1.5 - build: bc3d71b";
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
     paella.baseUrl = window.paella_debug_baseUrl;
@@ -1324,8 +1324,24 @@ function paella_DeferredNotImplemented() {
     function AudioElementBase(id, stream) {
       $traceurRuntime.superConstructor(AudioElementBase).call(this, 'div', id);
       this._stream = stream;
+      this._ready = false;
     }
     return ($traceurRuntime.createClass)(AudioElementBase, {
+      get ready() {
+        return this._ready;
+      },
+      get currentTimeSync() {
+        return null;
+      },
+      get volumeSync() {
+        return null;
+      },
+      get pausedSync() {
+        return null;
+      },
+      get durationSync() {
+        return null;
+      },
       get stream() {
         return this._stream;
       },
@@ -1475,6 +1491,18 @@ function paella_DeferredNotImplemented() {
     return ($traceurRuntime.createClass)(MultiformatAudioElement, {
       get audio() {
         return this._audio;
+      },
+      get currentTimeSync() {
+        return this.ready ? this.audio.currentTimeSync : null;
+      },
+      get volumeSync() {
+        return this.ready ? this.audio.volumeSync : null;
+      },
+      get pausedSync() {
+        return this.ready ? this.audio.pausedSync : null;
+      },
+      get durationSync() {
+        return this.ready ? this.audio.durationSync : null;
       },
       setAutoplay: function(ap) {
         this.audio.autoplay = ap;
@@ -2083,6 +2111,18 @@ function paella_DeferredNotImplemented() {
       defaultProfile: function() {
         return null;
       },
+      get currentTimeSync() {
+        return null;
+      },
+      get volumeSync() {
+        return null;
+      },
+      get pausedSync() {
+        return null;
+      },
+      get durationSync() {
+        return null;
+      },
       setVideoQualityStrategy: function(strategy) {
         this._videoQualityStrategy = strategy;
       },
@@ -2314,6 +2354,18 @@ function paella_DeferredNotImplemented() {
       },
       get ready() {
         return this.video.readyState >= 3;
+      },
+      get currentTimeSync() {
+        return this.ready ? this.video.currentTime : null;
+      },
+      get volumeSync() {
+        return this.ready ? this.video.volume : null;
+      },
+      get pausedSync() {
+        return this.ready ? this.video.paused : null;
+      },
+      get durationSync() {
+        return this.ready ? this.video.duration : null;
       },
       _deferredAction: function(action) {
         var $__2 = this;
@@ -3469,6 +3521,25 @@ function paella_DeferredNotImplemented() {
       }}, {}, $__super);
   }(ProfileFrameStrategy);
   paella.LimitedSizeProfileFrameStrategy = LimitedSizeProfileFrameStrategy;
+  function startVideoSync() {
+    var $__2 = this;
+    var maxDiff = 0.3;
+    var sync = function() {
+      $__2.mainAudioPlayer.currentTime().then(function(t) {
+        $__2.players.forEach(function(player) {
+          if (player != $__2.mainAudioPlayer && player.currentTimeSync != null && Math.abs(player.currentTimeSync - t) > maxDiff) {
+            player.setCurrentTime(t);
+          }
+        });
+      });
+      setTimeout(function() {
+        return sync();
+      }, 1000);
+    };
+    setTimeout(function() {
+      return sync();
+    }, 1000);
+  }
   var StreamProvider = function() {
     function StreamProvider(videoData) {
       this._mainStream = null;
@@ -3535,6 +3606,7 @@ function paella_DeferredNotImplemented() {
             $__2._players.push(player);
           }
         });
+        startVideoSync.apply(this);
       },
       loadVideos: function() {
         var promises = [];
