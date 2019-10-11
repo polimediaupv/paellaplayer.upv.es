@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.2.2 - build: fc53599";
+paella.version = "6.2.2 - build: 4a035b0";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -1470,8 +1470,15 @@ function paella_DeferredNotImplemented () {
         constructor(id,stream) {
             super('div',id);
             this._stream = stream;
-
+            this._ready = false;
         }
+
+        get ready() { return this._ready; } 
+
+        get currentTimeSync() { return null; }
+        get volumeSync() { return null; }
+        get pausedSync() { return null; }
+        get durationSync() { return null; }
 
         get stream() { return this._stream; }
         setAutoplay() {return Promise.reject(new Error("no such compatible video player"));}
@@ -1595,6 +1602,22 @@ class MultiformatAudioElement extends paella.AudioElementBase {
     }
 
     get audio() { return this._audio; }
+
+    get currentTimeSync() {
+		return this.ready ? this.audio.currentTimeSync : null;
+	}
+
+	get volumeSync() {
+		return this.ready ? this.audio.volumeSync : null;
+	}
+
+	get pausedSync() {
+		return this.ready ? this.audio.pausedSync : null;
+	}
+
+	get durationSync() {
+		return this.ready ? this.audio.durationSync : null;
+	}
 
     setAutoplay(ap) {
         this.audio.autoplay = ap;
@@ -2261,6 +2284,13 @@ class VideoElementBase extends paella.VideoRect {
 		return null;
 	}
 
+	// Synchronous functions: returns null if the resource is not loaded. Use only if 
+	// the resource is loaded.
+	get currentTimeSync() { return null; }
+	get volumeSync() { return null; }
+	get pausedSync() { return null; }
+	get durationSync() { return null; }
+
 	// Initialization functions
 	setVideoQualityStrategy(strategy) {
 		this._videoQualityStrategy = strategy;
@@ -2515,6 +2545,23 @@ class Html5Video extends paella.VideoElementBase {
 		return this.video.readyState>=3;
 	}
 
+	// Synchronous functions: returns null if the resource is not loaded. Use only if 
+	// the resource is loaded.
+	get currentTimeSync() {
+		return this.ready ? this.video.currentTime : null;
+	}
+
+	get volumeSync() {
+		return this.ready ? this.video.volume : null;
+	}
+
+	get pausedSync() {
+		return this.ready ? this.video.paused : null;
+	}
+
+	get durationSync() {
+		return this.ready ? this.video.duration : null;
+	}
 
 	_deferredAction(action) {
 		return new Promise((resolve,reject) => {
@@ -3775,6 +3822,26 @@ class LimitedSizeProfileFrameStrategy extends ProfileFrameStrategy {
 
 paella.LimitedSizeProfileFrameStrategy = LimitedSizeProfileFrameStrategy;
 
+function startVideoSync() {
+	let maxDiff = 0.3;
+	let sync = () => {
+		this.mainAudioPlayer.currentTime()
+			.then((t) => {
+				this.players.forEach((player) => {
+					if (player!=this.mainAudioPlayer &&
+						player.currentTimeSync!=null &&
+						Math.abs(player.currentTimeSync-t)>maxDiff) {
+						player.setCurrentTime(t);
+					}
+				});
+				
+			});
+		setTimeout(() => sync(), 1000);
+	};
+
+	setTimeout(() => sync(), 1000);
+}
+
 class StreamProvider {
 	constructor(videoData) {
 		this._mainStream = null;
@@ -3846,6 +3913,8 @@ class StreamProvider {
 				this._players.push(player);
 			}
 		});
+
+		startVideoSync.apply(this);
 	}
 
 	loadVideos() {
