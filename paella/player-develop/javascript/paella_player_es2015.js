@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: c220c5d";
+paella.version = "6.3.0 - build: 38c520b";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3715,6 +3715,7 @@ class VideoContainerBase extends paella.DomNode {
 	}
 
 	play() {
+		this.streamProvider.startVideoSync(this.audioPlayer);
 		this.startTimeupdate();
 		setTimeout(() => paella.events.trigger(paella.events.play), 50)
 	}
@@ -3722,6 +3723,7 @@ class VideoContainerBase extends paella.DomNode {
 	pause() {
 		paella.events.trigger(paella.events.pause);
 		this.stopTimeupdate();
+		this.streamProvider.stopVideoSync();
 	}
 
 	seekTo(newPositionPercent) {
@@ -4005,26 +4007,6 @@ class LimitedSizeProfileFrameStrategy extends ProfileFrameStrategy {
 
 paella.LimitedSizeProfileFrameStrategy = LimitedSizeProfileFrameStrategy;
 
-function startVideoSync() {
-	let maxDiff = 0.3;
-	let sync = () => {
-		this.mainAudioPlayer.currentTime()
-			.then((t) => {
-				this.players.forEach((player) => {
-					if (player!=this.mainAudioPlayer &&
-						player.currentTimeSync!=null &&
-						Math.abs(player.currentTimeSync-t)>maxDiff) {
-						player.setCurrentTime(t);
-					}
-				});
-				
-			});
-		setTimeout(() => sync(), 1000);
-	};
-
-	setTimeout(() => sync(), 1000);
-}
-
 class StreamProvider {
 	constructor(videoData) {
 		this._mainStream = null;
@@ -4096,8 +4078,42 @@ class StreamProvider {
 				this._players.push(player);
 			}
 		});
+	}
 
-		startVideoSync.apply(this);
+	startVideoSync(syncProviderPlayer) {
+		this._syncProviderPlayer = syncProviderPlayer;
+		this.stopVideoSync();
+		
+		console.debug("Start sync to player:");
+		console.debug(this._syncProviderPlayer);
+		let maxDiff = 0.3;
+		let sync = () => {
+			this._syncProviderPlayer.currentTime()
+				.then((t) => {
+					this.players.forEach((player) => {
+						if (player!=syncProviderPlayer &&
+							player.currentTimeSync!=null &&
+							Math.abs(player.currentTimeSync-t)>maxDiff)
+						{
+							console.debug(`Sync player current time: ${ player.currentTimeSync } to time ${ t }`);
+							console.debug(player);	
+							player.setCurrentTime(t);
+						}
+					});
+					
+				});
+			this._syncTimer = setTimeout(() => sync(), 1000);
+		};
+	
+		this._syncTimer = setTimeout(() => sync(), 1000);
+	}
+
+	stopVideoSync() {
+		if (this._syncTimer) {
+			console.debug("Stop video sync");
+			clearTimeout(this._syncTimer);
+			this._syncTimer = null;
+		}
 	}
 
 	loadVideos() {
@@ -4457,6 +4473,7 @@ class VideoContainer extends paella.VideoContainerBase {
 	}
 
 	setAudioTag(lang) {
+		this.streamProvider.stopVideoSync();
 		return new Promise((resolve) => {
 			let audioSet = false;
 			let firstAudioPlayer = null;
@@ -4488,6 +4505,7 @@ class VideoContainer extends paella.VideoContainerBase {
 			.then(() => {
 				this._audioTag = this._audioPlayer.stream.audioTag;
 				paella.events.trigger(paella.events.audioTagChanged);
+				this.streamProvider.startVideoSync(this.audioPlayer);
 				resolve();
 			});
 		})

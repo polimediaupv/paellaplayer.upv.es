@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: c220c5d";
+paella.version = "6.3.0 - build: 38c520b";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -4753,6 +4753,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "play",
       value: function play() {
+        this.streamProvider.startVideoSync(this.audioPlayer);
         this.startTimeupdate();
         setTimeout(function () {
           return paella.events.trigger(paella.events.play);
@@ -4763,6 +4764,7 @@ function paella_DeferredNotImplemented() {
       value: function pause() {
         paella.events.trigger(paella.events.pause);
         this.stopTimeupdate();
+        this.streamProvider.stopVideoSync();
       }
     }, {
       key: "seekTo",
@@ -5200,30 +5202,6 @@ function paella_DeferredNotImplemented() {
 
   paella.LimitedSizeProfileFrameStrategy = LimitedSizeProfileFrameStrategy;
 
-  function startVideoSync() {
-    var _this73 = this;
-
-    var maxDiff = 0.3;
-
-    var sync = function sync() {
-      _this73.mainAudioPlayer.currentTime().then(function (t) {
-        _this73.players.forEach(function (player) {
-          if (player != _this73.mainAudioPlayer && player.currentTimeSync != null && Math.abs(player.currentTimeSync - t) > maxDiff) {
-            player.setCurrentTime(t);
-          }
-        });
-      });
-
-      setTimeout(function () {
-        return sync();
-      }, 1000);
-    };
-
-    setTimeout(function () {
-      return sync();
-    }, 1000);
-  }
-
   var StreamProvider =
   /*#__PURE__*/
   function () {
@@ -5245,7 +5223,7 @@ function paella_DeferredNotImplemented() {
     _createClass(StreamProvider, [{
       key: "init",
       value: function init(videoData) {
-        var _this74 = this;
+        var _this73 = this;
 
         if (videoData.length == 0) throw Error("Empty video data.");
         this._videoData = videoData;
@@ -5260,13 +5238,13 @@ function paella_DeferredNotImplemented() {
           stream.type = stream.type || 'video';
 
           if (stream.role == 'master') {
-            _this74._mainStream = stream;
+            _this73._mainStream = stream;
           }
 
           if (stream.type == 'video') {
-            _this74._videoStreams.push(stream);
+            _this73._videoStreams.push(stream);
           } else if (stream.type == 'audio') {
-            _this74._audioStreams.push(stream);
+            _this73._audioStreams.push(stream);
           }
         });
 
@@ -5285,19 +5263,19 @@ function paella_DeferredNotImplemented() {
             h: 720
           };
           var player = paella.videoFactory.getVideoObject("video_".concat(index), videoStream, rect);
-          player.setVideoQualityStrategy(_this74._qualityStrategy);
+          player.setVideoQualityStrategy(_this73._qualityStrategy);
           player.setAutoplay(autoplay);
 
-          if (videoStream == _this74._mainStream) {
-            _this74._mainPlayer = player;
-            _this74._audioPlayer = player;
+          if (videoStream == _this73._mainStream) {
+            _this73._mainPlayer = player;
+            _this73._audioPlayer = player;
           } else {
             player.setVolume(0);
           }
 
-          _this74._videoPlayers.push(player);
+          _this73._videoPlayers.push(player);
 
-          _this74._players.push(player);
+          _this73._players.push(player);
         }); // Create audio player
 
 
@@ -5306,13 +5284,51 @@ function paella_DeferredNotImplemented() {
           player.setAutoplay(autoplay);
 
           if (player) {
-            _this74._audioPlayers.push(player);
+            _this73._audioPlayers.push(player);
 
-            _this74._players.push(player);
+            _this73._players.push(player);
           }
         });
+      }
+    }, {
+      key: "startVideoSync",
+      value: function startVideoSync(syncProviderPlayer) {
+        var _this74 = this;
 
-        startVideoSync.apply(this);
+        this._syncProviderPlayer = syncProviderPlayer;
+        this.stopVideoSync();
+        console.debug("Start sync to player:");
+        console.debug(this._syncProviderPlayer);
+        var maxDiff = 0.3;
+
+        var sync = function sync() {
+          _this74._syncProviderPlayer.currentTime().then(function (t) {
+            _this74.players.forEach(function (player) {
+              if (player != syncProviderPlayer && player.currentTimeSync != null && Math.abs(player.currentTimeSync - t) > maxDiff) {
+                console.debug("Sync player current time: ".concat(player.currentTimeSync, " to time ").concat(t));
+                console.debug(player);
+                player.setCurrentTime(t);
+              }
+            });
+          });
+
+          _this74._syncTimer = setTimeout(function () {
+            return sync();
+          }, 1000);
+        };
+
+        this._syncTimer = setTimeout(function () {
+          return sync();
+        }, 1000);
+      }
+    }, {
+      key: "stopVideoSync",
+      value: function stopVideoSync() {
+        if (this._syncTimer) {
+          console.debug("Stop video sync");
+          clearTimeout(this._syncTimer);
+          this._syncTimer = null;
+        }
       }
     }, {
       key: "loadVideos",
@@ -5769,6 +5785,7 @@ function paella_DeferredNotImplemented() {
       value: function setAudioTag(lang) {
         var _this84 = this;
 
+        this.streamProvider.stopVideoSync();
         return new Promise(function (resolve) {
           var audioSet = false;
           var firstAudioPlayer = null;
@@ -5799,6 +5816,9 @@ function paella_DeferredNotImplemented() {
           }).then(function () {
             _this84._audioTag = _this84._audioPlayer.stream.audioTag;
             paella.events.trigger(paella.events.audioTagChanged);
+
+            _this84.streamProvider.startVideoSync(_this84.audioPlayer);
+
             resolve();
           });
         });
