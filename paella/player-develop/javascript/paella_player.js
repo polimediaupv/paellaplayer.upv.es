@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 5a34497";
+paella.version = "6.3.0 - build: 3f94d22";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -10928,13 +10928,23 @@ function paella_DeferredNotImplemented() {
     paella.initDelegate = new paella.DefaultInitDelegate(initObjects);
     new PaellaPlayer(playerContainer, paella.initDelegate);
   };
+  /*
+   *	playerContainer	Player DOM container id
+   *	params.configUrl		Url to the config json file
+   *	params.config			Use this configuration file
+   *	params.data				Paella video data schema
+   *	params.url				Repository URL
+   *  forceLazyLoad			Use lazyLoad even if your browser does not allow automatic playback of the video
+   */
+
 
   paella.lazyLoad = function (playerContainer, params) {
+    var forceLazyLoad = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
     paella.loaderFunctionParams = params;
     var auth = params && params.auth || {}; // Check autoplay. If autoplay is enabled, this function must call paella.load()
 
     paella.Html5Video.IsAutoplaySupported().then(function (supported) {
-      if (supported) {
+      if (supported || forceLazyLoad) {
         // Build custom init data using url parameters
         var data = getManifestFromParameters(params);
 
