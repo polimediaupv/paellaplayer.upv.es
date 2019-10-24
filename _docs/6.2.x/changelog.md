@@ -5,6 +5,11 @@
 CHANGELOG
 =========
 
+* Paella 6.2.3
+
+  * LazyLoad mode enhancements.
+  * Refactoring: play on screen icon.
+
 * Paella 6.2.2
 
   * Fix a bug in the search service
@@ -25,6 +30,11 @@ CHANGELOG
     - Monostream profile APIs removed. This may break monostream videos if the streams
       in `data.json` does not include the `content` attribute.
       
+* Paella 6.1.6
+
+  * Improved synchronization between video and audio streams
+  * Syncrhonous query functions added to video and audio elements
+
 * Paella 6.1.5
 
   * Bug fixed and improvements in breaks plugin
