@@ -7,7 +7,20 @@ CHANGELOG
 
 * Paella 6.3.0
 
-  * New feature: video canvas
+  * New feature:
+
+    * video canvas.
+    * mute/unmute through paella.player.videoContainer, which retains the previous volume value.
+    * related videos: allows you to add links to two related videos, which appear at the end of the current video.
+    * related videos data delegate: by default, related video data is placed in the video manifest, but it is possible to customize this data with a new DataDelegate.
+
+  * Improvements in video zoom UX: now it is necessary to press the ALT key to make the video zoom work.
+  * Oter minor UX improvements.
+
+* Paella 6.2.3
+
+  * LazyLoad mode enhancements.
+  * Refactoring: play on screen icon.
 
 * Paella 6.2.2
 
@@ -29,6 +42,11 @@ CHANGELOG
     - Monostream profile APIs removed. This may break monostream videos if the streams
       in `data.json` does not include the `content` attribute.
       
+* Paella 6.1.6
+
+  * Improved synchronization between video and audio streams
+  * Syncrhonous query functions added to video and audio elements
+
 * Paella 6.1.5
 
   * Bug fixed and improvements in breaks plugin
