@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 7b7aef8";
+paella.version = "6.3.0 - build: 06b72d8";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2150,8 +2150,44 @@ class VideoRect extends paella.DomNode {
 				paella.events.trigger(paella.events.videoZoomChanged,{ video:this });
 			}
 
+			let altScrollMessageContainer = document.createElement('div');
+			altScrollMessageContainer.className = "alt-scroll-message-container";
+			altScrollMessageContainer.innerHTML = "<p>" + paella.dictionary.translate("Use Alt+Scroll to zoom the video") + "</p>";
+			eventCapture.appendChild(altScrollMessageContainer);
+			$(altScrollMessageContainer).css({ opacity: 0.0 });
+			let altScrollMessageTimer = null;
+			function clearAltScrollMessage(animate = true) {
+				animate ? 
+					$(altScrollMessageContainer).animate({ opacity: 0.0 }) :
+					$(altScrollMessageContainer).css({ opacity: 0.0 });
+			}
+			function showAltScrollMessage() {
+				if (altScrollMessageTimer) {
+					clearTimeout(altScrollMessageTimer);
+					altScrollMessageTimer = null;
+				}
+				else {
+					$(altScrollMessageContainer).css({ opacity: 1.0 });
+				}
+				altScrollMessageTimer = setTimeout(() => {
+					clearAltScrollMessage();
+					altScrollMessageTimer = null;
+				}, 500);
+			}
+
 			$(eventCapture).on('mousewheel wheel',(evt) => {
 				if (!this.allowZoom() || !this._zoomAvailable) return;
+				if (!evt.altKey) {
+					showAltScrollMessage();
+					return;
+				}
+				else {
+					clearAltScrollMessage(false);
+					if (altScrollMessageTimer) {
+						clearTimeout(altScrollMessageTimer);
+						altScrollMessageTimer = null;
+					}
+				}
 				let mouse = mousePos(evt);
 				let wheel = wheelDelta(evt);
 				if (this._zoom>=this._maxZoom && wheel>0) return;
@@ -2865,7 +2901,7 @@ class Html5Video extends paella.VideoElementBase {
 
 	setCurrentTime(time) {
 		return this._deferredAction(() => {
-			time && !isNaN(time) && (this.video.currentTime = time);
+			(time == 0 || time) && !isNaN(time) && (this.video.currentTime = time);
 		});
 	}
 
@@ -6595,15 +6631,41 @@ class PlaybackBar extends paella.DomNode {
 		this.addNode(new paella.TimeControl(this.timeControlId));
 		var thisClass = this;
 		paella.events.bind(paella.events.timeupdate,function(event,params) { thisClass.onTimeUpdate(params); });
-		$(this.domElement).bind('mousedown',function(event) { paella.utils.mouseManager.down(thisClass,event); event.stopPropagation(); });
-		$(playbackFull.domElement).bind('mousedown',function(event) { paella.utils.mouseManager.down(thisClass,event); event.stopPropagation();  });
+		$(this.domElement).bind('mousedown',function(event) {
+			paella.utils.mouseManager.down(thisClass,event); event.stopPropagation();
+		});
+		$(playbackFull.domElement).bind('mousedown',function(event) {
+			paella.utils.mouseManager.down(thisClass,event); event.stopPropagation();
+		});
 		if (!base.userAgent.browser.IsMobileVersion) {
-			$(this.domElement).bind('mousemove',function(event) { thisClass.movePassive(event); paella.utils.mouseManager.move(event); });
-			$(playbackFull.domElement).bind('mousemove',function(event) { paella.utils.mouseManager.move(event); });
-			$(this.domElement).bind("mouseout",function(event) { thisClass.mouseOut(event); });
+			$(this.domElement).bind('mousemove',function(event) {
+				thisClass.movePassive(event); paella.utils.mouseManager.move(event);
+			});
+			$(playbackFull.domElement).bind('mousemove',function(event) {
+				paella.utils.mouseManager.move(event);
+			});
+			$(this.domElement).bind("mouseout",function(event) {
+				thisClass.mouseOut(event);
+			});
 		}
-		$(this.domElement).bind('mouseup',function(event) { paella.utils.mouseManager.up(event); });
-		$(playbackFull.domElement).bind('mouseup',function(event) { paella.utils.mouseManager.up(event); });
+		
+		this.domElement.addEventListener('touchstart',(event) => {
+			paella.utils.mouseManager.down(thisClass,event); event.stopPropagation();
+		}, false);
+		this.domElement.addEventListener('touchmove',(event) => {
+			thisClass.movePassive(event);
+			paella.utils.mouseManager.move(event);
+		}, false);
+		this.domElement.addEventListener('touchend',(event) => {
+			paella.utils.mouseManager.up(event);
+		}, false);
+	
+		$(this.domElement).bind('mouseup',function(event) {
+			paella.utils.mouseManager.up(event);
+		});
+		$(playbackFull.domElement).bind('mouseup',function(event) {
+			paella.utils.mouseManager.up(event);
+		});
 
 		if (paella.player.isLiveStream()) {
 			$(this.domElement).hide();
@@ -14365,6 +14427,11 @@ paella.addPlugin(function() {
 		}
 	
 		checkEnabled(onSuccess) {
+			this.showOnEnd = true;
+			paella.data.read('relatedVideos', {id:paella.player.videoIdentifier}, (data) => {
+                this.showOnEnd = !Array.isArray(data) ||  data.length == 0;
+			});
+			
 			onSuccess(!paella.player.isLiveStream() || base.userAgent.system.Android 
 				|| base.userAgent.system.iOS || !paella.player.videoContainer.supportAutoplay());
 		}
@@ -14409,6 +14476,7 @@ paella.addPlugin(function() {
 	
 		endVideo() {
 			this.isPlaying = false;
+			this.showIcon = this.showOnEnd;
 			this.checkStatus();
 		}
 	
