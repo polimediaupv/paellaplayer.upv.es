@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: bb889ae";
+paella.version = "6.3.0 - build: ba9a9f9";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4126,6 +4126,7 @@ class StreamProvider {
 
 	startVideoSync(syncProviderPlayer) {
 		this._syncProviderPlayer = syncProviderPlayer;
+		this._audioPlayer = syncProviderPlayer; // The player that provides the synchronization is also used as main audio player.
 		this.stopVideoSync();
 		
 		console.debug("Start sync to player:");
