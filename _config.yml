@@ -1,4 +1,4 @@
-version: 6.1.5
+version: 6.3.0
 title: Paella Player
 description: the multistream player for lectures
 paella_repository: https://github.com/polimediaupv/paella
@@ -8,6 +8,7 @@ google_analytics: UA-26470475-6
 markdown: kramdown
 highlighter: rouge
 baseurl: "/"
+
 plugins:
   - jekyll-seo-tag
   - jekyll-redirect-from

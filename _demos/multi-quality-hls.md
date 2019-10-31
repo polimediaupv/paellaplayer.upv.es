@@ -1,5 +1,5 @@
 ---
-videoid: belmar-demo-hls
+videoid: belmar-hls
 ---
 
 # Multi quality video (HLS format)
