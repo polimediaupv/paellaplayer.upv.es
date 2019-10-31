@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 9776711";
+paella.version = "6.4.0 - build: 2cd1abc";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4126,6 +4126,7 @@ class StreamProvider {
 
 	startVideoSync(syncProviderPlayer) {
 		this._syncProviderPlayer = syncProviderPlayer;
+		this._audioPlayer = syncProviderPlayer; // The player that provides the synchronization is also used as main audio player.
 		this.stopVideoSync();
 		
 		console.debug("Start sync to player:");
@@ -14483,6 +14484,9 @@ paella.addPlugin(function() {
 		play() {
 			this.isPlaying = true;
 			this.showIcon = false;
+			if (!/dimmed/.test(this.container.className)) {
+				this.container.className += " dimmed";
+			}
 			this.checkStatus();
 		}
 	

@@ -2884,6 +2884,14 @@ textarea {
   cursor: pointer;
   width: 100%;
 }
+.play-button-on-screen.dimmed .play-icon {
+  opacity: 0.2;
+  pointer-events: all;
+  cursor: pointer;
+}
+.play-button-on-screen.dimmed .play-icon:hover {
+  opacity: 1;
+}
 .playbackRateItem {
   font-size: 19px;
   padding-top: 3px;
