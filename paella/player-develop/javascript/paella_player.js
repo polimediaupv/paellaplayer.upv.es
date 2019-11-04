@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: c1d7787";
+paella.version = "6.4.0 - build: 8778052";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -5624,7 +5624,7 @@ function paella_DeferredNotImplemented() {
       _this76._audioTag = paella.player.config.player.defaultAudioTag || paella.dictionary.currentLanguage();
       _this76._audioPlayer = null; // Initial volume level
 
-      _this76._volume = 1;
+      _this76._volume = paella.utils.cookies.get("volume") ? Number(paella.utils.cookies.get("volume")) : 1;
       _this76._muted = false;
       return _this76;
     } // Playback and status functions
@@ -5768,6 +5768,7 @@ function paella_DeferredNotImplemented() {
           return this.mute();
         } else {
           return new Promise(function (resolve, reject) {
+            paella.utils.cookies.set("volume", params);
             _this83._volume = params;
 
             _this83._audioPlayer.setVolume(params).then(function () {
@@ -22934,6 +22935,7 @@ paella.addPlugin(function () {
 
             _this232.updateClass();
           });
+          this.updateClass();
           return rangeInput;
         }
       }, {
