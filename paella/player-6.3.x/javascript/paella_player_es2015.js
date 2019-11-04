@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: 3e5547d";
+paella.version = "6.3.0 - build: 67db370";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4323,7 +4323,7 @@ class VideoContainer extends paella.VideoContainerBase {
 		this._audioPlayer = null;
 
 		// Initial volume level
-		this._volume = 1;
+		this._volume = paella.utils.cookies.get("volume") ? Number(paella.utils.cookies.get("volume")) : 1;
 		this._muted = false;
 	}
 
@@ -4445,6 +4445,7 @@ class VideoContainer extends paella.VideoContainerBase {
 		}
 		else {
 			return new Promise((resolve,reject) => {
+				paella.utils.cookies.set("volume",params);
 				this._volume = params;
 				this._audioPlayer.setVolume(params)
 					.then(() => {
@@ -17764,6 +17765,7 @@ paella.addPlugin(function() {
 				rangeInput.value = params.master;
 				this.updateClass();
 			});
+			this.updateClass();
 
 			return rangeInput;
 		}
