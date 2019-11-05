@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.0 - build: a337cc5";
+paella.version = "6.3.0 - build: f1dc0cb";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -21163,185 +21163,6 @@ paella.addPlugin(function () {
 });
 
 (function () {
-  function buildVideo360Canvas(stream, canvas) {
-    var Video360Canvas =
-    /*#__PURE__*/
-    function (_bg$app$WindowControl4) {
-      _inherits(Video360Canvas, _bg$app$WindowControl4);
-
-      function Video360Canvas(stream) {
-        var _this202;
-
-        _classCallCheck(this, Video360Canvas);
-
-        _this202 = _possibleConstructorReturn(this, _getPrototypeOf(Video360Canvas).call(this));
-        _this202.stream = stream;
-        return _this202;
-      }
-
-      _createClass(Video360Canvas, [{
-        key: "loaded",
-        value: function loaded() {
-          var _this203 = this;
-
-          return new Promise(function (resolve) {
-            var checkLoaded = function checkLoaded() {
-              if (_this203.video) {
-                resolve(_this203);
-              } else {
-                setTimeout(checkLoaded, 100);
-              }
-            };
-
-            checkLoaded();
-          });
-        }
-      }, {
-        key: "buildScene",
-        value: function buildScene() {
-          var _this204 = this;
-
-          this._root = new bg.scene.Node(this.gl, "Root node");
-          bg.base.Loader.RegisterPlugin(new bg.base.TextureLoaderPlugin());
-          bg.base.Loader.RegisterPlugin(new bg.base.VideoTextureLoaderPlugin());
-          bg.base.Loader.RegisterPlugin(new bg.base.VWGLBLoaderPlugin());
-          bg.base.Loader.Load(this.gl, this.stream.src).then(function (texture) {
-            _this204.texture = texture;
-            var sphere = bg.scene.PrimitiveFactory.Sphere(_this204.gl, 1, 50);
-            var sphereNode = new bg.scene.Node(_this204.gl);
-            sphereNode.addComponent(sphere);
-            sphere.getMaterial(0).texture = texture;
-            sphere.getMaterial(0).lightEmission = 0.0;
-            sphere.getMaterial(0).lightEmissionMaskInvert = false;
-            sphere.getMaterial(0).cullFace = false;
-            sphereNode.addComponent(new bg.scene.Transform(bg.Matrix4.Scale(1, -1, 1)));
-
-            _this204._root.addChild(sphereNode);
-          });
-          var lightNode = new bg.scene.Node(this.gl, "Light");
-          var l = new bg.base.Light();
-          l.ambient = bg.Color.White();
-          l.diffuse = bg.Color.Black();
-          l.specular = bg.Color.Black();
-          lightNode.addComponent(new bg.scene.Light(l));
-
-          this._root.addChild(lightNode);
-
-          this._camera = new bg.scene.Camera();
-          var cameraNode = new bg.scene.Node("Camera");
-          cameraNode.addComponent(this._camera);
-          cameraNode.addComponent(new bg.scene.Transform(bg.Matrix4.Translation(0, 0, 0)));
-          var oc = new bg.manipulation.OrbitCameraController();
-          cameraNode.addComponent(oc);
-          oc.maxPitch = 90;
-          oc.minPitch = -90;
-          oc.maxDistance = 0;
-          oc.minDistace = 0;
-
-          this._root.addChild(cameraNode);
-        }
-      }, {
-        key: "init",
-        value: function init() {
-          bg.Engine.Set(new bg.webgl1.Engine(this.gl));
-          this.buildScene();
-          this._renderer = bg.render.Renderer.Create(this.gl, bg.render.RenderPath.FORWARD);
-          this._inputVisitor = new bg.scene.InputVisitor();
-        }
-      }, {
-        key: "frame",
-        value: function frame(delta) {
-          if (this.texture) {
-            this.texture.update();
-          }
-
-          this._renderer.frame(this._root, delta);
-
-          this.postReshape();
-        }
-      }, {
-        key: "display",
-        value: function display() {
-          this._renderer.display(this._root, this._camera);
-        }
-      }, {
-        key: "reshape",
-        value: function reshape(width, height) {
-          this._camera.viewport = new bg.Viewport(0, 0, width, height);
-
-          this._camera.projection.perspective(60, this._camera.viewport.aspectRatio, 0.1, 100);
-        } // Pass the input events to the scene
-
-      }, {
-        key: "mouseDown",
-        value: function mouseDown(evt) {
-          this._inputVisitor.mouseDown(this._root, evt);
-        }
-      }, {
-        key: "mouseDrag",
-        value: function mouseDrag(evt) {
-          this._inputVisitor.mouseDrag(this._root, evt);
-
-          this.postRedisplay();
-        }
-      }, {
-        key: "mouseWheel",
-        value: function mouseWheel(evt) {
-          this._inputVisitor.mouseWheel(this._root, evt);
-
-          this.postRedisplay();
-        }
-      }, {
-        key: "touchStart",
-        value: function touchStart(evt) {
-          this._inputVisitor.touchStart(this._root, evt);
-        }
-      }, {
-        key: "touchMove",
-        value: function touchMove(evt) {
-          this._inputVisitor.touchMove(this._root, evt);
-
-          this.postRedisplay();
-        } // You may pass also the following events, but they aren't used by the camera controller
-
-      }, {
-        key: "mouseUp",
-        value: function mouseUp(evt) {
-          this._inputVisitor.mouseUp(this._root, evt);
-        }
-      }, {
-        key: "mouseMove",
-        value: function mouseMove(evt) {
-          this._inputVisitor.mouseMove(this._root, evt);
-        }
-      }, {
-        key: "mouseOut",
-        value: function mouseOut(evt) {
-          this._inputVisitor.mouseOut(this._root, evt);
-        }
-      }, {
-        key: "touchEnd",
-        value: function touchEnd(evt) {
-          this._inputVisitor.touchEnd(this._root, evt);
-        }
-      }, {
-        key: "video",
-        get: function get() {
-          return this.texture ? this.texture.video : null;
-        }
-      }]);
-
-      return Video360Canvas;
-    }(bg.app.WindowController);
-
-    var controller = new Video360Canvas(stream);
-    var mainLoop = bg.app.MainLoop.singleton;
-    mainLoop.updateMode = bg.app.FrameUpdate.AUTO;
-    mainLoop.canvas = canvas;
-    mainLoop.run(controller);
-    return controller.loaded();
-  }
-
   paella.addCanvasPlugin("video360", true, true, function () {
     return (
       /*#__PURE__*/
@@ -21357,12 +21178,12 @@ paella.addPlugin(function () {
         _createClass(Video360Canvas, [{
           key: "loadVideo",
           value: function loadVideo(videoPlugin, stream) {
-            var _this205 = this;
+            var _this202 = this;
 
             return new Promise(function (resolve, reject) {
               var checkLoaded = function checkLoaded() {
-                if (_this205.video) {
-                  resolve(_this205);
+                if (_this202.video) {
+                  resolve(_this202);
                 } else {
                   setTimeout(checkLoaded, 100);
                 }
@@ -21413,737 +21234,181 @@ paella.addPlugin(function () {
 })();
 
 (function () {
-  function buildVideo360ThetaCanvas(stream, canvas) {
-    function cyln2world(a, e) {
-      return new bg.Vector3(Math.cos(e) * Math.cos(a), Math.cos(e) * Math.sin(a), Math.sin(e));
-    }
-
-    function world2fish(x, y, z) {
-      var nz = z;
-      if (z < -1.0) nz = -1.0;else if (z > 1.0) nz = 1.0;
-      return new bg.Vector2(Math.atan2(y, x), Math.acos(nz) / Math.PI); // 0.0 to 1.0
-    }
-
-    function calcTexUv(i, j, lens) {
-      var world = cyln2world(((i + 90) / 180.0 - 1.0) * Math.PI, // rotate 90 deg for polygon
-      (0.5 - j / 180.0) * Math.PI);
-      var ar = world2fish(Math.sin(-0.5 * Math.PI) * world.z + Math.cos(-0.5 * Math.PI) * world.x, world.y, Math.cos(-0.5 * Math.PI) * world.z - Math.sin(-0.5 * Math.PI) * world.x);
-      var fishRad = 0.883;
-      var fishRad2 = fishRad * 0.88888888888888;
-      var fishCenter = 1.0 - 0.44444444444444;
-      var x = lens === 0 ? fishRad * ar.y * Math.cos(ar.x) * 0.5 + 0.25 : fishRad * (1.0 - ar.y) * Math.cos(-1.0 * ar.x + Math.PI) * 0.5 + 0.75;
-      var y = lens === 0 ? fishRad2 * ar.y * Math.sin(ar.x) + fishCenter : fishRad2 * (1.0 - ar.y) * Math.sin(-1.0 * ar.x + Math.PI) + fishCenter;
-      return new bg.Vector2(x, y);
-    }
-
-    function buildViewerNode(ctx) {
-      var radius = 1;
-      var node = new bg.scene.Node(ctx);
-      var drw = new bg.scene.Drawable();
-      node.addComponent(drw);
-      var plist = new bg.base.PolyList(ctx);
-      var vertex = [];
-      var normals = [];
-      var uvs = [];
-      var index = [];
-
-      for (var j = 0; j <= 180; j += 5) {
-        for (var i = 0; i <= 360; i += 5) {
-          vertex.push(new bg.Vector3(Math.sin(Math.PI * j / 180.0) * Math.sin(Math.PI * i / 180.0) * radius, Math.cos(Math.PI * j / 180.0) * radius, Math.sin(Math.PI * j / 180.0) * Math.cos(Math.PI * i / 180.0) * radius));
-          normals.push(new bg.Vector3(0, 0, -1));
-        }
-        /* devide texture */
-
-
-        for (var k = 0; k <= 180; k += 5) {
-          uvs.push(calcTexUv(k, j, 0));
-        }
-
-        for (var l = 180; l <= 360; l += 5) {
-          uvs.push(calcTexUv(l, j, 1));
-        }
-      }
-
-      function addFace(v0, v1, v2, n0, n1, n2, uv0, uv1, uv2) {
-        plist.vertex.push(v0.x);
-        plist.vertex.push(v0.y);
-        plist.vertex.push(v0.z);
-        plist.vertex.push(v1.x);
-        plist.vertex.push(v1.y);
-        plist.vertex.push(v1.z);
-        plist.vertex.push(v2.x);
-        plist.vertex.push(v2.y);
-        plist.vertex.push(v2.z);
-        plist.normal.push(n0.x);
-        plist.normal.push(n0.y);
-        plist.normal.push(n0.z);
-        plist.normal.push(n1.x);
-        plist.normal.push(n1.y);
-        plist.normal.push(n1.z);
-        plist.normal.push(n2.x);
-        plist.normal.push(n2.z);
-        plist.normal.push(n2.z);
-        plist.texCoord0.push(uv0.x);
-        plist.texCoord0.push(uv0.y);
-        plist.texCoord0.push(uv1.x);
-        plist.texCoord0.push(uv1.y);
-        plist.texCoord0.push(uv2.x);
-        plist.texCoord0.push(uv2.y);
-        plist.index.push(plist.index.length);
-        plist.index.push(plist.index.length);
-        plist.index.push(plist.index.length);
-      }
-
-      for (var m = 0; m < 36; m++) {
-        for (var n = 0; n < 72; n++) {
-          var v = m * 73 + n;
-          var t = n < 36 ? m * 74 + n : m * 74 + n + 1;
-          [uvs[t + 0], uvs[t + 1], uvs[t + 74]], [uvs[t + 1], uvs[t + 75], uvs[t + 74]];
-          var v0 = vertex[v + 0];
-          var n0 = normals[v + 0];
-          var uv0 = uvs[t + 0];
-          var v1 = vertex[v + 1];
-          var n1 = normals[v + 1];
-          var uv1 = uvs[t + 1];
-          var v2 = vertex[v + 73];
-          var n2 = normals[v + 73];
-          var uv2 = uvs[t + 74];
-          var v3 = vertex[v + 74];
-          var n3 = normals[v + 74];
-          var uv3 = uvs[t + 75];
-          addFace(v0, v1, v2, n0, n1, n2, uv0, uv1, uv2);
-          addFace(v1, v3, v2, n1, n3, n2, uv1, uv3, uv2);
-        }
-      }
-
-      plist.build();
-      drw.addPolyList(plist);
-      var trx = bg.Matrix4.Scale(-1, 1, 1);
-      node.addComponent(new bg.scene.Transform(trx));
-      return node;
-    }
-
-    var Video360ThetaCanvas =
-    /*#__PURE__*/
-    function (_bg$app$WindowControl5) {
-      _inherits(Video360ThetaCanvas, _bg$app$WindowControl5);
-
-      function Video360ThetaCanvas(stream) {
-        var _this206;
-
-        _classCallCheck(this, Video360ThetaCanvas);
-
-        _this206 = _possibleConstructorReturn(this, _getPrototypeOf(Video360ThetaCanvas).call(this));
-        _this206.stream = stream;
-        return _this206;
-      }
-
-      _createClass(Video360ThetaCanvas, [{
-        key: "loaded",
-        value: function loaded() {
-          var _this207 = this;
-
-          return new Promise(function (resolve) {
-            var checkLoaded = function checkLoaded() {
-              if (_this207.video) {
-                resolve(_this207);
-              } else {
-                setTimeout(checkLoaded, 100);
-              }
-            };
-
-            checkLoaded();
-          });
-        }
-      }, {
-        key: "buildScene",
-        value: function buildScene() {
-          var _this208 = this;
-
-          this._root = new bg.scene.Node(this.gl, "Root node");
-          bg.base.Loader.RegisterPlugin(new bg.base.TextureLoaderPlugin());
-          bg.base.Loader.RegisterPlugin(new bg.base.VideoTextureLoaderPlugin());
-          bg.base.Loader.RegisterPlugin(new bg.base.VWGLBLoaderPlugin());
-          bg.base.Loader.Load(this.gl, this.stream.src).then(function (texture) {
-            _this208.texture = texture; //let sphere = bg.scene.PrimitiveFactory.Sphere(this.gl,1,50);
-            //let sphereNode = new bg.scene.Node(this.gl);
-
-            var viewerNode = buildViewerNode(_this208.gl);
-            var sphere = viewerNode.component("bg.scene.Drawable");
-            sphere.getMaterial(0).texture = texture;
-            sphere.getMaterial(0).lightEmission = 1.0;
-            sphere.getMaterial(0).lightEmissionMaskInvert = true;
-            sphere.getMaterial(0).cullFace = false;
-
-            _this208._root.addChild(viewerNode);
-
-            _this208.postRedisplay();
-          });
-          var lightNode = new bg.scene.Node(this.gl, "Light");
-
-          this._root.addChild(lightNode);
-
-          this._camera = new bg.scene.Camera();
-          var cameraNode = new bg.scene.Node("Camera");
-          cameraNode.addComponent(this._camera);
-          cameraNode.addComponent(new bg.scene.Transform());
-          var oc = new bg.manipulation.OrbitCameraController();
-          cameraNode.addComponent(oc);
-          oc.maxPitch = 90;
-          oc.minPitch = -90;
-          oc.maxDistance = 0;
-          oc.minDistace = 0;
-
-          this._root.addChild(cameraNode);
-        }
-      }, {
-        key: "init",
-        value: function init() {
-          bg.Engine.Set(new bg.webgl1.Engine(this.gl));
-          this.buildScene();
-          this._renderer = bg.render.Renderer.Create(this.gl, bg.render.RenderPath.FORWARD);
-          this._inputVisitor = new bg.scene.InputVisitor();
-        }
-      }, {
-        key: "frame",
-        value: function frame(delta) {
-          if (this.texture) {
-            this.texture.update();
-          }
-
-          this._renderer.frame(this._root, delta);
-        }
-      }, {
-        key: "display",
-        value: function display() {
-          this._renderer.display(this._root, this._camera);
-        }
-      }, {
-        key: "reshape",
-        value: function reshape(width, height) {
-          this._camera.viewport = new bg.Viewport(0, 0, width, height);
-
-          this._camera.projection.perspective(60, this._camera.viewport.aspectRatio, 0.1, 100);
-        } // Pass the input events to the scene
-
-      }, {
-        key: "mouseDown",
-        value: function mouseDown(evt) {
-          this._inputVisitor.mouseDown(this._root, evt);
-        }
-      }, {
-        key: "mouseDrag",
-        value: function mouseDrag(evt) {
-          this._inputVisitor.mouseDrag(this._root, evt);
-
-          this.postRedisplay();
-        }
-      }, {
-        key: "mouseWheel",
-        value: function mouseWheel(evt) {
-          this._inputVisitor.mouseWheel(this._root, evt);
-
-          this.postRedisplay();
-        }
-      }, {
-        key: "touchStart",
-        value: function touchStart(evt) {
-          this._inputVisitor.touchStart(this._root, evt);
-        }
-      }, {
-        key: "touchMove",
-        value: function touchMove(evt) {
-          this._inputVisitor.touchMove(this._root, evt);
-
-          this.postRedisplay();
-        } // You may pass also the following events, but they aren't used by the camera controller
-
-      }, {
-        key: "mouseUp",
-        value: function mouseUp(evt) {
-          this._inputVisitor.mouseUp(this._root, evt);
-        }
-      }, {
-        key: "mouseMove",
-        value: function mouseMove(evt) {
-          this._inputVisitor.mouseMove(this._root, evt);
-        }
-      }, {
-        key: "mouseOut",
-        value: function mouseOut(evt) {
-          this._inputVisitor.mouseOut(this._root, evt);
-        }
-      }, {
-        key: "touchEnd",
-        value: function touchEnd(evt) {
-          this._inputVisitor.touchEnd(this._root, evt);
-        }
-      }, {
-        key: "video",
-        get: function get() {
-          return this.texture ? this.texture.video : null;
-        }
-      }]);
-
-      return Video360ThetaCanvas;
-    }(bg.app.WindowController);
-
-    var controller = new Video360ThetaCanvas(stream);
-    var mainLoop = bg.app.MainLoop.singleton;
-    mainLoop.updateMode = bg.app.FrameUpdate.AUTO;
-    mainLoop.canvas = canvas;
-    mainLoop.run(controller);
-    return controller.loaded();
+  function cyln2world(a, e) {
+    return new bg.Vector3(Math.cos(e) * Math.cos(a), Math.cos(e) * Math.sin(a), Math.sin(e));
   }
 
-  var Video360Theta =
-  /*#__PURE__*/
-  function (_paella$VideoElementB6) {
-    _inherits(Video360Theta, _paella$VideoElementB6);
+  function world2fish(x, y, z) {
+    var nz = z;
+    if (z < -1.0) nz = -1.0;else if (z > 1.0) nz = 1.0;
+    return new bg.Vector2(Math.atan2(y, x), Math.acos(nz) / Math.PI); // 0.0 to 1.0
+  }
 
-    function Video360Theta(id, stream, left, top, width, height, streamName) {
-      var _this209;
+  function calcTexUv(i, j, lens) {
+    var world = cyln2world(((i + 90) / 180.0 - 1.0) * Math.PI, // rotate 90 deg for polygon
+    (0.5 - j / 180.0) * Math.PI);
+    var ar = world2fish(Math.sin(-0.5 * Math.PI) * world.z + Math.cos(-0.5 * Math.PI) * world.x, world.y, Math.cos(-0.5 * Math.PI) * world.z - Math.sin(-0.5 * Math.PI) * world.x);
+    var fishRad = 0.883;
+    var fishRad2 = fishRad * 0.88888888888888;
+    var fishCenter = 1.0 - 0.44444444444444;
+    var x = lens === 0 ? fishRad * ar.y * Math.cos(ar.x) * 0.5 + 0.25 : fishRad * (1.0 - ar.y) * Math.cos(-1.0 * ar.x + Math.PI) * 0.5 + 0.75;
+    var y = lens === 0 ? fishRad2 * ar.y * Math.sin(ar.x) + fishCenter : fishRad2 * (1.0 - ar.y) * Math.sin(-1.0 * ar.x + Math.PI) + fishCenter;
+    return new bg.Vector2(x, y);
+  }
 
-      _classCallCheck(this, Video360Theta);
+  function buildViewerNode(ctx) {
+    var radius = 1;
+    var node = new bg.scene.Node(ctx);
+    var drw = new bg.scene.Drawable();
+    node.addComponent(drw);
+    var plist = new bg.base.PolyList(ctx);
+    var vertex = [];
+    var normals = [];
+    var uvs = [];
+    var index = [];
 
-      _this209 = _possibleConstructorReturn(this, _getPrototypeOf(Video360Theta).call(this, id, stream, 'canvas', 0, 0, 1280, 720));
-      _this209._posterFrame = null;
-      _this209._currentQuality = null;
-      _this209._autoplay = false;
-      _this209._streamName = null;
-      _this209._streamName = streamName || 'video360theta';
+    for (var j = 0; j <= 180; j += 5) {
+      for (var i = 0; i <= 360; i += 5) {
+        vertex.push(new bg.Vector3(Math.sin(Math.PI * j / 180.0) * Math.sin(Math.PI * i / 180.0) * radius, Math.cos(Math.PI * j / 180.0) * radius, Math.sin(Math.PI * j / 180.0) * Math.cos(Math.PI * i / 180.0) * radius));
+        normals.push(new bg.Vector3(0, 0, -1));
+      }
+      /* devide texture */
 
-      var This = _assertThisInitialized(_this209);
 
-      paella.player.videoContainer.disablePlayOnClick();
-
-      if (_this209._stream.sources[_this209._streamName]) {
-        _this209._stream.sources[_this209._streamName].sort(function (a, b) {
-          return a.res.h - b.res.h;
-        });
+      for (var k = 0; k <= 180; k += 5) {
+        uvs.push(calcTexUv(k, j, 0));
       }
 
-      _this209.video = null;
-
-      function onProgress(event) {
-        if (!This._ready && This.video.readyState == 4) {
-          This._ready = true;
-
-          if (This._initialCurrentTipe !== undefined) {
-            This.video.currentTime = This._initialCurrentTime;
-            delete This._initialCurrentTime;
-          }
-
-          This._callReadyEvent();
-        }
+      for (var l = 180; l <= 360; l += 5) {
+        uvs.push(calcTexUv(l, j, 1));
       }
-
-      function evtCallback(event) {
-        onProgress.apply(This, event);
-      }
-
-      function onUpdateSize() {
-        if (This.canvasController) {
-          var canvas = This.canvasController.canvas.domElement; //This.canvasController.reshape($(canvas).width(),$(canvas).height());
-        }
-      }
-
-      var timer = new paella.Timer(function (timer) {
-        onUpdateSize();
-      }, 500);
-      timer.repeat = true;
-      return _this209;
     }
 
-    _createClass(Video360Theta, [{
-      key: "defaultProfile",
-      value: function defaultProfile() {
-        return 'chroma';
-      }
-    }, {
-      key: "_setVideoElem",
-      value: function _setVideoElem(video) {
-        $(this.video).bind('progress', evtCallback);
-        $(this.video).bind('loadstart', evtCallback);
-        $(this.video).bind('loadedmetadata', evtCallback);
-        $(this.video).bind('canplay', evtCallback);
-        $(this.video).bind('oncanplay', evtCallback);
-      }
-    }, {
-      key: "_loadDeps",
-      value: function _loadDeps() {
-        return new Promise(function (resolve, reject) {
-          if (!window.$paella_bg2e) {
-            paella.require(paella.baseUrl + 'javascript/bg2e-es2015.js').then(function () {
-              window.$paella_bg2e = bg;
-              resolve(window.$paella_bg2e);
-            })["catch"](function (err) {
-              console.error(err.message);
-              reject();
-            });
-          } else {
-            defer.resolve(window.$paella_bg2e);
-          }
-        });
-      }
-    }, {
-      key: "_deferredAction",
-      value: function _deferredAction(action) {
-        var _this210 = this;
-
-        return new Promise(function (resolve, reject) {
-          if (_this210.video) {
-            resolve(action());
-          } else {
-            $(_this210.video).bind('canplay', function () {
-              _this210._ready = true;
-              resolve(action());
-            });
-          }
-        });
-      }
-    }, {
-      key: "_getQualityObject",
-      value: function _getQualityObject(index, s) {
-        return {
-          index: index,
-          res: s.res,
-          src: s.src,
-          toString: function toString() {
-            return this.res.w + "x" + this.res.h;
-          },
-          shortLabel: function shortLabel() {
-            return this.res.h + "p";
-          },
-          compare: function compare(q2) {
-            return this.res.w * this.res.h - q2.res.w * q2.res.h;
-          }
-        };
-      } // Initialization functions
-
-    }, {
-      key: "getVideoData",
-      value: function getVideoData() {
-        var _this211 = this;
-
-        var This = this;
-        return new Promise(function (resolve, reject) {
-          _this211._deferredAction(function () {
-            resolve({
-              duration: This.video.duration,
-              currentTime: This.video.currentTime,
-              volume: This.video.volume,
-              paused: This.video.paused,
-              ended: This.video.ended,
-              res: {
-                w: This.video.videoWidth,
-                h: This.video.videoHeight
-              }
-            });
-          });
-        });
-      }
-    }, {
-      key: "setPosterFrame",
-      value: function setPosterFrame(url) {
-        this._posterFrame = url;
-      }
-    }, {
-      key: "setAutoplay",
-      value: function setAutoplay(auto) {
-        this._autoplay = auto;
-
-        if (auto && this.video) {
-          this.video.setAttribute("autoplay", auto);
-        }
-      }
-    }, {
-      key: "load",
-      value: function load() {
-        var _this212 = this;
-
-        var This = this;
-        return new Promise(function (resolve, reject) {
-          _this212._loadDeps().then(function () {
-            var sources = _this212._stream.sources[_this212._streamName];
-
-            if (_this212._currentQuality === null && _this212._videoQualityStrategy) {
-              _this212._currentQuality = _this212._videoQualityStrategy.getQualityIndex(sources);
-            }
-
-            var stream = _this212._currentQuality < sources.length ? sources[_this212._currentQuality] : null;
-            _this212.video = null;
-
-            if (stream) {
-              _this212.canvasController = null;
-              buildVideo360ThetaCanvas(stream, _this212.domElement).then(function (canvasController) {
-                _this212.canvasController = canvasController;
-                _this212.video = canvasController.video;
-
-                _this212.video.pause();
-
-                _this212.disableEventCapture();
-
-                resolve(stream);
-              });
-            } else {
-              reject(new Error("Could not load video: invalid quality stream index"));
-            }
-          });
-        });
-      }
-    }, {
-      key: "getQualities",
-      value: function getQualities() {
-        var _this213 = this;
-
-        return new Promise(function (resolve, reject) {
-          setTimeout(function () {
-            var result = [];
-            var sources = _this213._stream.sources[_this213._streamName];
-            var index = -1;
-            sources.forEach(function (s) {
-              index++;
-              result.push(_this213._getQualityObject(index, s));
-            });
-            resolve(result);
-          }, 10);
-        });
-      }
-    }, {
-      key: "setQuality",
-      value: function setQuality(index) {
-        var _this214 = this;
-
-        return new Promise(function (resolve) {
-          var paused = _this214.video.paused;
-          var sources = _this214._stream.sources[_this214._streamName];
-          _this214._currentQuality = index < sources.length ? index : 0;
-          var currentTime = _this214.video.currentTime;
-
-          _this214.freeze().then(function () {
-            _this214._ready = false;
-            return _this214.load();
-          }).then(function () {
-            if (!paused) {
-              _this214.play();
-            }
-
-            $(_this214.video).on('seeked', function () {
-              _this214.unFreeze();
-
-              resolve();
-              $(_this214.video).off('seeked');
-            });
-            _this214.video.currentTime = currentTime;
-          });
-        });
-      }
-    }, {
-      key: "getCurrentQuality",
-      value: function getCurrentQuality() {
-        var _this215 = this;
-
-        return new Promise(function (resolve) {
-          resolve(_this215._getQualityObject(_this215._currentQuality, _this215._stream.sources[_this215._streamName][_this215._currentQuality]));
-        });
-      }
-    }, {
-      key: "play",
-      value: function play() {
-        var _this216 = this;
-
-        return this._deferredAction(function () {
-          bg.app.MainLoop.singleton.updateMode = bg.app.FrameUpdate.AUTO;
-
-          _this216.video.play();
-        });
-      }
-    }, {
-      key: "pause",
-      value: function pause() {
-        var _this217 = this;
-
-        return this._deferredAction(function () {
-          bg.app.MainLoop.singleton.updateMode = bg.app.FrameUpdate.MANUAL;
-
-          _this217.video.pause();
-        });
-      }
-    }, {
-      key: "isPaused",
-      value: function isPaused() {
-        var _this218 = this;
-
-        return this._deferredAction(function () {
-          return _this218.video.paused;
-        });
-      }
-    }, {
-      key: "duration",
-      value: function duration() {
-        var _this219 = this;
-
-        return this._deferredAction(function () {
-          return _this219.video.duration;
-        });
-      }
-    }, {
-      key: "setCurrentTime",
-      value: function setCurrentTime(time) {
-        var _this220 = this;
-
-        return this._deferredAction(function () {
-          _this220.video.currentTime = time;
-          $(_this220.video).on('seeked', function () {
-            _this220.canvasController.postRedisplay();
-
-            $(_this220.video).off('seeked');
-          });
-        });
-      }
-    }, {
-      key: "currentTime",
-      value: function currentTime() {
-        var _this221 = this;
-
-        return this._deferredAction(function () {
-          return _this221.video.currentTime;
-        });
-      }
-    }, {
-      key: "setVolume",
-      value: function setVolume(volume) {
-        var _this222 = this;
-
-        return this._deferredAction(function () {
-          _this222.video.volume = volume;
-        });
-      }
-    }, {
-      key: "volume",
-      value: function volume() {
-        var _this223 = this;
-
-        return this._deferredAction(function () {
-          return _this223.video.volume;
-        });
-      }
-    }, {
-      key: "setPlaybackRate",
-      value: function setPlaybackRate(rate) {
-        var _this224 = this;
-
-        return this._deferredAction(function () {
-          _this224.video.playbackRate = rate;
-        });
-      }
-    }, {
-      key: "playbackRate",
-      value: function playbackRate() {
-        var _this225 = this;
-
-        return this._deferredAction(function () {
-          return _this225.video.playbackRate;
-        });
-      }
-    }, {
-      key: "goFullScreen",
-      value: function goFullScreen() {
-        var _this226 = this;
-
-        return this._deferredAction(function () {
-          var elem = _this226.video;
-
-          if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-          } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-          } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-          } else if (elem.webkitEnterFullscreen) {
-            elem.webkitEnterFullscreen();
-          }
-        });
-      }
-    }, {
-      key: "unFreeze",
-      value: function unFreeze() {
-        var _this227 = this;
-
-        return this._deferredAction(function () {
-          var c = document.getElementById(_this227.video.className + "canvas");
-          $(c).remove();
-        });
-      }
-    }, {
-      key: "freeze",
-      value: function freeze() {
-        var This = this;
-        return this._deferredAction(function () {});
-      }
-    }, {
-      key: "unload",
-      value: function unload() {
-        this._callUnloadEvent();
-
-        return paella_DeferredNotImplemented();
-      }
-    }, {
-      key: "getDimensions",
-      value: function getDimensions() {
-        return paella_DeferredNotImplemented();
-      }
-    }]);
-
-    return Video360Theta;
-  }(paella.VideoElementBase);
-
-  paella.Video360Theta = Video360Theta;
-
-  var Video360ThetaFactory =
-  /*#__PURE__*/
-  function (_paella$VideoFactory6) {
-    _inherits(Video360ThetaFactory, _paella$VideoFactory6);
-
-    function Video360ThetaFactory() {
-      _classCallCheck(this, Video360ThetaFactory);
-
-      return _possibleConstructorReturn(this, _getPrototypeOf(Video360ThetaFactory).apply(this, arguments));
+    function addFace(v0, v1, v2, n0, n1, n2, uv0, uv1, uv2) {
+      plist.vertex.push(v0.x);
+      plist.vertex.push(v0.y);
+      plist.vertex.push(v0.z);
+      plist.vertex.push(v1.x);
+      plist.vertex.push(v1.y);
+      plist.vertex.push(v1.z);
+      plist.vertex.push(v2.x);
+      plist.vertex.push(v2.y);
+      plist.vertex.push(v2.z);
+      plist.normal.push(n0.x);
+      plist.normal.push(n0.y);
+      plist.normal.push(n0.z);
+      plist.normal.push(n1.x);
+      plist.normal.push(n1.y);
+      plist.normal.push(n1.z);
+      plist.normal.push(n2.x);
+      plist.normal.push(n2.z);
+      plist.normal.push(n2.z);
+      plist.texCoord0.push(uv0.x);
+      plist.texCoord0.push(1 - uv0.y);
+      plist.texCoord0.push(uv1.x);
+      plist.texCoord0.push(1 - uv1.y);
+      plist.texCoord0.push(uv2.x);
+      plist.texCoord0.push(1 - uv2.y);
+      plist.index.push(plist.index.length);
+      plist.index.push(plist.index.length);
+      plist.index.push(plist.index.length);
     }
 
-    _createClass(Video360ThetaFactory, [{
-      key: "isStreamCompatible",
-      value: function isStreamCompatible(streamData) {
-        try {
-          if (paella.ChromaVideo._loaded) {
-            return false;
-          }
-
-          if (paella.videoFactories.Html5VideoFactory.s_instances > 0 && base.userAgent.system.iOS) {
-            return false;
-          }
-
-          for (var key in streamData.sources) {
-            if (key == 'video360theta') return true;
-          }
-        } catch (e) {}
-
-        return false;
+    for (var m = 0; m < 36; m++) {
+      for (var n = 0; n < 72; n++) {
+        var v = m * 73 + n;
+        var t = n < 36 ? m * 74 + n : m * 74 + n + 1;
+        [uvs[t + 0], uvs[t + 1], uvs[t + 74]], [uvs[t + 1], uvs[t + 75], uvs[t + 74]];
+        var v0 = vertex[v + 0];
+        var n0 = normals[v + 0];
+        var uv0 = uvs[t + 0];
+        var v1 = vertex[v + 1];
+        var n1 = normals[v + 1];
+        var uv1 = uvs[t + 1];
+        var v2 = vertex[v + 73];
+        var n2 = normals[v + 73];
+        var uv2 = uvs[t + 74];
+        var v3 = vertex[v + 74];
+        var n3 = normals[v + 74];
+        var uv3 = uvs[t + 75];
+        addFace(v0, v1, v2, n0, n1, n2, uv0, uv1, uv2);
+        addFace(v1, v3, v2, n1, n3, n2, uv1, uv3, uv2);
       }
-    }, {
-      key: "getVideoObject",
-      value: function getVideoObject(id, streamData, rect) {
-        paella.ChromaVideo._loaded = true;
-        ++paella.videoFactories.Html5VideoFactory.s_instances;
-        return new paella.Video360Theta(id, streamData, rect.x, rect.y, rect.w, rect.h);
-      }
-    }]);
+    }
 
-    return Video360ThetaFactory;
-  }(paella.VideoFactory);
+    plist.build();
+    drw.addPolyList(plist);
+    var trx = bg.Matrix4.Scale(-1, 1, 1);
+    node.addComponent(new bg.scene.Transform(trx));
+    return node;
+  }
 
-  paella.videoFactories.Video360ThetaFactory = Video360ThetaFactory;
+  paella.addCanvasPlugin("video360Theta", true, true, function () {
+    return (
+      /*#__PURE__*/
+      function (_paella$WebGLCanvas2) {
+        _inherits(Video360ThetaCanvas, _paella$WebGLCanvas2);
+
+        function Video360ThetaCanvas(stream) {
+          _classCallCheck(this, Video360ThetaCanvas);
+
+          return _possibleConstructorReturn(this, _getPrototypeOf(Video360ThetaCanvas).call(this, stream));
+        }
+
+        _createClass(Video360ThetaCanvas, [{
+          key: "loadVideo",
+          value: function loadVideo(videoPlugin, stream) {
+            var _this203 = this;
+
+            return new Promise(function (resolve, reject) {
+              var checkLoaded = function checkLoaded() {
+                if (_this203.video) {
+                  resolve(_this203);
+                } else {
+                  setTimeout(checkLoaded, 100);
+                }
+              };
+
+              checkLoaded();
+            });
+          }
+        }, {
+          key: "buildVideoSurface",
+          value: function buildVideoSurface(sceneRoot, videoTexture) {
+            var sphereNode = buildViewerNode(this.gl);
+            var sphere = sphereNode.drawable;
+            sphere.getMaterial(0).texture = videoTexture;
+            sphere.getMaterial(0).lightEmission = 0;
+            sphere.getMaterial(0).lightEmissionMaskInvert = false;
+            sphere.getMaterial(0).cullFace = false;
+            sceneRoot.addChild(sphereNode);
+          }
+        }, {
+          key: "buildCamera",
+          value: function buildCamera() {
+            var cameraNode = new bg.scene.Node(this.gl, "Camera");
+            var camera = new bg.scene.Camera();
+            cameraNode.addComponent(camera);
+            cameraNode.addComponent(new bg.scene.Transform());
+            var projection = new bg.scene.OpticalProjectionStrategy();
+            projection.far = 100;
+            projection.focalLength = 55;
+            camera.projectionStrategy = projection;
+            var oc = new bg.manipulation.OrbitCameraController();
+            oc.maxPitch = 90;
+            oc.minPitch = -90;
+            oc.maxDistance = 0;
+            oc.minDistance = 0;
+            this._cameraController = oc;
+            cameraNode.addComponent(oc);
+            return cameraNode;
+          }
+        }]);
+
+        return Video360ThetaCanvas;
+      }(paella.WebGLCanvas)
+    );
+  });
 })();
 
 paella.addDataDelegate('metadata', function () {
@@ -22362,7 +21627,7 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this228 = this;
+          var _this204 = this;
 
           var thisClass = this;
           this._thumbnails = [];
@@ -22385,30 +21650,30 @@ paella.addPlugin(function () {
           var players = paella.player.videoContainer.streamProvider.videoPlayers;
           players.forEach(function (player, index) {
             if (player.allowZoom()) {
-              _this228._available = player.zoomAvailable();
-              _this228._visible = _this228._available;
-              setupButtons.apply(_this228, [player]);
+              _this204._available = player.zoomAvailable();
+              _this204._visible = _this204._available;
+              setupButtons.apply(_this204, [player]);
               player.supportsCaptureFrame().then(function (supports) {
                 if (supports) {
                   var thumbContainer = document.createElement('div');
                   thumbContainer.className = "zoom-container";
-                  var thumb = getThumbnailContainer.apply(_this228, [index]);
-                  var zoomRect = getZoomRect.apply(_this228);
+                  var thumb = getThumbnailContainer.apply(_this204, [index]);
+                  var zoomRect = getZoomRect.apply(_this204);
 
-                  _this228.button.appendChild(thumbContainer);
+                  _this204.button.appendChild(thumbContainer);
 
                   thumbContainer.appendChild(thumb);
                   thumbContainer.appendChild(zoomRect);
                   $(thumbContainer).hide();
 
-                  _this228._thumbnails.push({
+                  _this204._thumbnails.push({
                     player: player,
                     thumbContainer: thumbContainer,
                     zoomRect: zoomRect,
                     canvas: thumb
                   });
 
-                  checkVisibility.apply(_this228);
+                  checkVisibility.apply(_this204);
                 }
               });
             }
@@ -22416,7 +21681,7 @@ paella.addPlugin(function () {
           var update = false;
           paella.events.bind(paella.events.play, function (evt) {
             var updateThumbs = function updateThumbs() {
-              _this228._thumbnails.forEach(function (item) {
+              _this204._thumbnails.forEach(function (item) {
                 updateThumbnail(item);
               });
 
@@ -22434,7 +21699,7 @@ paella.addPlugin(function () {
             update = false;
           });
           paella.events.bind(paella.events.videoZoomChanged, function (evt, target) {
-            _this228._thumbnails.some(function (thumb) {
+            _this204._thumbnails.some(function (thumb) {
               if (thumb.player == target.video) {
                 if (thumb.player.zoom > 100) {
                   $(thumb.thumbContainer).show();
@@ -22456,17 +21721,17 @@ paella.addPlugin(function () {
             });
           });
           paella.events.bind(paella.events.zoomAvailabilityChanged, function (evt, target) {
-            _this228._available = target.available;
-            _this228._visible = target.available;
-            checkVisibility.apply(_this228);
+            _this204._available = target.available;
+            _this204._visible = target.available;
+            checkVisibility.apply(_this204);
           });
           paella.events.bind(paella.events.controlBarDidHide, function () {
-            _this228._visible = false;
-            checkVisibility.apply(_this228);
+            _this204._visible = false;
+            checkVisibility.apply(_this204);
           });
           paella.events.bind(paella.events.controlBarDidShow, function () {
-            _this228._visible = true;
-            checkVisibility.apply(_this228);
+            _this204._visible = true;
+            checkVisibility.apply(_this204);
           });
         }
       }, {
@@ -22543,10 +21808,10 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this229 = this;
+          var _this205 = this;
 
           paella.events.bind(paella.events.videoZoomChanged, function (evt, target) {
-            _this229.setText(Math.round(target.video.zoom) + "%");
+            _this205.setText(Math.round(target.video.zoom) + "%");
           });
           this.setText("100%");
 
@@ -22559,10 +21824,10 @@ paella.addPlugin(function () {
           }
 
           domElement.appendChild(getZoomButton('zoom-in', function (evt) {
-            _this229.targetPlayer.zoomIn();
+            _this205.targetPlayer.zoomIn();
           }));
           domElement.appendChild(getZoomButton('zoom-out', function (evt) {
-            _this229.targetPlayer.zoomOut();
+            _this205.targetPlayer.zoomOut();
           }));
         }
       }]);
@@ -22674,17 +21939,17 @@ paella.addPlugin(function () {
       }, {
         key: "rebuildProfileList",
         value: function rebuildProfileList() {
-          var _this230 = this;
+          var _this206 = this;
 
           this.buttonItems = {};
           this.domElement.innerText = "";
           paella.profiles.profileList.forEach(function (profileData) {
             if (profileData.hidden) return;
 
-            if (_this230.active_profiles) {
+            if (_this206.active_profiles) {
               var active = false;
 
-              _this230.active_profiles.forEach(function (ap) {
+              _this206.active_profiles.forEach(function (ap) {
                 if (ap == profile) {
                   active = true;
                 }
@@ -22695,16 +21960,16 @@ paella.addPlugin(function () {
               }
             }
 
-            var buttonItem = _this230.getProfileItemButton(profileData.id, profileData);
+            var buttonItem = _this206.getProfileItemButton(profileData.id, profileData);
 
-            _this230.buttonItems[profileData.id] = buttonItem;
+            _this206.buttonItems[profileData.id] = buttonItem;
 
-            _this230.domElement.appendChild(buttonItem);
+            _this206.domElement.appendChild(buttonItem);
 
-            _this230.buttons.push(buttonItem);
+            _this206.buttons.push(buttonItem);
 
             if (paella.player.selectedProfile == profileData.id) {
-              _this230.buttonItems[profileData.id].className = _this230.getButtonItemClass(profileData.id, true);
+              _this206.buttonItems[profileData.id].className = _this206.getButtonItemClass(profileData.id, true);
             }
           });
           this.selected_button = this.buttons.length;
@@ -22712,13 +21977,13 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this231 = this;
+          var _this207 = this;
 
           var thisClass = this;
           this.domElement = domElement;
           this.rebuildProfileList();
           paella.events.bind(paella.events.profileListChanged, function () {
-            _this231.rebuildProfileList();
+            _this207.rebuildProfileList();
           });
         }
       }, {
@@ -22900,7 +22165,7 @@ paella.addPlugin(function () {
       }, {
         key: "getExpandableContent",
         value: function getExpandableContent() {
-          var _this232 = this;
+          var _this208 = this;
 
           var rangeInput = document.createElement('input');
           this._inputMaster = rangeInput;
@@ -22915,7 +22180,7 @@ paella.addPlugin(function () {
           var updateMasterVolume = function updateMasterVolume() {
             var masterVolume = $(rangeInput).val();
             var slaveVolume = 0;
-            _this232._control_NotMyselfEvent = false;
+            _this208._control_NotMyselfEvent = false;
             paella.player.videoContainer.setVolume(masterVolume);
           };
 
@@ -22928,7 +22193,7 @@ paella.addPlugin(function () {
           paella.events.bind(paella.events.setVolume, function (event, params) {
             rangeInput.value = params.master;
 
-            _this232.updateClass();
+            _this208.updateClass();
           });
           this.updateClass();
           return rangeInput;
@@ -22936,7 +22201,7 @@ paella.addPlugin(function () {
       }, {
         key: "updateClass",
         value: function updateClass() {
-          var _this233 = this;
+          var _this209 = this;
 
           var selected = '';
           var self = this;
@@ -22953,7 +22218,7 @@ paella.addPlugin(function () {
               selected = 'icon-volume-high';
             }
 
-            _this233.changeIconClass(selected);
+            _this209.changeIconClass(selected);
           });
         }
       }]);
@@ -22966,8 +22231,8 @@ paella.addPlugin(function () {
 (function () {
   var WebmVideoFactory =
   /*#__PURE__*/
-  function (_paella$VideoFactory7) {
-    _inherits(WebmVideoFactory, _paella$VideoFactory7);
+  function (_paella$VideoFactory6) {
+    _inherits(WebmVideoFactory, _paella$VideoFactory6);
 
     function WebmVideoFactory() {
       _classCallCheck(this, WebmVideoFactory);
@@ -23032,11 +22297,11 @@ paella.addPlugin(function () {
       }, {
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this234 = this;
+          var _this210 = this;
 
           this._initDone = false;
           paella.player.videoContainer.masterVideo().duration().then(function (d) {
-            _this234.loadTitle();
+            _this210.loadTitle();
           });
           onSuccess(true);
         }
@@ -23057,30 +22322,30 @@ paella.addPlugin(function () {
 (function () {
   var YoutubeVideo =
   /*#__PURE__*/
-  function (_paella$VideoElementB7) {
-    _inherits(YoutubeVideo, _paella$VideoElementB7);
+  function (_paella$VideoElementB6) {
+    _inherits(YoutubeVideo, _paella$VideoElementB6);
 
     function YoutubeVideo(id, stream, left, top, width, height) {
-      var _this235;
+      var _this211;
 
       _classCallCheck(this, YoutubeVideo);
 
-      _this235 = _possibleConstructorReturn(this, _getPrototypeOf(YoutubeVideo).call(this, id, stream, 'div', left, top, width, height));
-      _this235._posterFrame = null;
-      _this235._currentQuality = null;
-      _this235._autoplay = false;
-      _this235._readyPromise = null;
-      _this235._readyPromise = $.Deferred();
-      return _this235;
+      _this211 = _possibleConstructorReturn(this, _getPrototypeOf(YoutubeVideo).call(this, id, stream, 'div', left, top, width, height));
+      _this211._posterFrame = null;
+      _this211._currentQuality = null;
+      _this211._autoplay = false;
+      _this211._readyPromise = null;
+      _this211._readyPromise = $.Deferred();
+      return _this211;
     }
 
     _createClass(YoutubeVideo, [{
       key: "_deferredAction",
       value: function _deferredAction(action) {
-        var _this236 = this;
+        var _this212 = this;
 
         return new Promise(function (resolve, reject) {
-          _this236._readyPromise.then(function () {
+          _this212._readyPromise.then(function () {
             resolve(action());
           }, function () {
             reject();
@@ -23148,13 +22413,13 @@ paella.addPlugin(function () {
     }, {
       key: "getVideoData",
       value: function getVideoData() {
-        var _this237 = this;
+        var _this213 = this;
 
         var This = this;
         return new Promise(function (resolve, reject) {
-          var stream = _this237._stream.sources.youtube[0];
+          var stream = _this213._stream.sources.youtube[0];
 
-          _this237._deferredAction(function () {
+          _this213._deferredAction(function () {
             var videoData = {
               duration: This.video.getDuration(),
               currentTime: This.video.getCurrentTime(),
@@ -23242,17 +22507,17 @@ paella.addPlugin(function () {
     }, {
       key: "load",
       value: function load() {
-        var _this238 = this;
+        var _this214 = this;
 
         var This = this;
         return new Promise(function (resolve, reject) {
-          _this238._qualityListReadyPromise = $.Deferred();
+          _this214._qualityListReadyPromise = $.Deferred();
           paella.youtubePlayerVars.apiReadyPromise.then(function () {
-            var stream = _this238._stream.sources.youtube[0];
+            var stream = _this214._stream.sources.youtube[0];
 
             if (stream) {
               // TODO: poster frame
-              _this238._youtubePlayer = new YT.Player(This.identifier, {
+              _this214._youtubePlayer = new YT.Player(This.identifier, {
                 height: '390',
                 width: '640',
                 videoId: stream.id,
@@ -23300,15 +22565,15 @@ paella.addPlugin(function () {
     }, {
       key: "setQuality",
       value: function setQuality(index) {
-        var _this239 = this;
+        var _this215 = this;
 
         return new Promise(function (resolve, reject) {
-          _this239._qualityListReadyPromise.then(function (q) {
-            for (var key in _this239._qualities) {
-              var searchQ = _this239._qualities[key];
+          _this215._qualityListReadyPromise.then(function (q) {
+            for (var key in _this215._qualities) {
+              var searchQ = _this215._qualities[key];
 
               if (_typeof(searchQ) == "object" && searchQ.index == index) {
-                _this239.video.setPlaybackQuality(searchQ.label);
+                _this215.video.setPlaybackQuality(searchQ.label);
 
                 break;
               }
@@ -23321,30 +22586,30 @@ paella.addPlugin(function () {
     }, {
       key: "getCurrentQuality",
       value: function getCurrentQuality() {
-        var _this240 = this;
+        var _this216 = this;
 
         return new Promise(function (resolve, reject) {
-          _this240._qualityListReadyPromise.then(function (q) {
-            resolve(_this240._qualities[_this240.video.getPlaybackQuality()]);
+          _this216._qualityListReadyPromise.then(function (q) {
+            resolve(_this216._qualities[_this216.video.getPlaybackQuality()]);
           });
         });
       }
     }, {
       key: "play",
       value: function play() {
-        var _this241 = this;
+        var _this217 = this;
 
         var This = this;
         return new Promise(function (resolve, reject) {
           This._playing = true;
           This.video.playVideo();
           new base.Timer(function (timer) {
-            var q = _this241.video.getAvailableQualityLevels();
+            var q = _this217.video.getAvailableQualityLevels();
 
             if (q.length) {
               timer.repeat = false;
 
-              _this241._qualityListReadyPromise.resolve(q);
+              _this217._qualityListReadyPromise.resolve(q);
 
               resolve();
             } else {
@@ -23356,93 +22621,93 @@ paella.addPlugin(function () {
     }, {
       key: "pause",
       value: function pause() {
-        var _this242 = this;
+        var _this218 = this;
 
         return this._deferredAction(function () {
-          _this242._playing = false;
+          _this218._playing = false;
 
-          _this242.video.pauseVideo();
+          _this218.video.pauseVideo();
         });
       }
     }, {
       key: "isPaused",
       value: function isPaused() {
-        var _this243 = this;
+        var _this219 = this;
 
         return this._deferredAction(function () {
-          return !_this243._playing;
+          return !_this219._playing;
         });
       }
     }, {
       key: "duration",
       value: function duration() {
-        var _this244 = this;
+        var _this220 = this;
 
         return this._deferredAction(function () {
-          return _this244.video.getDuration();
+          return _this220.video.getDuration();
         });
       }
     }, {
       key: "setCurrentTime",
       value: function setCurrentTime(time) {
-        var _this245 = this;
+        var _this221 = this;
 
         return this._deferredAction(function () {
-          _this245.video.seekTo(time);
+          _this221.video.seekTo(time);
         });
       }
     }, {
       key: "currentTime",
       value: function currentTime() {
-        var _this246 = this;
+        var _this222 = this;
 
         return this._deferredAction(function () {
-          return _this246.video.getCurrentTime();
+          return _this222.video.getCurrentTime();
         });
       }
     }, {
       key: "setVolume",
       value: function setVolume(volume) {
-        var _this247 = this;
+        var _this223 = this;
 
         return this._deferredAction(function () {
-          _this247.video.setVolume && _this247.video.setVolume(volume * 100);
+          _this223.video.setVolume && _this223.video.setVolume(volume * 100);
         });
       }
     }, {
       key: "volume",
       value: function volume() {
-        var _this248 = this;
+        var _this224 = this;
 
         return this._deferredAction(function () {
-          return _this248.video.getVolume() / 100;
+          return _this224.video.getVolume() / 100;
         });
       }
     }, {
       key: "setPlaybackRate",
       value: function setPlaybackRate(rate) {
-        var _this249 = this;
+        var _this225 = this;
 
         return this._deferredAction(function () {
-          _this249.video.playbackRate = rate;
+          _this225.video.playbackRate = rate;
         });
       }
     }, {
       key: "playbackRate",
       value: function playbackRate() {
-        var _this250 = this;
+        var _this226 = this;
 
         return this._deferredAction(function () {
-          return _this250.video.playbackRate;
+          return _this226.video.playbackRate;
         });
       }
     }, {
       key: "goFullScreen",
       value: function goFullScreen() {
-        var _this251 = this;
+        var _this227 = this;
 
         return this._deferredAction(function () {
-          var elem = _this251.video;
+          var elem = _this227.video;
 
           if (elem.requestFullscreen) {
             elem.requestFullscreen();
@@ -23458,29 +22723,29 @@ paella.addPlugin(function () {
     }, {
       key: "unFreeze",
       value: function unFreeze() {
-        var _this252 = this;
+        var _this228 = this;
 
         return this._deferredAction(function () {
-          var c = document.getElementById(_this252.video.className + "canvas");
+          var c = document.getElementById(_this228.video.className + "canvas");
           $(c).remove();
         });
       }
     }, {
       key: "freeze",
       value: function freeze() {
-        var _this253 = this;
+        var _this229 = this;
 
         return this._deferredAction(function () {
           var canvas = document.createElement("canvas");
-          canvas.id = _this253.video.className + "canvas";
-          canvas.width = _this253.video.videoWidth;
-          canvas.height = _this253.video.videoHeight;
-          canvas.style.cssText = _this253.video.style.cssText;
+          canvas.id = _this229.video.className + "canvas";
+          canvas.width = _this229.video.videoWidth;
+          canvas.height = _this229.video.videoHeight;
+          canvas.style.cssText = _this229.video.style.cssText;
           canvas.style.zIndex = 2;
           var ctx = canvas.getContext("2d");
-          ctx.drawImage(_this253.video, 0, 0, Math.ceil(canvas.width / 16) * 16, Math.ceil(canvas.height / 16) * 16); //Draw image
+          ctx.drawImage(_this229.video, 0, 0, Math.ceil(canvas.width / 16) * 16, Math.ceil(canvas.height / 16) * 16); //Draw image
 
-          _this253.video.parentElement.appendChild(canvas);
+          _this229.video.parentElement.appendChild(canvas);
         });
       }
     }, {
@@ -23509,8 +22774,8 @@ paella.addPlugin(function () {
 
   var YoutubeVideoFactory =
   /*#__PURE__*/
-  function (_paella$VideoFactory8) {
-    _inherits(YoutubeVideoFactory, _paella$VideoFactory8);
+  function (_paella$VideoFactory7) {
+    _inherits(YoutubeVideoFactory, _paella$VideoFactory7);
 
     function YoutubeVideoFactory() {
       _classCallCheck(this, YoutubeVideoFactory);
