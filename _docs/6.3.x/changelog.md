@@ -5,6 +5,10 @@
 CHANGELOG
 =========
 
+* Paella 6.3.1
+
+ * New video canvas: video360theta
+ 
 * Paella 6.3.0
 
   * New feature:
