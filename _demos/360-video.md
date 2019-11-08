@@ -1,9 +1,8 @@
 ---
-videoid: video360theta
+videoid: video360
 ---
 
 # Video 360º
 
-Video 360º: This is a video grabbed directly from a Ricoh Theta S camera (720p)
+Video 360º: 360º video demonstration in equirectangular format.
 
-DUE TO A NASTY BUG IN THE LAST PAELLA RELEASE, THIS DEMO IS CURRENTLY NOT WORKING. We'll expect to fix it soon  
