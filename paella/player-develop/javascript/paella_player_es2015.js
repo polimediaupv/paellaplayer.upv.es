@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: a5cd497";
+paella.version = "6.4.0 - build: 67fcc01";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2540,7 +2540,6 @@ class Html5Video extends paella.VideoElementBase {
 	constructor(id,stream,left,top,width,height,streamName) {
 		super(id,stream,'video',left,top,width,height);
 
-		this._posterFrame = null;
 		this._currentQuality = null;
 		this._autoplay = false;
 

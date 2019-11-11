@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: a5cd497";
+paella.version = "6.4.0 - build: 67fcc01";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -3314,7 +3314,6 @@ function paella_DeferredNotImplemented() {
       _classCallCheck(this, Html5Video);
 
       _this25 = _possibleConstructorReturn(this, _getPrototypeOf(Html5Video).call(this, id, stream, 'video', left, top, width, height));
-      _this25._posterFrame = null;
       _this25._currentQuality = null;
       _this25._autoplay = false;
       _this25._streamName = streamName || 'mp4';
