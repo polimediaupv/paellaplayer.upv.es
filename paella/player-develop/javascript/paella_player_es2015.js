@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: d0008c2";
+paella.version = "6.4.0 - build: be225ea";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3639,17 +3639,6 @@ class VideoContainerBase extends paella.DomNode {
 				paella.player.controls.restartHideTimer();
 			}
 		});
-
-		let endedTimer = null;
-		paella.events.bind(paella.events.endVideo,(event) => {
-			if (endedTimer) {
-				clearTimeout(endedTimer);
-				endedTimer = null;
-			}
-			endedTimer = setTimeout(() => {
-				paella.events.trigger(paella.events.ended);
-			}, 1000);
-		});
 	}
 
 	set attenuationEnabled(att) {
@@ -3999,6 +3988,20 @@ class VideoContainerBase extends paella.DomNode {
 
 	onresize() { super.onresize(onresize);
 	}
+
+	ended() {
+		return new Promise((resolve) => {
+			let duration = 0;
+			this.duration()
+				.then((d) => {
+					duration = d;
+					return this.currentTime();
+				})
+				.then((currentTime) => {
+					resolve(Math.floor(duration) <= Math.ceil(currentTime));
+				});
+		});
+	}
 }
 
 paella.VideoContainerBase = VideoContainerBase;
@@ -4329,8 +4332,17 @@ class VideoContainer extends paella.VideoContainerBase {
 	// Playback and status functions
 	play() {
 		return new Promise((resolve,reject) => {
-			this.streamProvider.startTime = this._startTime;
-			this.streamProvider.callPlayerFunction('play')
+			this.ended()
+				.then((ended) => {
+					if (ended) {
+						this._streamProvider.startTime = 0;
+						this.seekToTime(0);
+					}
+					else {
+						this.streamProvider.startTime = this._startTime;
+					}
+					return this.streamProvider.callPlayerFunction('play')
+				})
 				.then(() => {
 					super.play();
 					resolve();
@@ -4672,6 +4684,17 @@ class VideoContainer extends paella.VideoContainerBase {
 
 				.then(() => {
 					let endedTimer = null;
+					let setupEndEventTimer = () => {
+						this.stopTimeupdate();
+						if (endedTimer) {
+							clearTimeout(endedTimer);
+							endedTimer = null;
+						}
+						endedTimer = setTimeout(() => {
+							paella.events.trigger(paella.events.ended);
+						}, 1000);
+					}
+
 					let eventBindingObject = this.masterVideo().video || this.masterVideo().audio;
 					$(eventBindingObject).bind('timeupdate', (evt) => {
 						this.trimming().then((trimmingData) => {
@@ -4681,18 +4704,15 @@ class VideoContainer extends paella.VideoContainerBase {
 								current -= trimmingData.start;
 								duration = trimmingData.end - trimmingData.start;
 							}
-							paella.events.trigger(paella.events.timeupdate, { videoContainer:this, currentTime:current, duration:duration });
 							if (current>=duration) {
 								this.streamProvider.callPlayerFunction('pause');
-								if (endedTimer) {
-									clearTimeout(endedTimer);
-									endedTimer = null;
-								}
-								endedTimer = setTimeout(() => {
-									paella.events.trigger(paella.events.ended);
-								}, 1000);
+								setupEndEventTimer();
 							}
 						})
+					});
+					
+					paella.events.bind(paella.events.endVideo,(event) => {
+						setupEndEventTimer();
 					});
 
 					this._ready = true;
@@ -14360,6 +14380,7 @@ paella.addPlugin(function() {
 		constructor() {
 			super();
 			this.playIconClass = 'icon-play';
+			this.replayIconClass = 'icon-loop2';
 			this.pauseIconClass = 'icon-pause';
 			this.playSubclass = 'playButton';
 			this.pauseSubclass = 'pauseButton';
@@ -14380,6 +14401,7 @@ paella.addPlugin(function() {
 			if (paella.player.playing()) {
 				this.changeIconClass(this.playIconClass);
 			}
+			
 			paella.events.bind(paella.events.play,(event) => {
 				this.changeIconClass(this.pauseIconClass);
 				this.changeSubclass(this.pauseSubclass);
@@ -14393,7 +14415,7 @@ paella.addPlugin(function() {
 			});
 
 			paella.events.bind(paella.events.ended,(event) => {
-				this.changeIconClass(this.playIconClass);
+				this.changeIconClass(this.replayIconClass);
 				this.changeSubclass(this.playSubclass);
 				this.setToolTip(paella.dictionary.translate("Play"));
 			});
