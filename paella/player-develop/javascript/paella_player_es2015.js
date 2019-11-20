@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: bd81d5e";
+paella.version = "6.4.0 - build: 58e476e";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -14302,8 +14302,10 @@ paella.addPlugin(function() {
 		
 		buildContent(domElement) {
 			this._available.forEach((q) => {
-				var title = q.shortLabel();
-				domElement.appendChild(this.getItemButton(q));
+				let resH = q.res && q.res.h || 0;
+				if (resH>=this.config.minVisibleQuality || resH<=0) {
+					domElement.appendChild(this.getItemButton(q));
+				}
 			});
 		}
 

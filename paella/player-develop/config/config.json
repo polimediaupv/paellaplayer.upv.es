@@ -167,7 +167,8 @@
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": true,
         "showWidthRes": true,
-        "minWindowSize": 550
+        "minWindowSize": 550,
+        "minVisibleQuality": 240
       },
       "es.upv.paella.playbackRatePlugin": {
         "enabled": true,

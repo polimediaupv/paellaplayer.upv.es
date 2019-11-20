@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: bd81d5e";
+paella.version = "6.4.0 - build: 58e476e";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -18372,8 +18372,11 @@ paella.addPlugin(function () {
           var _this179 = this;
 
           this._available.forEach(function (q) {
-            var title = q.shortLabel();
-            domElement.appendChild(_this179.getItemButton(q));
+            var resH = q.res && q.res.h || 0;
+
+            if (resH >= _this179.config.minVisibleQuality || resH <= 0) {
+              domElement.appendChild(_this179.getItemButton(q));
+            }
           });
         }
       }, {
