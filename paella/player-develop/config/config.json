@@ -60,7 +60,8 @@
           "highBufferWatchdogPeriod": 3
         },
         "iOSMaxStreams": 2,
-        "androidMaxStreams": 2
+        "androidMaxStreams": 2,
+        "initialQualityLevel": 2
       },
       {
         "factory": "RTMPVideoFactory",

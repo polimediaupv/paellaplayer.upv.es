@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: be225ea";
+paella.version = "6.4.0 - build: bd81d5e";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -1208,9 +1208,7 @@ function paella_DeferredNotImplemented () {
             }
             else if (videoWrapper) {
                 videoWrapper.setVisible(false,animate);
-                if (paella.player.videoContainer.streamProvider.mainAudioPlayer!=player) {
-                    player.disable();
-                }
+                player.disable(paella.player.videoContainer.streamProvider.mainAudioPlayer==player);
             }
         });
     }
@@ -13635,11 +13633,13 @@ paella.addPlugin(function() {
 		}
 	
 		setupHls(video,url) {
+			let initialQualityLevel = this.config.initialQualityLevel !== undefined ? this.config.initialQualityLevel : 1;
 			return new Promise((resolve,reject) => {
 				this._loadDeps()
 					.then((Hls) => {
 						if (Hls.isSupported()) {
 							let cfg = this.config;
+							//cfg.autoStartLoad = false;
 							this._hls = new Hls(cfg);
 							this._hls.loadSource(url);
 							this._hls.attachMedia(video);
@@ -13673,9 +13673,14 @@ paella.addPlugin(function() {
 							});
 
 							this._hls.on(Hls.Events.MANIFEST_PARSED, () => {
-								//this._deferredAction(function() {
-									resolve(video);
-								//});
+								if (!cfg.autoStartLoad) {
+									this._hls.startLoad();
+								}
+								// Fixes hls.js problems when loading the initial quality level
+								this._hls.currentLevel = this._hls.levels.length>=initialQualityLevel ? initialQualityLevel : -1;
+								setTimeout(() => this._hls.currentLevel = -1, 1000);
+								
+								resolve(video);
 							});
 						}
 						else {
@@ -13748,7 +13753,23 @@ paella.addPlugin(function() {
 				});
 			}
 		}
-		
+
+		disable(isMainAudioPlayer) {
+			if (base.userAgent.system.iOS) {
+				return;
+			}
+			
+			this._currentQualityIndex = this._qualityIndex;
+			this._hls.currentLevel = 0;
+		}
+	
+		enable(isMainAudioPlayer) {
+			if (this._currentQualityIndex !== undefined && this._currentQualityIndex !== null) {
+				this.setQuality(this._currentQualityIndex);
+				this._currentQualityIndex = null;
+			}
+		}
+
 		printQualityes() {
 			return new Promise((resolve,reject) => {
 				this.getCurrentQuality()

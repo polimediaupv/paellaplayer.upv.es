@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: be225ea";
+paella.version = "6.4.0 - build: bd81d5e";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -1491,10 +1491,7 @@ function paella_DeferredNotImplemented() {
         });
       } else if (videoWrapper) {
         videoWrapper.setVisible(false, animate);
-
-        if (paella.player.videoContainer.streamProvider.mainAudioPlayer != player) {
-          player.disable();
-        }
+        player.disable(paella.player.videoContainer.streamProvider.mainAudioPlayer == player);
       }
     });
   }
@@ -17439,10 +17436,12 @@ paella.addPlugin(function () {
       value: function setupHls(video, url) {
         var _this165 = this;
 
+        var initialQualityLevel = this.config.initialQualityLevel !== undefined ? this.config.initialQualityLevel : 1;
         return new Promise(function (resolve, reject) {
           _this165._loadDeps().then(function (Hls) {
             if (Hls.isSupported()) {
-              var cfg = _this165.config;
+              var cfg = _this165.config; //cfg.autoStartLoad = false;
+
               _this165._hls = new Hls(cfg);
 
               _this165._hls.loadSource(url);
@@ -17487,8 +17486,16 @@ paella.addPlugin(function () {
               });
 
               _this165._hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                //this._deferredAction(function() {
-                resolve(video); //});
+                if (!cfg.autoStartLoad) {
+                  _this165._hls.startLoad();
+                } // Fixes hls.js problems when loading the initial quality level
+
+
+                _this165._hls.currentLevel = _this165._hls.levels.length >= initialQualityLevel ? initialQualityLevel : -1;
+                setTimeout(function () {
+                  return _this165._hls.currentLevel = -1;
+                }, 1000);
+                resolve(video);
               });
             } else {
               reject(new Error("HLS not supported"));
@@ -17582,6 +17589,24 @@ paella.addPlugin(function () {
             _This.qualityIndex = _This._qualities.length - 1;
             resolve(_This._qualities);
           });
+        }
+      }
+    }, {
+      key: "disable",
+      value: function disable(isMainAudioPlayer) {
+        if (base.userAgent.system.iOS) {
+          return;
+        }
+
+        this._currentQualityIndex = this._qualityIndex;
+        this._hls.currentLevel = 0;
+      }
+    }, {
+      key: "enable",
+      value: function enable(isMainAudioPlayer) {
+        if (this._currentQualityIndex !== undefined && this._currentQualityIndex !== null) {
+          this.setQuality(this._currentQualityIndex);
+          this._currentQualityIndex = null;
         }
       }
     }, {
