@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: ca95e15";
+paella.version = "6.4.0 - build: 4c8b064";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -4699,7 +4699,7 @@ function paella_DeferredNotImplemented() {
       _this62._seekTimeLimit = 0;
       _this62._attenuationEnabled = false;
       $(_this62.domElement).click(function (evt) {
-        if (_this62.firstClick && base.userAgent.browser.IsMobileVersion) return;
+        //if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
         if (_this62.firstClick && !_this62._playOnClickEnabled) return;
         paella.player.videoContainer.paused().then(function (paused) {
           // If some player needs mouse events support, the click is ignored
@@ -17480,6 +17480,13 @@ paella.addPlugin(function () {
                   _this165._hls.recoverMediaError();
                 } else {
                   // iOS
+                  // In this way the recharge is forced, and it is possible to recover errors.
+                  var src = _this165.video.innerHTML;
+                  _this165.video.innerHTML = "";
+                  _this165.video.innerHTML = src;
+
+                  _this165.video.load();
+
                   _this165.video.play();
                 }
 

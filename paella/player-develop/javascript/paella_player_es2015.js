@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: ca95e15";
+paella.version = "6.4.0 - build: 4c8b064";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3618,7 +3618,7 @@ class VideoContainerBase extends paella.DomNode {
 		this._attenuationEnabled = false;
 		
 		$(this.domElement).click((evt) => {
-			if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
+			//if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
 			if (this.firstClick && !this._playOnClickEnabled) return;
 			paella.player.videoContainer.paused()
 				.then((paused) => {
@@ -13672,6 +13672,11 @@ paella.addPlugin(function() {
 							}
 							else {
 								// iOS
+								// In this way the recharge is forced, and it is possible to recover errors.
+								let src = this.video.innerHTML;
+								this.video.innerHTML = "";
+								this.video.innerHTML = src;
+								this.video.load();
 								this.video.play();
 							}
 							timer = setTimeout(timerFunction, 1000);
