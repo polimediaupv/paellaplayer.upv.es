@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: b085b72";
+paella.version = "6.4.0 - build: 8c13139";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -3404,11 +3404,6 @@ function paella_DeferredNotImplemented() {
               processResult(action());
               $(_this27.video).unbind('canplay');
               $(_this27.video).unbind('loadedmetadata');
-
-              if (timer) {
-                clearTimeout(timer);
-                timer = null;
-              }
             });
           }
         });
@@ -17463,9 +17458,9 @@ paella.addPlugin(function () {
               $(_this165.video).unbind('canplay');
               $(_this165.video).unbind('loadedmetadata');
 
-              if (_timer) {
-                clearTimeout(_timer);
-                _timer = null;
+              if (timer) {
+                clearTimeout(timer);
+                timer = null;
               }
             };
 
@@ -17490,13 +17485,13 @@ paella.addPlugin(function () {
                   _this165.video.play();
                 }
 
-                _timer = setTimeout(timerFunction, 1000);
+                timer = setTimeout(timerFunction, 1000);
               } else {
                 eventFunction();
               }
             };
 
-            var _timer = setTimeout(timerFunction, 1000);
+            var timer = setTimeout(timerFunction, 1000);
           }
         });
       }
@@ -21763,9 +21758,10 @@ paella.addPlugin(function () {
           function checkVisibility() {
             var buttons = $('.videoZoomButton');
             var thumbs = $('.videoZoom');
+            var showButtons = this.config.showButtons !== undefined ? this.config.showButtons : true;
 
             if (this._visible && this._available) {
-              buttons.show();
+              showButtons ? buttons.show() : buttons.hide();
               thumbs.show();
             } else {
               buttons.hide();
