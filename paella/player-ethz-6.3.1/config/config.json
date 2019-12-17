@@ -210,11 +210,6 @@
     "repository": "//repository.paellaplayer.upv.es/"
   },
   "skin": {
-    "available": [
-      "dark",
-      "dark_small",
-      "light",
-      "light_small"
-    ]
+    "default": "ethz"
   }
 }
