@@ -212,7 +212,8 @@
         "minWindowSize": 500
       },
       "es.upv.paella.videoZoomPlugin": {
-        "enabled": true
+        "enabled": true,
+        "showButtons": true
       },
       "es.upv.paella.audioSelector": {
         "enabled": true,
