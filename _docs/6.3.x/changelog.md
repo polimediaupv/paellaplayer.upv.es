@@ -7,12 +7,12 @@ CHANGELOG
 
 * Paella 6.3.2
 
- * Zoom plugin enhancements
- * Bug fixes
+  * Zoom plugin enhancements
+  * Bug fixes
 
 * Paella 6.3.1
 
- * New video canvas: video360theta
+  * New video canvas: video360theta
  
 * Paella 6.3.0
 
