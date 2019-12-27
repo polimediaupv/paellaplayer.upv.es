@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 9da5a0f";
+paella.version = "6.4.0 - build: 4ea6ca0";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -5368,7 +5368,7 @@ class ButtonPlugin extends paella.UIPlugin {
 	static BuildPluginButton(plugin,id) {
 		plugin.subclass = plugin.getSubclass();
 		var elem = document.createElement('div');
-		let ariaLabel = plugin.getAriaLabel();
+		let ariaLabel = plugin.getAriaLabel() || base.dictionary.translate(plugin.config.ariaLabel) || "";
 		if (ariaLabel!="") {
 			elem = document.createElement('button');
 		}
@@ -17229,7 +17229,6 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.volumeRangePlugin"; }
 		getDefaultToolTip() { return base.dictionary.translate("Volume"); }
 		getIndex() {return 9999;}
-		getAriaLabel() { return base.dictionary.translate("Volume"); }
 
 		checkEnabled(onSuccess) {
 			this._tempMasterVolume = 0;

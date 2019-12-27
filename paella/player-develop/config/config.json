@@ -154,7 +154,8 @@
         "reloadOnFullscreen": {
           "enabled": true,
           "keepUserSelection": true
-        }
+        },
+        "ariaLabel": "Switch full screen mode"
       },
       "es.upv.paella.helpPlugin": {
         "enabled": true,
@@ -204,7 +205,8 @@
       "es.upv.paella.volumeRangePlugin": {
         "enabled": true,
         "showMasterVolume": true,
-        "showSlaveVolume": false
+        "showSlaveVolume": false,
+        "ariaLabel": "Volume"
       },
       "es.upv.paella.pipModePlugin": {
         "enabled": true

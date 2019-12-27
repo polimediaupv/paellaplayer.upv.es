@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 9da5a0f";
+paella.version = "6.4.0 - build: 4ea6ca0";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6944,7 +6944,7 @@ function paella_DeferredNotImplemented() {
       value: function BuildPluginButton(plugin, id) {
         plugin.subclass = plugin.getSubclass();
         var elem = document.createElement('div');
-        var ariaLabel = plugin.getAriaLabel();
+        var ariaLabel = plugin.getAriaLabel() || base.dictionary.translate(plugin.config.ariaLabel) || "";
 
         if (ariaLabel != "") {
           elem = document.createElement('button');
@@ -22210,11 +22210,6 @@ paella.addPlugin(function () {
         key: "getIndex",
         value: function getIndex() {
           return 9999;
-        }
-      }, {
-        key: "getAriaLabel",
-        value: function getAriaLabel() {
-          return base.dictionary.translate("Volume");
         }
       }, {
         key: "checkEnabled",
