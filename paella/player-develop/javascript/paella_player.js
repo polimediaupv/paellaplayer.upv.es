@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 4ea6ca0";
+paella.version = "6.4.0 - build: 02009b2";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -8759,7 +8759,6 @@ function paella_DeferredNotImplemented() {
           }
         }
 
-        paella.player.videoContainer.duration();
         var duration = 0;
         paella.player.videoContainer.duration().then(function (d) {
           duration = d;
