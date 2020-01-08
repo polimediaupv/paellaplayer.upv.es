@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 02009b2";
+paella.version = "6.4.0 - build: 241b6f4";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -1029,7 +1029,7 @@ function paella_DeferredNotImplemented () {
         hideBackground.apply(this);
         this.backgroundData = bkgData;
         let style = {
-            backgroundImage: `url(${paella.utils.folders.get("resources")}/style/${ bkgData.content })`,
+            backgroundImage: `url(${paella.baseUrl}${paella.utils.folders.get("resources")}/style/${ bkgData.content })`,
             backgroundSize: "100% 100%",
             zIndex: bkgData.layer,
             position: 'absolute',
@@ -1061,7 +1061,7 @@ function paella_DeferredNotImplemented () {
             if (!logoNode) {
                 style = {};
                 logoNode = this.container.addNode(new paella.DomNode('img',logoId,style));
-                logoNode.domElement.setAttribute('src', `${paella.utils.folders.get("resources")}/style/${logo.content}`);
+                logoNode.domElement.setAttribute('src', `${paella.baseUrl}${paella.utils.folders.get("resources")}/style/${logo.content}`);
             }
             else {
                 $(logoNode.domElement).show();
@@ -1105,7 +1105,7 @@ function paella_DeferredNotImplemented () {
                     height:percentHeight,
                     position:'absolute',
                     zIndex:btn.layer,
-                    backgroundImage: `url(${paella.utils.folders.get("resources")}/style/${ btn.icon })`,
+                    backgroundImage: `url(${paella.baseUrl}${paella.utils.folders.get("resources")}/style/${ btn.icon })`,
                     backgroundSize: '100% 100%',
                     display: 'block'
                 };
