@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: b1626e7";
+paella.version = "6.4.0 - build: 28fae85";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4766,6 +4766,50 @@ class VideoContainer extends paella.VideoContainerBase {
 			this.resizePortrait();
 		}
 		//paella.profiles.setProfile(paella.player.selectedProfile,false)
+	}
+
+	// the duration and the current time are returned taking into account the trimming, for example:
+	//	trimming: { enabled: true, start: 10, end: 110 } 
+	//	currentTime: 0,	> the actual time is 10
+	//	duration: 100 > the actual duration is (at least) 110
+	getVideoData() {
+		return new Promise((resolve,reject) => {
+			let videoData = {
+				currentTime: 0,
+				volume: 0,
+				muted: this.muted,
+				duration: 0,
+				paused: false,
+				audioTag: this.audioTag,
+				trimming: {
+					enabled: false,
+					start: 0,
+					end: 0
+				}
+			}
+			this.currentTime()
+				.then((currentTime) => {
+					videoData.currentTime = currentTime;
+					return this.volume();
+				})
+				.then((v) => {
+					videoData.volume = v;
+					return this.duration();
+				})
+				.then((d) => {
+					videoData.duration = d;
+					return this.paused();
+				})
+				.then((p) => {
+					videoData.paused = p;
+					return this.trimming();
+				})
+				.then((trimming) => {
+					videoData.trimming = trimming;
+					resolve(videoData);
+				})
+				.catch((err) => reject(err));
+		});
 	}
 }
 
