@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 28fae85";
+paella.version = "6.4.0 - build: fa2dabf";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -4693,25 +4693,43 @@ function paella_DeferredNotImplemented() {
       _this62._seekType = paella.SeekType.FULL;
       _this62._seekTimeLimit = 0;
       _this62._attenuationEnabled = false;
+      $(_this62.domElement).dblclick(function (evt) {
+        if (_this62.firstClick) {
+          paella.player.isFullScreen() ? paella.player.exitFullScreen() : paella.player.goFullScreen();
+        }
+      });
+      var dblClickTimer = null;
       $(_this62.domElement).click(function (evt) {
-        //if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
-        if (_this62.firstClick && !_this62._playOnClickEnabled) return;
-        paella.player.videoContainer.paused().then(function (paused) {
-          // If some player needs mouse events support, the click is ignored
-          if (_this62.firstClick && _this62.streamProvider.videoPlayers.some(function (p) {
-            return p.canvasData.mouseEventsSupport;
-          })) {
-            return;
-          }
+        var doClick = function doClick() {
+          if (_this62.firstClick && !_this62._playOnClickEnabled) return;
+          paella.player.videoContainer.paused().then(function (paused) {
+            // If some player needs mouse events support, the click is ignored
+            if (_this62.firstClick && _this62.streamProvider.videoPlayers.some(function (p) {
+              return p.canvasData.mouseEventsSupport;
+            })) {
+              return;
+            }
 
-          _this62.firstClick = true;
+            _this62.firstClick = true;
 
-          if (paused) {
-            paella.player.play();
-          } else {
-            paella.player.pause();
-          }
-        });
+            if (paused) {
+              paella.player.play();
+            } else {
+              paella.player.pause();
+            }
+          });
+        }; // the dblClick timer prevents the single click from running when the user double clicks
+
+
+        if (dblClickTimer) {
+          clearTimeout(dblClickTimer);
+          dblClickTimer = null;
+        } else {
+          dblClickTimer = setTimeout(function () {
+            dblClickTimer = null;
+            doClick();
+          }, 200);
+        }
       });
 
       _this62.domElement.addEventListener("touchstart", function (event) {
