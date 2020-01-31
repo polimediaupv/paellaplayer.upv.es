@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: d850903";
+paella.version = "6.4.0 - build: ac48db9";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -14709,7 +14709,7 @@ paella.addPlugin(function() {
 			this.defaultRate = null;
 			this._domElement = null;
 			this.available_rates =  null;
-			var enabled = (!base.userAgent.browser.IsMobileVersion && paella.player.videoContainer.masterVideo() instanceof paella.Html5Video);
+			var enabled = paella.player.videoContainer.masterVideo() instanceof paella.Html5Video;
 			onSuccess(enabled && !paella.player.videoContainer.streamProvider.isLiveStreaming);
 		}
 
