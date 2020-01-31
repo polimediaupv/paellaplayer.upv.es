@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 64c5205";
+paella.version = "6.4.0 - build: 41a33b9";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -14986,7 +14986,17 @@ paella.addPlugin(() => {
                 <img src="${ data.thumb }" alt="">
                 <p>${ data.title }</p>
                 `;
-                linkContainer.href = data.url;
+                linkContainer.addEventListener("click", function() {
+                    try {
+                        if (window.self !== window.top) {
+                            window.parent.document.dispatchEvent(new CustomEvent('paella-change-video', { detail: data }));
+                        }
+                    }
+                    catch (e) {
+
+                    }
+                    location.href = data.url;
+                });
                 return linkContainer;
             }
 

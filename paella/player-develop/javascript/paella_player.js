@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 64c5205";
+paella.version = "6.4.0 - build: 41a33b9";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19328,7 +19328,17 @@ paella.addPlugin(function () {
             var linkContainer = document.createElement("a");
             linkContainer.className = "related-video-link " + className;
             linkContainer.innerHTML = "\n                <img src=\"".concat(data.thumb, "\" alt=\"\">\n                <p>").concat(data.title, "</p>\n                ");
-            linkContainer.href = data.url;
+            linkContainer.addEventListener("click", function () {
+              try {
+                if (window.self !== window.top) {
+                  window.parent.document.dispatchEvent(new CustomEvent('paella-change-video', {
+                    detail: data
+                  }));
+                }
+              } catch (e) {}
+
+              location.href = data.url;
+            });
             return linkContainer;
           }
 
