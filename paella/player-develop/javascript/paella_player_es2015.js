@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: e8f7620";
+paella.version = "6.4.0 - build: e1305c5";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -11221,7 +11221,7 @@ paella.addPlugin(() => {
 			paella.player.videoContainer.trimming()
 				.then((trimming) => {
 					if (trimming.enabled) {
-						paella.player.videoContainer.seekToTime(time + trimming.start);
+						paella.player.videoContainer.seekToTime(time - trimming.start);
 					}
 					else {
 						paella.player.videoContainer.seekToTime(time);
