@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 41a33b9";
+paella.version = "6.4.0 - build: e8f7620";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -678,13 +678,16 @@ paella.data = null;
       g_requiredScripts[path] = new Promise(function (resolve, reject) {
         var script = document.createElement("script");
 
+        script.onload = script.onreadystatechange = function () {
+          if (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") {
+            resolve();
+          }
+        };
+
         if (path.split(".").pop() == 'js') {
           script.src = path;
           script.async = false;
           document.head.appendChild(script);
-          setTimeout(function () {
-            return resolve();
-          }, 100);
         } else {
           reject(new Error("Unexpected file type"));
         }
