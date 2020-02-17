@@ -169,7 +169,8 @@
         "enabled": true,
         "showWidthRes": true,
         "minWindowSize": 550,
-        "minVisibleQuality": 240
+        "minVisibleQuality": 240,
+        "ariaLabel": "Change video quality"
       },
       "es.upv.paella.playbackRatePlugin": {
         "enabled": true,
