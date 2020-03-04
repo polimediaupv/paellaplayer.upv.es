@@ -74,6 +74,19 @@ span.expandable-content {
 .buttonPlugin {
   position: relative;
 }
+.menuItem.icon {
+  background-image: url(../images/paella_icons_dark.png);
+  width: 80px !important;
+  height: 40px;
+  cursor: pointer;
+  background-size: 100% 100% !important;
+  background-position: 0px 0px ! important;
+  background-color: white;
+  margin-right: 0px;
+}
+.menuItem.icon.selected {
+  background-color: #fa8533;
+}
 .button-text {
   position: absolute;
   left: 0px;
@@ -3250,52 +3263,8 @@ svg rect {
 .buttonPlugin.showViewModeButton {
   background-position: -1100% 0%;
 }
-.viewModeItemButton {
-  background-image: url(../images/paella_icons_dark.png);
-  width: 80px;
-  height: 40px;
-  cursor: pointer;
-  background-size: 100% 100% !important;
-  background-position: 0px 0px ! important;
-  background-color: white;
-}
 .viewModeItemButton:hover {
   background-color: #faa166;
-}
-.viewModeItemButton.selected {
-  /*background-position: 78px 0;*/
-  background-color: rgba(211, 211, 211, 0.8);
-  box-shadow: inset 0px 0px 2px 2px #fa8533;
-}
-.viewModeItemButton.slide_professor {
-  background-position: 80px -80px;
-}
-.viewModeItemButton.professor_slide {
-  background-position: 80px -120px;
-}
-.viewModeItemButton.professor {
-  background-position: 80px -40px;
-}
-.viewModeItemButton.slide_over_professor {
-  background-position: 80px -200px;
-}
-.viewModeItemButton.slide_over_professor_right {
-  background-position: 80px -160px;
-}
-.viewModeItemButton.s_p_blackboard2 {
-  background-position: 80px -240px;
-}
-.viewModeItemButton.professor_over_slide {
-  background-position: 80px -320px;
-}
-.viewModeItemButton.professor_over_slide_right {
-  background-position: 80px -280px;
-}
-.viewModeItemButton.slide {
-  background-position: 80px 0px;
-}
-.viewModeItemButton.chroma {
-  background-position: 80px -360px;
 }
 .buttonPlugin.volumeRangeButton.mute {
   background-position: -300% 0%;

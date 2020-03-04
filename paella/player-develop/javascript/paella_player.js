@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 3bd2b9b";
+paella.version = "6.4.0 - build: da08ee0";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6754,6 +6754,7 @@ function paella_DeferredNotImplemented() {
       _this93.subclass = '';
       _this93.container = null;
       _this93.containerManager = null;
+      _this93._domElement = null;
       return _this93;
     }
 
@@ -6926,6 +6927,58 @@ function paella_DeferredNotImplemented() {
           $(this._expand).hide();
         }
       }
+    }, {
+      key: "rebuildMenu",
+      value: function rebuildMenu() {
+        var _this94 = this;
+
+        function getButtonItem(itemData, plugin) {
+          var elem = document.createElement('div');
+          elem.className = itemData.className + " menuItem";
+
+          if (itemData["default"]) {
+            elem.className += " selected";
+          }
+
+          elem.id = itemData.id;
+          elem.innerText = itemData.title;
+
+          if (itemData.icon) {
+            elem.style.backgroundImage = "url(".concat(itemData.icon, ")");
+            $(elem).addClass('icon');
+          }
+
+          elem.data = {
+            itemData: itemData,
+            plugin: plugin
+          };
+          $(elem).click(function (event) {
+            this.data.plugin.menuItemSelected(this.data.itemData);
+            var buttons = this.parentElement ? this.parentElement.children : [];
+
+            for (var i = 0; i < buttons.length; ++i) {
+              $(buttons[i]).removeClass('selected');
+            }
+
+            $(this).addClass('selected');
+          });
+          return elem;
+        }
+
+        var menuContent = this.getMenuContent();
+        this.menuContent.innerHTML = "";
+        menuContent.forEach(function (menuItem) {
+          _this94.menuContent.appendChild(getButtonItem(menuItem, _this94));
+        });
+      }
+    }, {
+      key: "menuContent",
+      set: function set(domElem) {
+        this._domElement = domElem;
+      },
+      get: function get() {
+        return this._domElement;
+      }
     }], [{
       key: "BuildPluginButton",
       value: function BuildPluginButton(plugin, id) {
@@ -7016,39 +7069,8 @@ function paella_DeferredNotImplemented() {
         elem.className = plugin.getContainerClassName();
         elem.id = id;
         elem.plugin = plugin;
-        plugin._domElement = elem;
-
-        function getButtonItem(itemData) {
-          var elem = document.createElement('div');
-          elem.className = itemData.className + " menuItem";
-
-          if (itemData["default"]) {
-            elem.className += " selected";
-          }
-
-          elem.id = itemData.id;
-          elem.innerText = itemData.title;
-          elem.data = {
-            itemData: itemData,
-            plugin: plugin
-          };
-          $(elem).click(function (event) {
-            this.data.plugin.menuItemSelected(this.data.itemData);
-            var buttons = this.parentElement.children;
-
-            for (var i = 0; i < buttons.length; ++i) {
-              $(buttons[i]).removeClass('selected');
-            }
-
-            $(this).addClass('selected');
-          });
-          return elem;
-        }
-
-        var menuContent = plugin.getMenuContent();
-        menuContent.forEach(function (menuItem) {
-          elem.appendChild(getButtonItem(menuItem));
-        });
+        plugin.menuContent = elem;
+        plugin.rebuildMenu(elem);
         return elem;
       }
     }]);
@@ -7123,23 +7145,23 @@ function paella_DeferredNotImplemented() {
     }]);
 
     function EventDrivenPlugin() {
-      var _this94;
+      var _this95;
 
       _classCallCheck(this, EventDrivenPlugin);
 
-      _this94 = _possibleConstructorReturn(this, _getPrototypeOf(EventDrivenPlugin).call(this));
+      _this95 = _possibleConstructorReturn(this, _getPrototypeOf(EventDrivenPlugin).call(this));
 
-      var events = _this94.getEvents();
+      var events = _this95.getEvents();
 
       for (var i = 0; i < events.length; ++i) {
         var event = events[i];
 
         if (event == paella.events.loadStarted) {
-          _this94.onEvent(paella.events.loadStarted);
+          _this95.onEvent(paella.events.loadStarted);
         }
       }
 
-      return _this94;
+      return _this95;
     }
 
     _createClass(EventDrivenPlugin, [{
@@ -7194,24 +7216,24 @@ function paella_DeferredNotImplemented() {
         _inherits(WebGLCanvas, _bg$app$WindowControl);
 
         function WebGLCanvas(stream) {
-          var _this95;
+          var _this96;
 
           _classCallCheck(this, WebGLCanvas);
 
-          _this95 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
-          _this95._stream = stream;
-          return _this95;
+          _this96 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
+          _this96._stream = stream;
+          return _this96;
         }
 
         _createClass(WebGLCanvas, [{
           key: "loaded",
           value: function loaded() {
-            var _this96 = this;
+            var _this97 = this;
 
             return new Promise(function (resolve) {
               var checkLoaded = function checkLoaded() {
-                if (_this96.video) {
-                  resolve(_this96);
+                if (_this97.video) {
+                  resolve(_this97);
                 } else {
                   setTimeout(checkLoaded, 100);
                 }
@@ -7279,14 +7301,14 @@ function paella_DeferredNotImplemented() {
         }, {
           key: "buildScene",
           value: function buildScene() {
-            var _this97 = this;
+            var _this98 = this;
 
             this._root = new bg.scene.Node(this.gl, "Root node");
             this.registerPlugins();
             this.loadVideoTexture().then(function (texture) {
-              _this97._texture = texture;
+              _this98._texture = texture;
 
-              _this97.buildVideoSurface(_this97._root, texture);
+              _this98.buildVideoSurface(_this98._root, texture);
             });
             var lightNode = new bg.scene.Node(this.gl, "Light");
             var light = new bg.base.Light();
@@ -7421,13 +7443,13 @@ function paella_DeferredNotImplemented() {
         _inherits(WebGLCanvas, _bg$app$WindowControl2);
 
         function WebGLCanvas(stream) {
-          var _this98;
+          var _this99;
 
           _classCallCheck(this, WebGLCanvas);
 
-          _this98 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
-          _this98._stream = stream;
-          return _this98;
+          _this99 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
+          _this99._stream = stream;
+          return _this99;
         }
 
         _createClass(WebGLCanvas, [{
@@ -7438,12 +7460,12 @@ function paella_DeferredNotImplemented() {
         }, {
           key: "loaded",
           value: function loaded() {
-            var _this99 = this;
+            var _this100 = this;
 
             return new Promise(function (resolve) {
               var checkLoaded = function checkLoaded() {
-                if (_this99.video) {
-                  resolve(_this99);
+                if (_this100.video) {
+                  resolve(_this100);
                 } else {
                   setTimeout(checkLoaded, 100);
                 }
@@ -7500,14 +7522,14 @@ function paella_DeferredNotImplemented() {
         }, {
           key: "buildScene",
           value: function buildScene() {
-            var _this100 = this;
+            var _this101 = this;
 
             this._root = new bg.scene.Node(this.gl, "Root node");
             this.registerPlugins();
             this.loadVideoTexture().then(function (texture) {
-              _this100._texture = texture;
+              _this101._texture = texture;
 
-              _this100.buildVideoSurface(_this100._root, texture);
+              _this101.buildVideoSurface(_this101._root, texture);
             });
             var lightNode = new bg.scene.Node(this.gl, "Light");
             var light = new bg.base.Light();
@@ -7829,27 +7851,27 @@ function paella_DeferredNotImplemented() {
     _inherits(SearchCallback, _base$AsyncLoaderCall);
 
     function SearchCallback(caption, text) {
-      var _this101;
+      var _this102;
 
       _classCallCheck(this, SearchCallback);
 
-      _this101 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
-      _this101.name = "captionSearchCallback";
-      _this101.caption = caption;
-      _this101.text = text;
-      return _this101;
+      _this102 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
+      _this102.name = "captionSearchCallback";
+      _this102.caption = caption;
+      _this102.text = text;
+      return _this102;
     }
 
     _createClass(SearchCallback, [{
       key: "load",
       value: function load(onSuccess, onError) {
-        var _this102 = this;
+        var _this103 = this;
 
         this.caption.search(this.text, function (err, result) {
           if (err) {
             onError();
           } else {
-            _this102.result = result;
+            _this103.result = result;
             onSuccess();
           }
         });
@@ -8056,7 +8078,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "search",
       value: function search(txt, next) {
-        var _this103 = this;
+        var _this104 = this;
 
         var self = this;
 
@@ -8067,7 +8089,7 @@ function paella_DeferredNotImplemented() {
         } else {
           var results = [];
           paella.player.videoContainer.trimming().then(function (trimming) {
-            _this103._index.search(txt).forEach(function (s) {
+            _this104._index.search(txt).forEach(function (s) {
               var c = self.getCaptionById(s.ref);
 
               if (trimming.enabled && (c.end < trimming.start || c.begin > trimming.end)) {
@@ -8166,27 +8188,27 @@ function paella_DeferredNotImplemented() {
     _inherits(SearchCallback, _base$AsyncLoaderCall2);
 
     function SearchCallback(plugin, text) {
-      var _this104;
+      var _this105;
 
       _classCallCheck(this, SearchCallback);
 
-      _this104 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
-      _this104.name = "searchCallback";
-      _this104.plugin = plugin;
-      _this104.text = text;
-      return _this104;
+      _this105 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
+      _this105.name = "searchCallback";
+      _this105.plugin = plugin;
+      _this105.text = text;
+      return _this105;
     }
 
     _createClass(SearchCallback, [{
       key: "load",
       value: function load(onSuccess, onError) {
-        var _this105 = this;
+        var _this106 = this;
 
         this.plugin.search(this.text, function (err, result) {
           if (err) {
             onError();
           } else {
-            _this105.result = result;
+            _this106.result = result;
             onSuccess();
           }
         });
@@ -8270,13 +8292,13 @@ function paella_DeferredNotImplemented() {
   var userTrackingManager = {
     _plugins: [],
     addPlugin: function addPlugin(plugin) {
-      var _this106 = this;
+      var _this107 = this;
 
       plugin.checkEnabled(function (isEnabled) {
         if (isEnabled) {
           plugin.setup();
 
-          _this106._plugins.push(plugin);
+          _this107._plugins.push(plugin);
         }
       });
     },
@@ -8426,22 +8448,22 @@ function paella_DeferredNotImplemented() {
     _inherits(TimeControl, _paella$DomNode9);
 
     function TimeControl(id) {
-      var _this107;
+      var _this108;
 
       _classCallCheck(this, TimeControl);
 
-      _this107 = _possibleConstructorReturn(this, _getPrototypeOf(TimeControl).call(this, 'div', id, {
+      _this108 = _possibleConstructorReturn(this, _getPrototypeOf(TimeControl).call(this, 'div', id, {
         left: "0%"
       }));
-      _this107.domElement.className = 'timeControlOld';
-      _this107.domElement.className = 'timeControl'; //this.domElement.innerText = "0:00:00";
+      _this108.domElement.className = 'timeControlOld';
+      _this108.domElement.className = 'timeControl'; //this.domElement.innerText = "0:00:00";
 
-      var thisClass = _assertThisInitialized(_this107);
+      var thisClass = _assertThisInitialized(_this108);
 
       paella.events.bind(paella.events.timeupdate, function (event, params) {
         thisClass.onTimeUpdate(params);
       });
-      return _this107;
+      return _this108;
     }
 
     _createClass(TimeControl, [{
@@ -8481,43 +8503,43 @@ function paella_DeferredNotImplemented() {
     _inherits(PlaybackBar, _paella$DomNode10);
 
     function PlaybackBar(id) {
-      var _this108;
+      var _this109;
 
       _classCallCheck(this, PlaybackBar);
 
       var style = {};
-      _this108 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackBar).call(this, 'div', id, style));
-      _this108.playbackFullId = '';
-      _this108.updatePlayBar = true;
-      _this108.timeControlId = '';
-      _this108._images = null;
-      _this108._keys = null;
-      _this108._prev = null;
-      _this108._next = null;
-      _this108._videoLength = null;
-      _this108._lastSrc = null;
-      _this108._aspectRatio = 1.777777778;
-      _this108._hasSlides = null;
-      _this108._imgNode = null;
-      _this108._canvas = null;
-      _this108.domElement.className = "playbackBar";
+      _this109 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackBar).call(this, 'div', id, style));
+      _this109.playbackFullId = '';
+      _this109.updatePlayBar = true;
+      _this109.timeControlId = '';
+      _this109._images = null;
+      _this109._keys = null;
+      _this109._prev = null;
+      _this109._next = null;
+      _this109._videoLength = null;
+      _this109._lastSrc = null;
+      _this109._aspectRatio = 1.777777778;
+      _this109._hasSlides = null;
+      _this109._imgNode = null;
+      _this109._canvas = null;
+      _this109.domElement.className = "playbackBar";
 
-      _this108.domElement.setAttribute("alt", ""); //this.domElement.setAttribute("title", "Timeline Slider");
+      _this109.domElement.setAttribute("alt", ""); //this.domElement.setAttribute("title", "Timeline Slider");
 
 
-      _this108.domElement.setAttribute("aria-label", "Timeline Slider");
+      _this109.domElement.setAttribute("aria-label", "Timeline Slider");
 
-      _this108.domElement.setAttribute("role", "slider");
+      _this109.domElement.setAttribute("role", "slider");
 
-      _this108.domElement.setAttribute("aria-valuemin", "0");
+      _this109.domElement.setAttribute("aria-valuemin", "0");
 
-      _this108.domElement.setAttribute("aria-valuemax", "100");
+      _this109.domElement.setAttribute("aria-valuemax", "100");
 
-      _this108.domElement.setAttribute("aria-valuenow", "0");
+      _this109.domElement.setAttribute("aria-valuenow", "0");
 
-      _this108.domElement.setAttribute("tabindex", "1100");
+      _this109.domElement.setAttribute("tabindex", "1100");
 
-      $(_this108.domElement).keyup(function (event) {
+      $(_this109.domElement).keyup(function (event) {
         var currentTime = 0;
         var duration = 0;
         paella.player.videoContainer.currentTime().then(function (t) {
@@ -8544,23 +8566,23 @@ function paella_DeferredNotImplemented() {
           }
         });
       });
-      _this108.playbackFullId = id + "_full";
-      _this108.timeControlId = id + "_timeControl";
-      var playbackFull = new paella.DomNode('div', _this108.playbackFullId, {
+      _this109.playbackFullId = id + "_full";
+      _this109.timeControlId = id + "_timeControl";
+      var playbackFull = new paella.DomNode('div', _this109.playbackFullId, {
         width: '0%'
       });
       playbackFull.domElement.className = "playbackBarFull";
 
-      _this108.addNode(playbackFull);
+      _this109.addNode(playbackFull);
 
-      _this108.addNode(new paella.TimeControl(_this108.timeControlId));
+      _this109.addNode(new paella.TimeControl(_this109.timeControlId));
 
-      var thisClass = _assertThisInitialized(_this108);
+      var thisClass = _assertThisInitialized(_this109);
 
       paella.events.bind(paella.events.timeupdate, function (event, params) {
         thisClass.onTimeUpdate(params);
       });
-      $(_this108.domElement).bind('mousedown', function (event) {
+      $(_this109.domElement).bind('mousedown', function (event) {
         paella.utils.mouseManager.down(thisClass, event);
         event.stopPropagation();
       });
@@ -8570,33 +8592,33 @@ function paella_DeferredNotImplemented() {
       });
 
       if (!base.userAgent.browser.IsMobileVersion) {
-        $(_this108.domElement).bind('mousemove', function (event) {
+        $(_this109.domElement).bind('mousemove', function (event) {
           thisClass.movePassive(event);
           paella.utils.mouseManager.move(event);
         });
         $(playbackFull.domElement).bind('mousemove', function (event) {
           paella.utils.mouseManager.move(event);
         });
-        $(_this108.domElement).bind("mouseout", function (event) {
+        $(_this109.domElement).bind("mouseout", function (event) {
           thisClass.mouseOut(event);
         });
       }
 
-      _this108.domElement.addEventListener('touchstart', function (event) {
+      _this109.domElement.addEventListener('touchstart', function (event) {
         paella.utils.mouseManager.down(thisClass, event);
         event.stopPropagation();
       }, false);
 
-      _this108.domElement.addEventListener('touchmove', function (event) {
+      _this109.domElement.addEventListener('touchmove', function (event) {
         thisClass.movePassive(event);
         paella.utils.mouseManager.move(event);
       }, false);
 
-      _this108.domElement.addEventListener('touchend', function (event) {
+      _this109.domElement.addEventListener('touchend', function (event) {
         paella.utils.mouseManager.up(event);
       }, false);
 
-      $(_this108.domElement).bind('mouseup', function (event) {
+      $(_this109.domElement).bind('mouseup', function (event) {
         paella.utils.mouseManager.up(event);
       });
       $(playbackFull.domElement).bind('mouseup', function (event) {
@@ -8604,7 +8626,7 @@ function paella_DeferredNotImplemented() {
       });
 
       if (paella.player.isLiveStream()) {
-        $(_this108.domElement).hide();
+        $(_this109.domElement).hide();
       }
 
       paella.events.bind(paella.events.seekAvailabilityChanged, function (e, data) {
@@ -8614,7 +8636,7 @@ function paella_DeferredNotImplemented() {
           $(playbackFull.domElement).addClass("disabled");
         }
       });
-      return _this108;
+      return _this109;
     }
 
     _createClass(PlaybackBar, [{
@@ -8629,29 +8651,29 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "drawTimeMarks",
       value: function drawTimeMarks() {
-        var _this109 = this;
+        var _this110 = this;
 
         var trimming = {};
         paella.player.videoContainer.trimming().then(function (t) {
           trimming = t;
-          return _this109.imageSetup();
+          return _this110.imageSetup();
         }).then(function () {
           // Updated duration value. The duration may change during playback, because it's
           // possible to set the trimming during playback (for instance, using a plugin)
-          var duration = trimming.enabled ? trimming.end - trimming.start : _this109._videoLength;
+          var duration = trimming.enabled ? trimming.end - trimming.start : _this110._videoLength;
           var parent = $("#playerContainer_controls_playback_playbackBar");
 
-          _this109.clearCanvas();
+          _this110.clearCanvas();
 
-          if (_this109._keys && paella.player.config.player.slidesMarks.enabled) {
-            _this109._keys.forEach(function (l) {
+          if (_this110._keys && paella.player.config.player.slidesMarks.enabled) {
+            _this110._keys.forEach(function (l) {
               var timeInstant = parseInt(l) - trimming.start;
 
               if (timeInstant > 0) {
-                var aux = timeInstant * parent.width() / _this109._videoLength; // conversion to canvas
+                var aux = timeInstant * parent.width() / _this110._videoLength; // conversion to canvas
 
 
-                _this109.drawTimeMark(aux);
+                _this110.drawTimeMark(aux);
               }
             });
           }
@@ -8772,33 +8794,33 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "imageSetup",
       value: function imageSetup() {
-        var _this110 = this;
+        var _this111 = this;
 
         return new Promise(function (resolve) {
           paella.player.videoContainer.duration().then(function (duration) {
             //  BRING THE IMAGE ARRAY TO LOCAL
-            _this110._images = {};
+            _this111._images = {};
             var n = paella.initDelegate.initParams.videoLoader.frameList;
 
             if (!n || Object.keys(n).length === 0) {
-              _this110._hasSlides = false;
+              _this111._hasSlides = false;
               return;
             } else {
-              _this110._hasSlides = true;
+              _this111._hasSlides = true;
             }
 
-            _this110._images = n; // COPY TO LOCAL
+            _this111._images = n; // COPY TO LOCAL
 
-            _this110._videoLength = duration; // SORT KEYS FOR SEARCH CLOSEST
+            _this111._videoLength = duration; // SORT KEYS FOR SEARCH CLOSEST
 
-            _this110._keys = Object.keys(_this110._images);
-            _this110._keys = _this110._keys.sort(function (a, b) {
+            _this111._keys = Object.keys(_this111._images);
+            _this111._keys = _this111._keys.sort(function (a, b) {
               return parseInt(a) - parseInt(b);
             }); // SORT FRAME NUMBERS STRINGS
             //NEXT
 
-            _this110._next = 0;
-            _this110._prev = 0;
+            _this111._next = 0;
+            _this111._prev = 0;
             resolve();
           });
         });
@@ -8982,7 +9004,7 @@ function paella_DeferredNotImplemented() {
     _createClass(PlaybackControl, [{
       key: "addPlugin",
       value: function addPlugin(plugin) {
-        var _this112 = this;
+        var _this113 = this;
 
         var id = 'buttonPlugin' + this.buttonPlugins.length;
         this.buttonPlugins.push(plugin);
@@ -9009,70 +9031,70 @@ function paella_DeferredNotImplemented() {
           if (isEnabled) {
             $(plugin.button).show();
             paella.pluginManager.setupPlugin(plugin);
-            var id = 'buttonPlugin' + _this112.buttonPlugins.length;
+            var id = 'buttonPlugin' + _this113.buttonPlugins.length;
 
             if (plugin.getButtonType() == paella.ButtonPlugin.type.popUpButton) {
-              parent = _this112.popUpPluginContainer.domElement;
+              parent = _this113.popUpPluginContainer.domElement;
               var popUpContent = paella.ButtonPlugin.BuildPluginPopUp(parent, plugin, id + '_container');
 
-              _this112.popUpPluginContainer.registerContainer(plugin.getName(), popUpContent, button, plugin);
+              _this113.popUpPluginContainer.registerContainer(plugin.getName(), popUpContent, button, plugin);
             } else if (plugin.getButtonType() == paella.ButtonPlugin.type.timeLineButton) {
-              parent = _this112.timeLinePluginContainer.domElement;
+              parent = _this113.timeLinePluginContainer.domElement;
               var timeLineContent = paella.ButtonPlugin.BuildPluginPopUp(parent, plugin, id + '_timeline');
 
-              _this112.timeLinePluginContainer.registerContainer(plugin.getName(), timeLineContent, button, plugin);
+              _this113.timeLinePluginContainer.registerContainer(plugin.getName(), timeLineContent, button, plugin);
             } else if (plugin.getButtonType() == paella.ButtonPlugin.type.menuButton) {
-              parent = _this112.popUpPluginContainer.domElement;
+              parent = _this113.popUpPluginContainer.domElement;
               var popUpContent = paella.ButtonPlugin.BuildPluginMenu(parent, plugin, id + '_container');
 
-              _this112.popUpPluginContainer.registerContainer(plugin.getName(), popUpContent, button, plugin);
+              _this113.popUpPluginContainer.registerContainer(plugin.getName(), popUpContent, button, plugin);
             }
           } else {
-            _this112.pluginsContainer.domElement.removeChild(plugin.button);
+            _this113.pluginsContainer.domElement.removeChild(plugin.button);
           }
         });
       }
     }]);
 
     function PlaybackControl(id) {
-      var _this111;
+      var _this112;
 
       _classCallCheck(this, PlaybackControl);
 
       var style = {};
-      _this111 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackControl).call(this, 'div', id, style));
-      _this111.playbackBarId = '';
-      _this111.pluginsContainer = null;
-      _this111._popUpPluginContainer = null;
-      _this111._timeLinePluginContainer = null;
-      _this111.playbackPluginsWidth = 0;
-      _this111.popupPluginsWidth = 0;
-      _this111.minPlaybackBarSize = 120;
-      _this111.playbackBarInstance = null;
-      _this111.buttonPlugins = [];
-      _this111.domElement.className = 'playbackControls';
-      _this111.playbackBarId = id + '_playbackBar';
+      _this112 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackControl).call(this, 'div', id, style));
+      _this112.playbackBarId = '';
+      _this112.pluginsContainer = null;
+      _this112._popUpPluginContainer = null;
+      _this112._timeLinePluginContainer = null;
+      _this112.playbackPluginsWidth = 0;
+      _this112.popupPluginsWidth = 0;
+      _this112.minPlaybackBarSize = 120;
+      _this112.playbackBarInstance = null;
+      _this112.buttonPlugins = [];
+      _this112.domElement.className = 'playbackControls';
+      _this112.playbackBarId = id + '_playbackBar';
 
-      var thisClass = _assertThisInitialized(_this111);
+      var thisClass = _assertThisInitialized(_this112);
 
-      _this111.pluginsContainer = new paella.DomNode('div', id + '_playbackBarPlugins');
-      _this111.pluginsContainer.domElement.className = 'playbackBarPlugins';
+      _this112.pluginsContainer = new paella.DomNode('div', id + '_playbackBarPlugins');
+      _this112.pluginsContainer.domElement.className = 'playbackBarPlugins';
 
-      _this111.pluginsContainer.domElement.setAttribute("role", "toolbar");
+      _this112.pluginsContainer.domElement.setAttribute("role", "toolbar");
 
-      _this111.addNode(_this111.pluginsContainer);
+      _this112.addNode(_this112.pluginsContainer);
 
-      _this111.addNode(new paella.PlaybackBar(_this111.playbackBarId));
+      _this112.addNode(new paella.PlaybackBar(_this112.playbackBarId));
 
-      paella.pluginManager.setTarget('button', _assertThisInitialized(_this111));
+      paella.pluginManager.setTarget('button', _assertThisInitialized(_this112));
       $(window).mousemove(function (evt) {
-        if (_this111._expandedPlugin && $(window).height() - evt.clientY > 50) {
-          _this111._expandedPlugin.contract();
+        if (_this112._expandedPlugin && $(window).height() - evt.clientY > 50) {
+          _this112._expandedPlugin.contract();
 
-          _this111._expandPlugin = null;
+          _this112._expandPlugin = null;
         }
       });
-      return _this111;
+      return _this112;
     }
 
     _createClass(PlaybackControl, [{
@@ -9164,28 +9186,28 @@ function paella_DeferredNotImplemented() {
     }]);
 
     function ControlsContainer(id) {
-      var _this113;
+      var _this114;
 
       _classCallCheck(this, ControlsContainer);
 
-      _this113 = _possibleConstructorReturn(this, _getPrototypeOf(ControlsContainer).call(this, 'div', id));
-      _this113.playbackControlId = '';
-      _this113.editControlId = '';
-      _this113.isEnabled = true;
-      _this113.autohideTimer = null;
-      _this113.hideControlsTimeMillis = 3000;
-      _this113.playbackControlInstance = null;
-      _this113.videoOverlayButtons = null;
-      _this113.buttonPlugins = [];
-      _this113._hidden = false;
-      _this113._over = false;
-      _this113.viewControlId = id + '_view';
-      _this113.playbackControlId = id + '_playback';
-      _this113.editControlId = id + '_editor';
+      _this114 = _possibleConstructorReturn(this, _getPrototypeOf(ControlsContainer).call(this, 'div', id));
+      _this114.playbackControlId = '';
+      _this114.editControlId = '';
+      _this114.isEnabled = true;
+      _this114.autohideTimer = null;
+      _this114.hideControlsTimeMillis = 3000;
+      _this114.playbackControlInstance = null;
+      _this114.videoOverlayButtons = null;
+      _this114.buttonPlugins = [];
+      _this114._hidden = false;
+      _this114._over = false;
+      _this114.viewControlId = id + '_view';
+      _this114.playbackControlId = id + '_playback';
+      _this114.editControlId = id + '_editor';
 
-      _this113.addNode(new paella.PlaybackControl(_this113.playbackControlId));
+      _this114.addNode(new paella.PlaybackControl(_this114.playbackControlId));
 
-      var thisClass = _assertThisInitialized(_this113);
+      var thisClass = _assertThisInitialized(_this114);
 
       paella.events.bind(paella.events.showEditor, function (event) {
         thisClass.onShowEditor();
@@ -9202,10 +9224,10 @@ function paella_DeferredNotImplemented() {
       $(document).mousemove(function (event) {
         paella.player.controls.restartHideTimer();
       });
-      $(_this113.domElement).bind("mousemove", function (event) {
+      $(_this114.domElement).bind("mousemove", function (event) {
         thisClass._over = true;
       });
-      $(_this113.domElement).bind("mouseout", function (event) {
+      $(_this114.domElement).bind("mouseout", function (event) {
         thisClass._over = false;
       });
       paella.events.bind(paella.events.endVideo, function (event) {
@@ -9214,15 +9236,15 @@ function paella_DeferredNotImplemented() {
       paella.events.bind('keydown', function (event) {
         thisClass.onKeyEvent();
       });
-      _this113.videoOverlayButtons = new paella.DomNode('div', id + '_videoOverlayButtonPlugins');
-      _this113.videoOverlayButtons.domElement.className = 'videoOverlayButtonPlugins';
+      _this114.videoOverlayButtons = new paella.DomNode('div', id + '_videoOverlayButtonPlugins');
+      _this114.videoOverlayButtons.domElement.className = 'videoOverlayButtonPlugins';
 
-      _this113.videoOverlayButtons.domElement.setAttribute("role", "toolbar");
+      _this114.videoOverlayButtons.domElement.setAttribute("role", "toolbar");
 
-      _this113.addNode(_this113.videoOverlayButtons);
+      _this114.addNode(_this114.videoOverlayButtons);
 
-      paella.pluginManager.setTarget('videoOverlayButton', _assertThisInitialized(_this113));
-      return _this113;
+      paella.pluginManager.setTarget('videoOverlayButton', _assertThisInitialized(_this114));
+      return _this114;
     }
 
     _createClass(ControlsContainer, [{
@@ -9358,13 +9380,13 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "hideControls",
       value: function hideControls() {
-        var _this114 = this;
+        var _this115 = this;
 
         paella.player.videoContainer.paused().then(function (paused) {
           if (!paused) {
-            _this114.hide();
+            _this115.hide();
           } else {
-            _this114.show();
+            _this115.show();
           }
         });
       }
@@ -9407,7 +9429,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "restartTimerEvent",
       value: function restartTimerEvent() {
-        var _this115 = this;
+        var _this116 = this;
 
         if (this.isHidden()) {
           this.showControls();
@@ -9416,7 +9438,7 @@ function paella_DeferredNotImplemented() {
         this._doHide = false;
         paella.player.videoContainer.paused(function (paused) {
           if (!paused) {
-            _this115.restartHideTimer();
+            _this116.restartHideTimer();
           }
         });
       }
@@ -9472,11 +9494,11 @@ function paella_DeferredNotImplemented() {
     _inherits(LoaderContainer, _paella$DomNode13);
 
     function LoaderContainer(id) {
-      var _this116;
+      var _this117;
 
       _classCallCheck(this, LoaderContainer);
 
-      _this116 = _possibleConstructorReturn(this, _getPrototypeOf(LoaderContainer).call(this, 'div', id, {
+      _this117 = _possibleConstructorReturn(this, _getPrototypeOf(LoaderContainer).call(this, 'div', id, {
         position: 'fixed',
         backgroundColor: 'white',
         opacity: '0.7',
@@ -9486,10 +9508,10 @@ function paella_DeferredNotImplemented() {
         bottom: '0px',
         zIndex: 10000
       }));
-      _this116.timer = null;
-      _this116.loader = null;
-      _this116.loaderPosition = 0;
-      _this116.loader = _this116.addNode(new paella.DomNode('i', '', {
+      _this117.timer = null;
+      _this117.loader = null;
+      _this117.loaderPosition = 0;
+      _this117.loader = _this117.addNode(new paella.DomNode('i', '', {
         width: "100px",
         height: "100px",
         color: "black",
@@ -9499,18 +9521,18 @@ function paella_DeferredNotImplemented() {
         marginTop: "32%",
         fontSize: "100px"
       }));
-      _this116.loader.domElement.className = "icon-spinner";
+      _this117.loader.domElement.className = "icon-spinner";
       paella.events.bind(paella.events.loadComplete, function (event, params) {
-        _this116.loadComplete(params);
+        _this117.loadComplete(params);
       });
-      _this116.timer = new base.Timer(function (timer) {
+      _this117.timer = new base.Timer(function (timer) {
         //thisClass.loaderPosition -= 128;
         //thisClass.loader.domElement.style.backgroundPosition = thisClass.loaderPosition + 'px';
-        _this116.loader.domElement.style.transform = "rotate(".concat(_this116.loaderPosition, "deg");
-        _this116.loaderPosition += 45;
+        _this117.loader.domElement.style.transform = "rotate(".concat(_this117.loaderPosition, "deg");
+        _this117.loaderPosition += 45;
       }, 250);
-      _this116.timer.repeat = true;
-      return _this116;
+      _this117.timer.repeat = true;
+      return _this117;
     }
 
     _createClass(LoaderContainer, [{
@@ -9627,10 +9649,10 @@ function paella_DeferredNotImplemented() {
     _createClass(KeyManager, [{
       key: "addPlugin",
       value: function addPlugin(plugin) {
-        var _this117 = this;
+        var _this118 = this;
 
         if (plugin.checkEnabled(function (e) {
-          _this117._pluginList.push(plugin);
+          _this118._pluginList.push(plugin);
 
           plugin.setup();
         })) ;
@@ -9638,14 +9660,14 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "loadComplete",
       value: function loadComplete(event, params) {
-        var _this118 = this;
+        var _this119 = this;
 
         if (g_keyboardEventSet) {
           return;
         }
 
         paella.events.bind("keyup", function (event) {
-          _this118.keyUp(event);
+          _this119.keyUp(event);
         });
         g_keyboardEventSet = true;
       }
@@ -9986,11 +10008,11 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "loadDictionary",
       value: function loadDictionary() {
-        var _this119 = this;
+        var _this120 = this;
 
         return new Promise(function (resolve) {
           base.ajax.get({
-            url: _this119.initParams.dictionaryUrl + "_" + base.dictionary.currentLanguage() + '.json'
+            url: _this120.initParams.dictionaryUrl + "_" + base.dictionary.currentLanguage() + '.json'
           }, function (data, type, returnCode) {
             base.dictionary.addDictionary(data);
             resolve(data);
@@ -10002,21 +10024,21 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "loadConfig",
       value: function loadConfig() {
-        var _this120 = this;
+        var _this121 = this;
 
         var loadAccessControl = function loadAccessControl(data) {
           var AccessControlClass = Class.fromString(data.player.accessControlClass || "paella.AccessControl");
-          _this120.initParams.accessControl = new AccessControlClass();
+          _this121.initParams.accessControl = new AccessControlClass();
         };
 
         if (this.initParams.config) {
           return new Promise(function (resolve) {
-            loadAccessControl(_this120.initParams.config);
-            resolve(_this120.initParams.config);
+            loadAccessControl(_this121.initParams.config);
+            resolve(_this121.initParams.config);
           });
         } else if (this.initParams.loadConfig) {
           return new Promise(function (resolve, reject) {
-            _this120.initParams.loadConfig(_this120.initParams.configUrl).then(function (data) {
+            _this121.initParams.loadConfig(_this121.initParams.configUrl).then(function (data) {
               loadAccessControl(data);
               resolve(data);
             })["catch"](function (err) {
@@ -10025,7 +10047,7 @@ function paella_DeferredNotImplemented() {
           });
         } else {
           return new Promise(function (resolve, reject) {
-            var configUrl = _this120.initParams.configUrl;
+            var configUrl = _this121.initParams.configUrl;
             var params = {};
             params.url = configUrl;
             base.ajax.get(params, function (data, type, returnCode) {
@@ -10202,24 +10224,24 @@ function paella_DeferredNotImplemented() {
     }]);
 
     function PaellaPlayer(playerId) {
-      var _this121;
+      var _this122;
 
       _classCallCheck(this, PaellaPlayer);
 
-      _this121 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayer).call(this, playerId));
-      _this121.player = null;
-      _this121.videoIdentifier = '';
-      _this121.loader = null; // Video data:
+      _this122 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayer).call(this, playerId));
+      _this122.player = null;
+      _this122.videoIdentifier = '';
+      _this122.loader = null; // Video data:
 
-      _this121.videoData = null; // if initialization ok
+      _this122.videoData = null; // if initialization ok
 
-      if (_this121.playerId == playerId) {
-        _this121.loadPaellaPlayer();
+      if (_this122.playerId == playerId) {
+        _this122.loadPaellaPlayer();
 
-        var thisClass = _assertThisInitialized(_this121);
+        var thisClass = _assertThisInitialized(_this122);
       }
 
-      return _this121;
+      return _this122;
     }
 
     _createClass(PaellaPlayer, [{
@@ -10470,7 +10492,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "play",
       value: function play() {
-        var _this122 = this;
+        var _this123 = this;
 
         if (this.lazyLoadContainer) {
           document.body.removeChild(this.lazyLoadContainer.domElement);
@@ -10478,13 +10500,13 @@ function paella_DeferredNotImplemented() {
         }
 
         return new Promise(function (resolve, reject) {
-          _this122.videoContainer.play().then(function () {
-            if (!_this122.controls) {
-              _this122.showPlaybackBar();
+          _this123.videoContainer.play().then(function () {
+            if (!_this123.controls) {
+              _this123.showPlaybackBar();
 
               paella.events.trigger(paella.events.controlBarLoaded);
 
-              _this122.controls.onresize();
+              _this123.controls.onresize();
             }
 
             resolve();
@@ -10501,10 +10523,10 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "playing",
       value: function playing() {
-        var _this123 = this;
+        var _this124 = this;
 
         return new Promise(function (resolve) {
-          _this123.paused().then(function (p) {
+          _this124.paused().then(function (p) {
             resolve(!p);
           });
         });
@@ -10551,20 +10573,20 @@ function paella_DeferredNotImplemented() {
     }]);
 
     function LazyThumbnailContainer(src) {
-      var _this124;
+      var _this125;
 
       _classCallCheck(this, LazyThumbnailContainer);
 
-      _this124 = _possibleConstructorReturn(this, _getPrototypeOf(LazyThumbnailContainer).call(this, 'img', 'lazyLoadThumbnailContainer', {}));
-      _this124.domElement.src = src;
-      _this124.domElement.alt = "";
-      _this124.container = LazyThumbnailContainer.GetIconElement();
+      _this125 = _possibleConstructorReturn(this, _getPrototypeOf(LazyThumbnailContainer).call(this, 'img', 'lazyLoadThumbnailContainer', {}));
+      _this125.domElement.src = src;
+      _this125.domElement.alt = "";
+      _this125.container = LazyThumbnailContainer.GetIconElement();
 
       if (!paella.player.videoContainer) {
-        document.body.appendChild(_this124.container);
+        document.body.appendChild(_this125.container);
       }
 
-      return _this124;
+      return _this125;
     }
 
     _createClass(LazyThumbnailContainer, [{
@@ -10595,13 +10617,13 @@ function paella_DeferredNotImplemented() {
     _inherits(PaellaPlayerLazy, _PaellaPlayer);
 
     function PaellaPlayerLazy(playerId, initDelegate) {
-      var _this125;
+      var _this126;
 
       _classCallCheck(this, PaellaPlayerLazy);
 
-      _this125 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayerLazy).call(this, playerId, initDelegate));
-      g_lazyLoadInstance = _assertThisInitialized(_this125);
-      return _this125;
+      _this126 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayerLazy).call(this, playerId, initDelegate));
+      g_lazyLoadInstance = _assertThisInitialized(_this126);
+      return _this126;
     }
 
     _createClass(PaellaPlayerLazy, [{
@@ -10624,7 +10646,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "loadVideo",
       value: function loadVideo() {
-        var _this126 = this;
+        var _this127 = this;
 
         if (this.videoIdentifier) {
           var This = this;
@@ -10632,17 +10654,17 @@ function paella_DeferredNotImplemented() {
           this.onresize();
           loader.loadVideo(function () {
             if (!loader.metadata.preview) {
-              paella.load(_this126.playerId, paella.loaderFunctionParams);
+              paella.load(_this127.playerId, paella.loaderFunctionParams);
               g_lazyLoadInstance = null; // Lazy load is disabled when the video has no preview
             } else {
-              _this126.lazyLoadContainer = new LazyThumbnailContainer(loader.metadata.preview);
-              document.body.appendChild(_this126.lazyLoadContainer.domElement);
+              _this127.lazyLoadContainer = new LazyThumbnailContainer(loader.metadata.preview);
+              document.body.appendChild(_this127.lazyLoadContainer.domElement);
 
-              _this126.lazyLoadContainer.onClick(function () {
-                _this126.lazyLoadContainer.destroyElements();
+              _this127.lazyLoadContainer.onClick(function () {
+                _this127.lazyLoadContainer.destroyElements();
 
-                _this126.lazyLoadContainer = null;
-                _this126._onPlayClosure && _this126._onPlayClosure();
+                _this127.lazyLoadContainer = null;
+                _this127._onPlayClosure && _this127._onPlayClosure();
               });
 
               paella.events.trigger(paella.events.loadComplete);
@@ -10699,24 +10721,24 @@ function paella_DeferredNotImplemented() {
     _inherits(DefaultVideoLoader, _paella$VideoLoader);
 
     function DefaultVideoLoader(data) {
-      var _this127;
+      var _this128;
 
       _classCallCheck(this, DefaultVideoLoader);
 
-      _this127 = _possibleConstructorReturn(this, _getPrototypeOf(DefaultVideoLoader).call(this, data));
-      _this127._url = null;
+      _this128 = _possibleConstructorReturn(this, _getPrototypeOf(DefaultVideoLoader).call(this, data));
+      _this128._url = null;
 
       if (_typeof(data) == "object") {
-        _this127._data = data;
+        _this128._data = data;
       } else {
         try {
-          _this127._data = JSON.parse(data);
+          _this128._data = JSON.parse(data);
         } catch (e) {
-          _this127._url = data;
+          _this128._url = data;
         }
       }
 
-      return _this127;
+      return _this128;
     }
 
     _createClass(DefaultVideoLoader, [{
@@ -10741,7 +10763,7 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "loadVideo",
       value: function loadVideo(onSuccess) {
-        var _this128 = this;
+        var _this129 = this;
 
         var loadVideoDelegate = paella.initDelegate.initParams.loadVideo;
         var url = this._url || this.getDataUrl();
@@ -10750,9 +10772,9 @@ function paella_DeferredNotImplemented() {
           this.loadVideoData(this._data, onSuccess);
         } else if (loadVideoDelegate) {
           loadVideoDelegate().then(function (data) {
-            _this128._data = data;
+            _this129._data = data;
 
-            _this128.loadVideoData(_this128._data, onSuccess);
+            _this129.loadVideoData(_this129._data, onSuccess);
           });
         } else if (url) {
           var This = this;
@@ -13432,7 +13454,7 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this129 = this;
+          var _this130 = this;
 
           var video = paella.player.videoContainer.masterVideo().video;
 
@@ -13440,15 +13462,15 @@ paella.addPlugin(function () {
             video.addEventListener('webkitplaybacktargetavailabilitychanged', function (event) {
               switch (event.availability) {
                 case "available":
-                  _this129._visible = true;
+                  _this130._visible = true;
                   break;
 
                 case "not-available":
-                  _this129._visible = false;
+                  _this130._visible = false;
                   break;
               }
 
-              _this129.updateClassName();
+              _this130.updateClassName();
             });
           }
         }
@@ -13597,10 +13619,10 @@ paella.addPlugin(function () {
       }, {
         key: "getCurrentRange",
         value: function getCurrentRange() {
-          var _this130 = this;
+          var _this131 = this;
 
           return new Promise(function (resolve) {
-            if (_this130._frames.length < 1) {
+            if (_this131._frames.length < 1) {
               resolve(null);
             } else {
               var trimming = null;
@@ -13612,13 +13634,13 @@ paella.addPlugin(function () {
                 trimming = t;
                 return paella.player.videoContainer.currentTime();
               }).then(function (currentTime) {
-                if (!_this130._frames.some(function (f1, i, array) {
+                if (!_this131._frames.some(function (f1, i, array) {
                   if (i + 1 == array.length) {
                     return;
                   }
 
-                  var f0 = i == 0 ? f1 : _this130._frames[i - 1];
-                  var f2 = _this130._frames[i + 1];
+                  var f0 = i == 0 ? f1 : _this131._frames[i - 1];
+                  var f2 = _this131._frames[i + 1];
                   var t0 = trimming.enabled ? f0.time - trimming.start : f0.time;
                   var t1 = trimming.enabled ? f1.time - trimming.start : f1.time;
                   var t2 = trimming.enabled ? f2.time - trimming.start : f2.time;
@@ -13637,8 +13659,8 @@ paella.addPlugin(function () {
                     return true;
                   }
                 })) {
-                  var t0 = _this130._frames[_this130._frames.length - 2].time;
-                  var t1 = _this130._frames[_this130._frames.length - 1].time;
+                  var t0 = _this131._frames[_this131._frames.length - 2].time;
+                  var t1 = _this131._frames[_this131._frames.length - 1].time;
                   resolve({
                     prev: trimming.enabled ? t0 - trimming.start : t0,
                     next: trimming.enabled ? t1 - trimming.start : t1
@@ -13758,10 +13780,10 @@ paella.addPlugin(function () {
       }, {
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this131 = this;
+          var _this132 = this;
 
           paella.player.videoContainer.getAudioTags().then(function (tags) {
-            _this131._tags = tags;
+            _this132._tags = tags;
             onSuccess(tags.length > 1);
           });
         }
@@ -13773,10 +13795,10 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this132 = this;
+          var _this133 = this;
 
           this._tags.forEach(function (tag) {
-            domElement.appendChild(_this132.getItemButton(tag));
+            domElement.appendChild(_this133.getItemButton(tag));
           });
         }
       }, {
@@ -14210,7 +14232,7 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this133 = this;
+          var _this134 = this;
 
           this.breaks = [];
           this.status = false;
@@ -14219,7 +14241,7 @@ paella.addPlugin(function () {
             id: paella.player.videoIdentifier
           }, function (data) {
             if (data && _typeof(data) == 'object' && data.breaks && data.breaks.length > 0) {
-              _this133.breaks = data.breaks;
+              _this134.breaks = data.breaks;
             }
           });
         }
@@ -14231,29 +14253,29 @@ paella.addPlugin(function () {
       }, {
         key: "onEvent",
         value: function onEvent(eventType, params) {
-          var _this134 = this;
+          var _this135 = this;
 
           paella.player.videoContainer.currentTime(true).then(function (currentTime) {
             // The event type checking must to be done using the time difference, because
             // the timeUpdate event may arrive before the seekToTime event
-            var diff = Math.abs(currentTime - _this134.lastTime);
+            var diff = Math.abs(currentTime - _this135.lastTime);
 
-            _this134.checkBreaks(currentTime, diff >= 1 ? paella.events.seekToTime : paella.events.timeUpdate);
+            _this135.checkBreaks(currentTime, diff >= 1 ? paella.events.seekToTime : paella.events.timeUpdate);
 
-            _this134.lastTime = currentTime;
+            _this135.lastTime = currentTime;
           });
         }
       }, {
         key: "checkBreaks",
         value: function checkBreaks(currentTime, eventType) {
-          var _this135 = this;
+          var _this136 = this;
 
           var breakMessage = "";
 
           if (this.breaks.some(function (breakItem) {
             if (breakItem.s <= currentTime && breakItem.e >= currentTime) {
-              if (eventType == paella.events.timeUpdate && !_this135.status) {
-                _this135.skipTo(breakItem.e);
+              if (eventType == paella.events.timeUpdate && !_this136.status) {
+                _this136.skipTo(breakItem.e);
               }
 
               breakMessage = breakItem.text;
@@ -14831,10 +14853,10 @@ paella.addPlugin(function () {
       }, {
         key: "buildBodyContent",
         value: function buildBodyContent(obj, type) {
-          var _this136 = this;
+          var _this137 = this;
 
           paella.player.videoContainer.trimming().then(function (trimming) {
-            var thisClass = _this136;
+            var thisClass = _this137;
             $(thisClass._body).empty();
             obj.forEach(function (l) {
               if (trimming.enabled && (l.end < trimming.start || l.begin > trimming.end)) {
@@ -14992,7 +15014,7 @@ paella.addPlugin(function () {
       }, {
         key: "updateCaptions",
         value: function updateCaptions(time) {
-          var _this137 = this;
+          var _this138 = this;
 
           if (this.captions) {
             paella.player.videoContainer.trimming().then(function (trimming) {
@@ -15001,14 +15023,14 @@ paella.addPlugin(function () {
               var caption = c.getCaptionAtTime(time.currentTime + offset);
 
               if (caption) {
-                $(_this137.container).show();
-                _this137.innerContainer.innerText = caption.content;
+                $(_this138.container).show();
+                _this138.innerContainer.innerText = caption.content;
 
-                _this137.moveCaptionsOverlay("auto");
+                _this138.moveCaptionsOverlay("auto");
               } else {
-                _this137.innerContainer.innerText = "";
+                _this138.innerContainer.innerText = "";
 
-                _this137.hideContent();
+                _this138.hideContent();
               }
             });
           }
@@ -15065,28 +15087,28 @@ paella.addPlugin(function () {
       _inherits(ChromaVideoCanvas, _bg$app$WindowControl3);
 
       function ChromaVideoCanvas(stream) {
-        var _this138;
+        var _this139;
 
         _classCallCheck(this, ChromaVideoCanvas);
 
-        _this138 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideoCanvas).call(this));
-        _this138.stream = stream;
-        _this138._chroma = bg.Color.White();
-        _this138._crop = new bg.Vector4(0.3, 0.01, 0.3, 0.01);
-        _this138._transform = bg.Matrix4.Identity().translate(0.6, -0.04, 0);
-        _this138._bias = 0.01;
-        return _this138;
+        _this139 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideoCanvas).call(this));
+        _this139.stream = stream;
+        _this139._chroma = bg.Color.White();
+        _this139._crop = new bg.Vector4(0.3, 0.01, 0.3, 0.01);
+        _this139._transform = bg.Matrix4.Identity().translate(0.6, -0.04, 0);
+        _this139._bias = 0.01;
+        return _this139;
       }
 
       _createClass(ChromaVideoCanvas, [{
         key: "loaded",
         value: function loaded() {
-          var _this139 = this;
+          var _this140 = this;
 
           return new Promise(function (resolve) {
             var checkLoaded = function checkLoaded() {
-              if (_this139.video) {
-                resolve(_this139);
+              if (_this140.video) {
+                resolve(_this140);
               } else {
                 setTimeout(checkLoaded, 100);
               }
@@ -15124,7 +15146,7 @@ paella.addPlugin(function () {
       }, {
         key: "init",
         value: function init() {
-          var _this140 = this;
+          var _this141 = this;
 
           // Use WebGL V1 engine
           bg.Engine.Set(new bg.webgl1.Engine(this.gl));
@@ -15135,7 +15157,7 @@ paella.addPlugin(function () {
           bg.base.Pipeline.SetCurrent(this.pipeline);
           this.pipeline.clearColor = bg.Color.Transparent();
           bg.base.Loader.Load(this.gl, this.stream.src).then(function (texture) {
-            _this140.texture = texture;
+            _this141.texture = texture;
           });
         }
       }, {
@@ -15232,26 +15254,26 @@ paella.addPlugin(function () {
     _inherits(ChromaVideo, _paella$VideoElementB4);
 
     function ChromaVideo(id, stream, left, top, width, height, streamName) {
-      var _this141;
+      var _this142;
 
       _classCallCheck(this, ChromaVideo);
 
-      _this141 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideo).call(this, id, stream, 'canvas', left, top, width, height));
-      _this141._posterFrame = null;
-      _this141._currentQuality = null;
-      _this141._autoplay = false;
-      _this141._streamName = null;
-      _this141._streamName = streamName || 'chroma';
+      _this142 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideo).call(this, id, stream, 'canvas', left, top, width, height));
+      _this142._posterFrame = null;
+      _this142._currentQuality = null;
+      _this142._autoplay = false;
+      _this142._streamName = null;
+      _this142._streamName = streamName || 'chroma';
 
-      var This = _assertThisInitialized(_this141);
+      var This = _assertThisInitialized(_this142);
 
-      if (_this141._stream.sources[_this141._streamName]) {
-        _this141._stream.sources[_this141._streamName].sort(function (a, b) {
+      if (_this142._stream.sources[_this142._streamName]) {
+        _this142._stream.sources[_this142._streamName].sort(function (a, b) {
           return a.res.h - b.res.h;
         });
       }
 
-      _this141.video = null;
+      _this142.video = null;
 
       function onProgress(event) {
         if (!This._ready && This.video.readyState == 4) {
@@ -15281,7 +15303,7 @@ paella.addPlugin(function () {
         onUpdateSize();
       }, 500);
       timer.repeat = true;
-      return _this141;
+      return _this142;
     }
 
     _createClass(ChromaVideo, [{
@@ -15318,14 +15340,14 @@ paella.addPlugin(function () {
     }, {
       key: "_deferredAction",
       value: function _deferredAction(action) {
-        var _this142 = this;
+        var _this143 = this;
 
         return new Promise(function (resolve, reject) {
-          if (_this142.video) {
+          if (_this143.video) {
             resolve(action());
           } else {
-            $(_this142.video).bind('canplay', function () {
-              _this142._ready = true;
+            $(_this143.video).bind('canplay', function () {
+              _this143._ready = true;
               resolve(action());
             });
           }
@@ -15353,11 +15375,11 @@ paella.addPlugin(function () {
     }, {
       key: "getVideoData",
       value: function getVideoData() {
-        var _this143 = this;
+        var _this144 = this;
 
         var This = this;
         return new Promise(function (resolve, reject) {
-          _this143._deferredAction(function () {
+          _this144._deferredAction(function () {
             resolve({
               duration: This.video.duration,
               currentTime: This.video.currentTime,
@@ -15389,43 +15411,43 @@ paella.addPlugin(function () {
     }, {
       key: "load",
       value: function load() {
-        var _this144 = this;
+        var _this145 = this;
 
         var This = this;
         return new Promise(function (resolve, reject) {
-          _this144._loadDeps().then(function () {
-            var sources = _this144._stream.sources[_this144._streamName];
+          _this145._loadDeps().then(function () {
+            var sources = _this145._stream.sources[_this145._streamName];
 
-            if (_this144._currentQuality === null && _this144._videoQualityStrategy) {
-              _this144._currentQuality = _this144._videoQualityStrategy.getQualityIndex(sources);
+            if (_this145._currentQuality === null && _this145._videoQualityStrategy) {
+              _this145._currentQuality = _this145._videoQualityStrategy.getQualityIndex(sources);
             }
 
-            var stream = _this144._currentQuality < sources.length ? sources[_this144._currentQuality] : null;
-            _this144.video = null;
-            _this144.domElement.parentNode.style.backgroundColor = "transparent";
+            var stream = _this145._currentQuality < sources.length ? sources[_this145._currentQuality] : null;
+            _this145.video = null;
+            _this145.domElement.parentNode.style.backgroundColor = "transparent";
 
             if (stream) {
-              _this144.canvasController = null;
-              buildChromaVideoCanvas(stream, _this144.domElement).then(function (canvasController) {
-                _this144.canvasController = canvasController;
-                _this144.video = canvasController.video;
+              _this145.canvasController = null;
+              buildChromaVideoCanvas(stream, _this145.domElement).then(function (canvasController) {
+                _this145.canvasController = canvasController;
+                _this145.video = canvasController.video;
 
-                _this144.video.pause();
+                _this145.video.pause();
 
                 if (stream.crop) {
-                  _this144.canvasController.crop = new bg.Vector4(stream.crop.left, stream.crop.top, stream.crop.right, stream.crop.bottom);
+                  _this145.canvasController.crop = new bg.Vector4(stream.crop.left, stream.crop.top, stream.crop.right, stream.crop.bottom);
                 }
 
                 if (stream.displacement) {
-                  _this144.canvasController.transform = bg.Matrix4.Translation(stream.displacement.x, stream.displacement.y, 0);
+                  _this145.canvasController.transform = bg.Matrix4.Translation(stream.displacement.x, stream.displacement.y, 0);
                 }
 
                 if (stream.chromaColor) {
-                  _this144.canvasController.chroma = new bg.Color(stream.chromaColor[0], stream.chromaColor[1], stream.chromaColor[2], stream.chromaColor[3]);
+                  _this145.canvasController.chroma = new bg.Color(stream.chromaColor[0], stream.chromaColor[1], stream.chromaColor[2], stream.chromaColor[3]);
                 }
 
                 if (stream.chromaBias) {
-                  _this144.canvasController.bias = stream.chromaBias;
+                  _this145.canvasController.bias = stream.chromaBias;
                 }
 
                 resolve(stream);
@@ -15439,16 +15461,16 @@ paella.addPlugin(function () {
     }, {
       key: "getQualities",
       value: function getQualities() {
-        var _this145 = this;
+        var _this146 = this;
 
         return new Promise(function (resolve, reject) {
           setTimeout(function () {
             var result = [];
-            var sources = _this145._stream.sources[_this145._streamName];
+            var sources = _this146._stream.sources[_this146._streamName];
             var index = -1;
             sources.forEach(function (s) {
               index++;
-              result.push(_this145._getQualityObject(index, s));
+              result.push(_this146._getQualityObject(index, s));
             });
             resolve(result);
           }, 10);
@@ -15457,147 +15479,147 @@ paella.addPlugin(function () {
     }, {
       key: "setQuality",
       value: function setQuality(index) {
-        var _this146 = this;
+        var _this147 = this;
 
         return new Promise(function (resolve) {
-          var paused = _this146.video.paused;
-          var sources = _this146._stream.sources[_this146._streamName];
-          _this146._currentQuality = index < sources.length ? index : 0;
-          var currentTime = _this146.video.currentTime;
+          var paused = _this147.video.paused;
+          var sources = _this147._stream.sources[_this147._streamName];
+          _this147._currentQuality = index < sources.length ? index : 0;
+          var currentTime = _this147.video.currentTime;
 
-          _this146.freeze().then(function () {
-            _this146._ready = false;
-            return _this146.load();
+          _this147.freeze().then(function () {
+            _this147._ready = false;
+            return _this147.load();
           }).then(function () {
             if (!paused) {
-              _this146.play();
+              _this147.play();
             }
 
-            $(_this146.video).on('seeked', function () {
-              _this146.unFreeze();
+            $(_this147.video).on('seeked', function () {
+              _this147.unFreeze();
 
               resolve();
-              $(_this146.video).off('seeked');
+              $(_this147.video).off('seeked');
             });
-            _this146.video.currentTime = currentTime;
+            _this147.video.currentTime = currentTime;
           });
         });
       }
     }, {
       key: "getCurrentQuality",
       value: function getCurrentQuality() {
-        var _this147 = this;
+        var _this148 = this;
 
         return new Promise(function (resolve) {
-          resolve(_this147._getQualityObject(_this147._currentQuality, _this147._stream.sources[_this147._streamName][_this147._currentQuality]));
+          resolve(_this148._getQualityObject(_this148._currentQuality, _this148._stream.sources[_this148._streamName][_this148._currentQuality]));
         });
       }
     }, {
       key: "play",
       value: function play() {
-        var _this148 = this;
+        var _this149 = this;
 
         return this._deferredAction(function () {
           bg.app.MainLoop.singleton.updateMode = bg.app.FrameUpdate.AUTO;
 
-          _this148.video.play();
+          _this149.video.play();
         });
       }
     }, {
       key: "pause",
       value: function pause() {
-        var _this149 = this;
+        var _this150 = this;
 
         return this._deferredAction(function () {
           bg.app.MainLoop.singleton.updateMode = bg.app.FrameUpdate.MANUAL;
 
-          _this149.video.pause();
+          _this150.video.pause();
         });
       }
     }, {
       key: "isPaused",
       value: function isPaused() {
-        var _this150 = this;
+        var _this151 = this;
 
         return this._deferredAction(function () {
-          return _this150.video.paused;
+          return _this151.video.paused;
         });
       }
     }, {
       key: "duration",
       value: function duration() {
-        var _this151 = this;
+        var _this152 = this;
 
         return this._deferredAction(function () {
-          return _this151.video.duration;
+          return _this152.video.duration;
         });
       }
     }, {
       key: "setCurrentTime",
       value: function setCurrentTime(time) {
-        var _this152 = this;
+        var _this153 = this;
 
         return this._deferredAction(function () {
-          _this152.video.currentTime = time;
-          $(_this152.video).on('seeked', function () {
-            _this152.canvasController.postRedisplay();
+          _this153.video.currentTime = time;
+          $(_this153.video).on('seeked', function () {
+            _this153.canvasController.postRedisplay();
 
-            $(_this152.video).off('seeked');
+            $(_this153.video).off('seeked');
           });
         });
       }
     }, {
       key: "currentTime",
       value: function currentTime() {
-        var _this153 = this;
+        var _this154 = this;
 
         return this._deferredAction(function () {
-          return _this153.video.currentTime;
+          return _this154.video.currentTime;
         });
       }
     }, {
       key: "setVolume",
       value: function setVolume(volume) {
-        var _this154 = this;
+        var _this155 = this;
 
         return this._deferredAction(function () {
-          _this154.video.volume = volume;
+          _this155.video.volume = volume;
         });
       }
     }, {
       key: "volume",
       value: function volume() {
-        var _this155 = this;
+        var _this156 = this;
 
         return this._deferredAction(function () {
-          return _this155.video.volume;
+          return _this156.video.volume;
         });
       }
     }, {
       key: "setPlaybackRate",
       value: function setPlaybackRate(rate) {
-        var _this156 = this;
+        var _this157 = this;
 
         return this._deferredAction(function () {
-          _this156.video.playbackRate = rate;
+          _this157.video.playbackRate = rate;
         });
       }
     }, {
       key: "playbackRate",
       value: function playbackRate() {
-        var _this157 = this;
+        var _this158 = this;
 
         return this._deferredAction(function () {
-          return _this157.video.playbackRate;
+          return _this158.video.playbackRate;
         });
       }
     }, {
       key: "goFullScreen",
       value: function goFullScreen() {
-        var _this158 = this;
+        var _this159 = this;
 
         return this._deferredAction(function () {
-          var elem = _this158.video;
+          var elem = _this159.video;
 
           if (elem.requestFullscreen) {
             elem.requestFullscreen();
@@ -15613,10 +15635,10 @@ paella.addPlugin(function () {
     }, {
       key: "unFreeze",
       value: function unFreeze() {
-        var _this159 = this;
+        var _this160 = this;
 
         return this._deferredAction(function () {
-          var c = document.getElementById(_this159.video.className + "canvas");
+          var c = document.getElementById(_this160.video.className + "canvas");
           $(c).remove();
         });
       }
@@ -16343,7 +16365,7 @@ paella.addPlugin(function () {
       }, {
         key: "onTimeUpdate",
         value: function onTimeUpdate() {
-          var _this160 = this;
+          var _this161 = this;
 
           var currentTime = -1;
           paella.player.videoContainer.currentTime().then(function (c) {
@@ -16352,19 +16374,19 @@ paella.addPlugin(function () {
           }).then(function (trimming) {
             var videoCurrentTime = Math.round(currentTime + (trimming.enabled ? trimming.start : 0));
 
-            if (_this160.inPosition <= videoCurrentTime && videoCurrentTime <= _this160.inPosition + _this160.INTERVAL_LENGTH) {
-              _this160.outPosition = videoCurrentTime;
+            if (_this161.inPosition <= videoCurrentTime && videoCurrentTime <= _this161.inPosition + _this161.INTERVAL_LENGTH) {
+              _this161.outPosition = videoCurrentTime;
 
-              if (_this160.inPosition + _this160.INTERVAL_LENGTH === _this160.outPosition) {
-                _this160.trackFootPrint(_this160.inPosition, _this160.outPosition);
+              if (_this161.inPosition + _this161.INTERVAL_LENGTH === _this161.outPosition) {
+                _this161.trackFootPrint(_this161.inPosition, _this161.outPosition);
 
-                _this160.inPosition = _this160.outPosition;
+                _this161.inPosition = _this161.outPosition;
               }
             } else {
-              _this160.trackFootPrint(_this160.inPosition, _this160.outPosition);
+              _this161.trackFootPrint(_this161.inPosition, _this161.outPosition);
 
-              _this160.inPosition = videoCurrentTime;
-              _this160.outPosition = videoCurrentTime;
+              _this161.inPosition = videoCurrentTime;
+              _this161.outPosition = videoCurrentTime;
             }
           });
         }
@@ -16710,7 +16732,7 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this161 = this;
+          var _this162 = this;
 
           var thisClass = this;
           this.frames = [];
@@ -16767,13 +16789,13 @@ paella.addPlugin(function () {
             width: numFrames * itemWidth + 'px'
           });
           paella.events.bind(paella.events.setTrim, function (event, params) {
-            _this161.updateFrameVisibility(params.trimEnabled, params.trimStart, params.trimEnd);
+            _this162.updateFrameVisibility(params.trimEnabled, params.trimStart, params.trimEnd);
           });
           paella.player.videoContainer.trimming().then(function (trimData) {
-            _this161.updateFrameVisibility(trimData.enabled, trimData.start, trimData.end);
+            _this162.updateFrameVisibility(trimData.enabled, trimData.start, trimData.end);
           });
           paella.events.bind(paella.events.timeupdate, function (event, params) {
-            return _this161.onTimeUpdate(params.currentTime);
+            return _this162.onTimeUpdate(params.currentTime);
           });
         }
       }, {
@@ -16932,10 +16954,10 @@ paella.addPlugin(function () {
       }, {
         key: "onMouseOut",
         value: function onMouseOut(event, frameData) {
-          var _this162 = this;
+          var _this163 = this;
 
           this._searchTimer = setTimeout(function (timer) {
-            return _this162.removeHiResFrame();
+            return _this163.removeHiResFrame();
           }, this._searchTimerTime);
         }
       }, {
@@ -16954,25 +16976,25 @@ paella.addPlugin(function () {
       }, {
         key: "onTimeUpdate",
         value: function onTimeUpdate(currentTime) {
-          var _this163 = this;
+          var _this164 = this;
 
           var frame = null;
           paella.player.videoContainer.trimming().then(function (trimming) {
             var time = trimming.enabled ? currentTime + trimming.start : currentTime;
 
-            for (var i = 0; i < _this163.frames.length; ++i) {
-              if (_this163.frames[i].frameData && _this163.frames[i].frameData.time <= time) {
-                frame = _this163.frames[i];
+            for (var i = 0; i < _this164.frames.length; ++i) {
+              if (_this164.frames[i].frameData && _this164.frames[i].frameData.time <= time) {
+                frame = _this164.frames[i];
               } else {
                 break;
               }
             }
 
-            if (_this163.currentFrame != frame && frame) {
+            if (_this164.currentFrame != frame && frame) {
               //this.navButtons.left.scrollContainer.scrollLeft += 100;
-              if (_this163.currentFrame) _this163.currentFrame.className = 'frameControlItem';
-              _this163.currentFrame = frame;
-              _this163.currentFrame.className = 'frameControlItem current';
+              if (_this164.currentFrame) _this164.currentFrame.className = 'frameControlItem';
+              _this164.currentFrame = frame;
+              _this164.currentFrame.className = 'frameControlItem current';
             }
           });
         }
@@ -17084,20 +17106,20 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this164 = this;
+          var _this165 = this;
 
           this._reload = this.config.reloadOnFullscreen ? this.config.reloadOnFullscreen.enabled : false;
           paella.events.bind(paella.events.enterFullscreen, function (event) {
-            return _this164.onEnterFullscreen();
+            return _this165.onEnterFullscreen();
           });
           paella.events.bind(paella.events.exitFullscreen, function (event) {
-            return _this164.onExitFullscreen();
+            return _this165.onExitFullscreen();
           });
         }
       }, {
         key: "action",
         value: function action(button) {
-          var _this165 = this;
+          var _this166 = this;
 
           if (paella.player.isFullScreen()) {
             paella.player.exitFullScreen();
@@ -17106,7 +17128,7 @@ paella.addPlugin(function () {
             var url = window.location.href;
             paella.player.pause();
             paella.player.videoContainer.currentTime().then(function (currentTime) {
-              var obj = _this165.secondsToHours(currentTime);
+              var obj = _this166.secondsToHours(currentTime);
 
               window.open(url + "&time=" + obj.h + "h" + obj.m + "m" + obj.s + "s&autoplay=true");
             });
@@ -17117,7 +17139,7 @@ paella.addPlugin(function () {
 
           if (paella.player.config.player.reloadOnFullscreen && paella.player.videoContainer.supportAutoplay()) {
             setTimeout(function () {
-              if (_this165._reload) {
+              if (_this166._reload) {
                 paella.player.videoContainer.setQuality(null).then(function () {}); //paella.player.reloadVideos();
               }
             }, 1000);
@@ -17355,7 +17377,7 @@ paella.addPlugin(function () {
     }, {
       key: "_deferredAction",
       value: function _deferredAction(action) {
-        var _this166 = this;
+        var _this167 = this;
 
         return new Promise(function (resolve, reject) {
           function processResult(actionResult) {
@@ -17370,13 +17392,13 @@ paella.addPlugin(function () {
             }
           }
 
-          if (_this166.ready) {
+          if (_this167.ready) {
             processResult(action());
           } else {
             var eventFunction = function eventFunction() {
               processResult(action());
-              $(_this166.video).unbind('canplay');
-              $(_this166.video).unbind('loadedmetadata');
+              $(_this167.video).unbind('canplay');
+              $(_this167.video).unbind('loadedmetadata');
 
               if (timer) {
                 clearTimeout(timer);
@@ -17384,25 +17406,25 @@ paella.addPlugin(function () {
               }
             };
 
-            $(_this166.video).bind('canplay', eventFunction);
-            $(_this166.video).bind('loadedmetadata', eventFunction);
+            $(_this167.video).bind('canplay', eventFunction);
+            $(_this167.video).bind('loadedmetadata', eventFunction);
 
             var timerFunction = function timerFunction() {
-              if (!_this166.ready) {
+              if (!_this167.ready) {
                 console.debug("HLS video resume failed. Trying to recover.");
 
-                if (_this166._hls) {
-                  _this166._hls.recoverMediaError();
+                if (_this167._hls) {
+                  _this167._hls.recoverMediaError();
                 } else {
                   // iOS
                   // In this way the recharge is forced, and it is possible to recover errors.
-                  var src = _this166.video.innerHTML;
-                  _this166.video.innerHTML = "";
-                  _this166.video.innerHTML = src;
+                  var src = _this167.video.innerHTML;
+                  _this167.video.innerHTML = "";
+                  _this167.video.innerHTML = src;
 
-                  _this166.video.load();
+                  _this167.video.load();
 
-                  _this166.video.play();
+                  _this167.video.play();
                 }
 
                 timer = setTimeout(timerFunction, 1000);
@@ -17418,50 +17440,50 @@ paella.addPlugin(function () {
     }, {
       key: "setupHls",
       value: function setupHls(video, url) {
-        var _this167 = this;
+        var _this168 = this;
 
         var initialQualityLevel = this.config.initialQualityLevel !== undefined ? this.config.initialQualityLevel : 1;
         return new Promise(function (resolve, reject) {
-          _this167._loadDeps().then(function (Hls) {
+          _this168._loadDeps().then(function (Hls) {
             if (Hls.isSupported()) {
-              var cfg = _this167.config; //cfg.autoStartLoad = false;
+              var cfg = _this168.config; //cfg.autoStartLoad = false;
 
-              _this167._hls = new Hls(cfg);
+              _this168._hls = new Hls(cfg);
 
-              _this167._hls.loadSource(url);
+              _this168._hls.loadSource(url);
 
-              _this167._hls.attachMedia(video);
+              _this168._hls.attachMedia(video);
 
-              _this167.autoQuality = true;
+              _this168.autoQuality = true;
 
-              _this167._hls.on(Hls.Events.LEVEL_SWITCHED, function (ev, data) {
-                _this167._qualities = _this167._qualities || [];
-                _this167._qualityIndex = _this167.autoQuality ? _this167._qualities.length - 1 : data.level;
+              _this168._hls.on(Hls.Events.LEVEL_SWITCHED, function (ev, data) {
+                _this168._qualities = _this168._qualities || [];
+                _this168._qualityIndex = _this168.autoQuality ? _this168._qualities.length - 1 : data.level;
                 paella.events.trigger(paella.events.qualityChanged, {});
                 if (console && console.log) console.log("HLS: quality level changed to ".concat(data.level));
               });
 
-              _this167._hls.on(Hls.Events.ERROR, function (event, data) {
+              _this168._hls.on(Hls.Events.ERROR, function (event, data) {
                 if (data.fatal) {
                   switch (data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
                       console.error("paella.HLSPlayer: Fatal network error encountered, try to recover");
 
-                      _this167._hls.startLoad();
+                      _this168._hls.startLoad();
 
                       break;
 
                     case Hls.ErrorTypes.MEDIA_ERROR:
                       console.error("paella.HLSPlayer: Fatal media error encountered, try to recover");
 
-                      _this167._hls.recoverMediaError();
+                      _this168._hls.recoverMediaError();
 
                       break;
 
                     default:
                       console.error("paella.HLSPlayer: Fatal error. Can not recover");
 
-                      _this167._hls.destroy();
+                      _this168._hls.destroy();
 
                       reject(new Errro("Invalid media"));
                       break;
@@ -17469,15 +17491,15 @@ paella.addPlugin(function () {
                 }
               });
 
-              _this167._hls.on(Hls.Events.MANIFEST_PARSED, function () {
+              _this168._hls.on(Hls.Events.MANIFEST_PARSED, function () {
                 if (!cfg.autoStartLoad) {
-                  _this167._hls.startLoad();
+                  _this168._hls.startLoad();
                 } // Fixes hls.js problems when loading the initial quality level
 
 
-                _this167._hls.currentLevel = _this167._hls.levels.length >= initialQualityLevel ? initialQualityLevel : -1;
+                _this168._hls.currentLevel = _this168._hls.levels.length >= initialQualityLevel ? initialQualityLevel : -1;
                 setTimeout(function () {
-                  return _this167._hls.currentLevel = -1;
+                  return _this168._hls.currentLevel = -1;
                 }, 1000);
                 resolve(video);
               });
@@ -17490,7 +17512,7 @@ paella.addPlugin(function () {
     }, {
       key: "webGlDidLoad",
       value: function webGlDidLoad() {
-        var _this168 = this;
+        var _this169 = this;
 
         if (base.userAgent.system.iOS) {
           return _get(_getPrototypeOf(HLSPlayer.prototype), "webGlDidLoad", this).call(this);
@@ -17502,7 +17524,7 @@ paella.addPlugin(function () {
           var video = document.createElement("video");
           s_preventVideoDump.push(video);
 
-          _this168.setupHls(video, url).then(function () {
+          _this169.setupHls(video, url).then(function () {
             return onSuccess(video);
           })["catch"](function () {
             return onFail();
@@ -17513,20 +17535,20 @@ paella.addPlugin(function () {
     }, {
       key: "loadVideoStream",
       value: function loadVideoStream(canvasInstance, stream) {
-        var _this169 = this;
+        var _this170 = this;
 
         if (base.userAgent.system.iOS) {
           return _get(_getPrototypeOf(HLSPlayer.prototype), "loadVideoStream", this).call(this, canvasInstance, stream);
         }
 
         return canvasInstance.loadVideo(this, stream, function (videoElem) {
-          return _this169.setupHls(videoElem, stream.src);
+          return _this170.setupHls(videoElem, stream.src);
         });
       }
     }, {
       key: "getQualities",
       value: function getQualities() {
-        var _this170 = this;
+        var _this171 = this;
 
         if (base.userAgent.system.iOS) // ||
           //		base.userAgent.browser.Safari)
@@ -17551,7 +17573,7 @@ paella.addPlugin(function () {
           var _This = this;
 
           return new Promise(function (resolve) {
-            if (!_this170._qualities || _this170._qualities.length == 0) {
+            if (!_this171._qualities || _this171._qualities.length == 0) {
               _This._qualities = [];
 
               _This._hls.levels.forEach(function (q, index) {
@@ -17565,7 +17587,7 @@ paella.addPlugin(function () {
                 }));
               });
 
-              if (_this170._qualities.length > 1) {
+              if (_this171._qualities.length > 1) {
                 // If there is only one quality level, don't add the "auto" option
                 _This._qualities.push(_This._getQualityObject(_This._qualities.length, {
                   index: _This._qualities.length,
@@ -17604,11 +17626,11 @@ paella.addPlugin(function () {
     }, {
       key: "printQualityes",
       value: function printQualityes() {
-        var _this171 = this;
+        var _this172 = this;
 
         return new Promise(function (resolve, reject) {
-          _this171.getCurrentQuality().then(function (cq) {
-            return _this171.getNextQuality();
+          _this172.getCurrentQuality().then(function (cq) {
+            return _this172.getNextQuality();
           }).then(function (nq) {
             resolve();
           });
@@ -17643,17 +17665,17 @@ paella.addPlugin(function () {
     }, {
       key: "getNextQuality",
       value: function getNextQuality() {
-        var _this172 = this;
+        var _this173 = this;
 
         return new Promise(function (resolve, reject) {
-          var index = _this172.qualityIndex;
-          resolve(_this172._qualities[index]);
+          var index = _this173.qualityIndex;
+          resolve(_this173._qualities[index]);
         });
       }
     }, {
       key: "getCurrentQuality",
       value: function getCurrentQuality() {
-        var _this173 = this;
+        var _this174 = this;
 
         if (base.userAgent.system.iOS) // ||
           //base.userAgent.browser.Safari)
@@ -17661,7 +17683,7 @@ paella.addPlugin(function () {
             return Promise.resolve(0);
           } else {
           return new Promise(function (resolve, reject) {
-            resolve(_this173._qualities[_this173.qualityIndex]);
+            resolve(_this174._qualities[_this174.qualityIndex]);
           });
         }
       }
@@ -17976,14 +17998,14 @@ paella.addPlugin(function () {
     _inherits(MpegDashVideo, _paella$Html5Video2);
 
     function MpegDashVideo(id, stream, left, top, width, height) {
-      var _this174;
+      var _this175;
 
       _classCallCheck(this, MpegDashVideo);
 
-      _this174 = _possibleConstructorReturn(this, _getPrototypeOf(MpegDashVideo).call(this, id, stream, left, top, width, height, 'mpd'));
-      _this174._posterFrame = null;
-      _this174._player = null;
-      return _this174;
+      _this175 = _possibleConstructorReturn(this, _getPrototypeOf(MpegDashVideo).call(this, id, stream, left, top, width, height, 'mpd'));
+      _this175._posterFrame = null;
+      _this175._player = null;
+      return _this175;
     }
 
     _createClass(MpegDashVideo, [{
@@ -18041,16 +18063,16 @@ paella.addPlugin(function () {
     }, {
       key: "loadVideoStream",
       value: function loadVideoStream(canvasInstance, stream) {
-        var _this175 = this;
+        var _this176 = this;
 
         var This = this;
         return canvasInstance.loadVideo(this, stream, function (videoElem) {
           return new Promise(function (resolve, reject) {
-            _this175._loadDeps().then(function () {
+            _this176._loadDeps().then(function () {
               var player = dashjs.MediaPlayer().create();
               player.initialize(videoElem, stream.src, true);
               player.getDebug().setLogToBrowserConsole(false);
-              _this175._player = player;
+              _this176._player = player;
               player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function (a, b) {
                 var bitrates = player.getBitrateInfoListFor("video");
 
@@ -18107,23 +18129,23 @@ paella.addPlugin(function () {
     }, {
       key: "getQualities",
       value: function getQualities() {
-        var _this176 = this;
+        var _this177 = this;
 
         return new Promise(function (resolve) {
-          _this176._deferredAction(function () {
-            if (!_this176._qualities) {
-              _this176._qualities = [];
+          _this177._deferredAction(function () {
+            if (!_this177._qualities) {
+              _this177._qualities = [];
 
-              _this176._player.getBitrateInfoListFor("video").sort(function (a, b) {
+              _this177._player.getBitrateInfoListFor("video").sort(function (a, b) {
                 return a.bitrate - b.bitrate;
               }).forEach(function (item, index, bitrates) {
-                _this176._qualities.push(_this176._getQualityObject(item, index, bitrates));
+                _this177._qualities.push(_this177._getQualityObject(item, index, bitrates));
               });
 
-              _this176.autoQualityIndex = _this176._qualities.length;
+              _this177.autoQualityIndex = _this177._qualities.length;
 
-              _this176._qualities.push({
-                index: _this176.autoQualityIndex,
+              _this177._qualities.push({
+                index: _this177.autoQualityIndex,
                 res: {
                   w: null,
                   h: null
@@ -18142,37 +18164,37 @@ paella.addPlugin(function () {
               });
             }
 
-            resolve(_this176._qualities);
+            resolve(_this177._qualities);
           });
         });
       }
     }, {
       key: "setQuality",
       value: function setQuality(index) {
-        var _this177 = this;
+        var _this178 = this;
 
         return new Promise(function (resolve, reject) {
-          var currentQuality = _this177._player.getQualityFor("video");
+          var currentQuality = _this178._player.getQualityFor("video");
 
-          if (index == _this177.autoQualityIndex) {
-            _this177._player.setAutoSwitchQuality(true);
+          if (index == _this178.autoQualityIndex) {
+            _this178._player.setAutoSwitchQuality(true);
 
             resolve();
           } else if (index != currentQuality) {
-            _this177._player.setAutoSwitchQuality(false);
+            _this178._player.setAutoSwitchQuality(false);
 
-            _this177._player.off(dashjs.MediaPlayer.events.METRIC_CHANGED);
+            _this178._player.off(dashjs.MediaPlayer.events.METRIC_CHANGED);
 
-            _this177._player.on(dashjs.MediaPlayer.events.METRIC_CHANGED, function (a, b) {
+            _this178._player.on(dashjs.MediaPlayer.events.METRIC_CHANGED, function (a, b) {
               if (a.type == "metricchanged") {
-                if (currentQuality != _this177._player.getQualityFor("video")) {
-                  currentQuality = _this177._player.getQualityFor("video");
+                if (currentQuality != _this178._player.getQualityFor("video")) {
+                  currentQuality = _this178._player.getQualityFor("video");
                   resolve();
                 }
               }
             });
 
-            _this177._player.setQualityFor("video", index);
+            _this178._player.setQualityFor("video", index);
           } else {
             resolve();
           }
@@ -18181,13 +18203,13 @@ paella.addPlugin(function () {
     }, {
       key: "getCurrentQuality",
       value: function getCurrentQuality() {
-        var _this178 = this;
+        var _this179 = this;
 
         return new Promise(function (resolve, reject) {
-          if (_this178._player.getAutoSwitchQuality()) {
+          if (_this179._player.getAutoSwitchQuality()) {
             // auto quality
             resolve({
-              index: _this178.autoQualityIndex,
+              index: _this179.autoQualityIndex,
               res: {
                 w: null,
                 h: null
@@ -18205,9 +18227,9 @@ paella.addPlugin(function () {
               }
             });
           } else {
-            var index = _this178._player.getQualityFor("video");
+            var index = _this179._player.getQualityFor("video");
 
-            resolve(_this178._getQualityObject(_this178._qualities[index], index, _this178._player.getBitrateInfoListFor("video")));
+            resolve(_this179._getQualityObject(_this179._qualities[index], index, _this179._player.getBitrateInfoListFor("video")));
           }
         });
       }
@@ -18321,22 +18343,22 @@ paella.addPlugin(function () {
       }, {
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this179 = this;
+          var _this180 = this;
 
           this._available = [];
           paella.player.videoContainer.getQualities().then(function (q) {
-            _this179._available = q;
+            _this180._available = q;
             onSuccess(q.length > 1);
           });
         }
       }, {
         key: "setup",
         value: function setup() {
-          var _this180 = this;
+          var _this181 = this;
 
           this.setQualityLabel();
           paella.events.bind(paella.events.qualityChanged, function (event) {
-            return _this180.setQualityLabel();
+            return _this181.setQualityLabel();
           });
         }
       }, {
@@ -18347,20 +18369,20 @@ paella.addPlugin(function () {
       }, {
         key: "getMenuContent",
         value: function getMenuContent() {
-          var _this181 = this;
+          var _this182 = this;
 
           var buttonItems = [];
 
           this._available.forEach(function (q, index) {
             var resH = q.res && q.res.h || 0;
 
-            if (resH >= _this181.config.minVisibleQuality || resH <= 0) {
+            if (resH >= _this182.config.minVisibleQuality || resH <= 0) {
               buttonItems.push({
                 id: q.shortLabel(),
                 title: q.shortLabel(),
                 value: index,
                 icon: "",
-                className: _this181.getButtonItemClass(q.shortLabel()),
+                className: _this182.getButtonItemClass(q.shortLabel()),
                 "default": false
               });
             }
@@ -18371,21 +18393,21 @@ paella.addPlugin(function () {
       }, {
         key: "menuItemSelected",
         value: function menuItemSelected(itemData) {
-          var _this182 = this;
+          var _this183 = this;
 
           paella.player.videoContainer.setQuality(itemData.value).then(function () {
-            paella.player.controls.hidePopUp(_this182.getName());
+            paella.player.controls.hidePopUp(_this183.getName());
 
-            _this182.setQualityLabel();
+            _this183.setQualityLabel();
           });
         }
       }, {
         key: "setQualityLabel",
         value: function setQualityLabel() {
-          var _this183 = this;
+          var _this184 = this;
 
           paella.player.videoContainer.getCurrentQuality().then(function (q) {
-            _this183.setText(q.shortLabel());
+            _this184.setText(q.shortLabel());
           });
         }
       }, {
@@ -18489,17 +18511,17 @@ paella.addPlugin(function () {
       _inherits(PlayPauseButtonPlugin, _paella$ButtonPlugin13);
 
       function PlayPauseButtonPlugin() {
-        var _this184;
+        var _this185;
 
         _classCallCheck(this, PlayPauseButtonPlugin);
 
-        _this184 = _possibleConstructorReturn(this, _getPrototypeOf(PlayPauseButtonPlugin).call(this));
-        _this184.playIconClass = 'icon-play';
-        _this184.replayIconClass = 'icon-loop2';
-        _this184.pauseIconClass = 'icon-pause';
-        _this184.playSubclass = 'playButton';
-        _this184.pauseSubclass = 'pauseButton';
-        return _this184;
+        _this185 = _possibleConstructorReturn(this, _getPrototypeOf(PlayPauseButtonPlugin).call(this));
+        _this185.playIconClass = 'icon-play';
+        _this185.replayIconClass = 'icon-loop2';
+        _this185.pauseIconClass = 'icon-pause';
+        _this185.playSubclass = 'playButton';
+        _this185.pauseSubclass = 'pauseButton';
+        return _this185;
       }
 
       _createClass(PlayPauseButtonPlugin, [{
@@ -18540,32 +18562,32 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this185 = this;
+          var _this186 = this;
 
           if (paella.player.playing()) {
             this.changeIconClass(this.playIconClass);
           }
 
           paella.events.bind(paella.events.play, function (event) {
-            _this185.changeIconClass(_this185.pauseIconClass);
+            _this186.changeIconClass(_this186.pauseIconClass);
 
-            _this185.changeSubclass(_this185.pauseSubclass);
+            _this186.changeSubclass(_this186.pauseSubclass);
 
-            _this185.setToolTip(paella.dictionary.translate("Pause"));
+            _this186.setToolTip(paella.dictionary.translate("Pause"));
           });
           paella.events.bind(paella.events.pause, function (event) {
-            _this185.changeIconClass(_this185.playIconClass);
+            _this186.changeIconClass(_this186.playIconClass);
 
-            _this185.changeSubclass(_this185.playSubclass);
+            _this186.changeSubclass(_this186.playSubclass);
 
-            _this185.setToolTip(paella.dictionary.translate("Play"));
+            _this186.setToolTip(paella.dictionary.translate("Play"));
           });
           paella.events.bind(paella.events.ended, function (event) {
-            _this185.changeIconClass(_this185.replayIconClass);
+            _this186.changeIconClass(_this186.replayIconClass);
 
-            _this185.changeSubclass(_this185.playSubclass);
+            _this186.changeSubclass(_this186.playSubclass);
 
-            _this185.setToolTip(paella.dictionary.translate("Play"));
+            _this186.setToolTip(paella.dictionary.translate("Play"));
           });
         }
       }, {
@@ -18590,30 +18612,30 @@ paella.addPlugin(function () {
       _inherits(PlayButtonOnScreen, _paella$EventDrivenPl9);
 
       function PlayButtonOnScreen() {
-        var _this186;
+        var _this187;
 
         _classCallCheck(this, PlayButtonOnScreen);
 
-        _this186 = _possibleConstructorReturn(this, _getPrototypeOf(PlayButtonOnScreen).call(this));
-        _this186.containerId = 'paella_plugin_PlayButtonOnScreen';
-        _this186.container = null;
-        _this186.enabled = true;
-        _this186.isPlaying = false;
-        _this186.showIcon = true;
-        _this186.firstPlay = false;
-        return _this186;
+        _this187 = _possibleConstructorReturn(this, _getPrototypeOf(PlayButtonOnScreen).call(this));
+        _this187.containerId = 'paella_plugin_PlayButtonOnScreen';
+        _this187.container = null;
+        _this187.enabled = true;
+        _this187.isPlaying = false;
+        _this187.showIcon = true;
+        _this187.firstPlay = false;
+        return _this187;
       }
 
       _createClass(PlayButtonOnScreen, [{
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this187 = this;
+          var _this188 = this;
 
           this.showOnEnd = true;
           paella.data.read('relatedVideos', {
             id: paella.player.videoIdentifier
           }, function (data) {
-            _this187.showOnEnd = !Array.isArray(data) || data.length == 0;
+            _this188.showOnEnd = !Array.isArray(data) || data.length == 0;
           });
           onSuccess(!paella.player.isLiveStream() || base.userAgent.system.Android || base.userAgent.system.iOS || !paella.player.videoContainer.supportAutoplay());
         }
@@ -18630,12 +18652,12 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this188 = this;
+          var _this189 = this;
 
           this.container = paella.LazyThumbnailContainer.GetIconElement();
           paella.player.videoContainer.domElement.appendChild(this.container);
           $(this.container).click(function () {
-            return _this188.onPlayButtonClick();
+            return _this189.onPlayButtonClick();
           });
         }
       }, {
@@ -18801,7 +18823,7 @@ paella.addPlugin(function () {
       }, {
         key: "getMenuContent",
         value: function getMenuContent() {
-          var _this189 = this;
+          var _this190 = this;
 
           var buttonItems = [];
           this.available_rates.forEach(function (rate) {
@@ -18811,7 +18833,7 @@ paella.addPlugin(function () {
               title: profileName,
               value: rate,
               icon: "",
-              className: _this189.getButtonItemClass(profileName),
+              className: _this190.getButtonItemClass(profileName),
               "default": rate == 1.0
             });
           });
@@ -18888,7 +18910,7 @@ paella.addPlugin(function () {
       }, {
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this190 = this;
+          var _this191 = this;
 
           this.buttonItems = null;
           this.buttons = [];
@@ -18905,10 +18927,10 @@ paella.addPlugin(function () {
             id: paella.initDelegate.getId()
           }, function (data, status) {
             if (data && _typeof(data) == 'object') {
-              _this190.score = Number(data.mean).toFixed(1);
-              _this190.count = data.count;
-              _this190.myScore = data.myScore;
-              _this190.canVote = data.canVote;
+              _this191.score = Number(data.mean).toFixed(1);
+              _this191.count = data.count;
+              _this191.myScore = data.myScore;
+              _this191.canVote = data.canVote;
             }
 
             onSuccess(status);
@@ -18993,7 +19015,7 @@ paella.addPlugin(function () {
       }, {
         key: "vote",
         value: function vote(score) {
-          var _this191 = this;
+          var _this192 = this;
 
           this.myScore = score;
           var data = {
@@ -19009,25 +19031,25 @@ paella.addPlugin(function () {
               id: paella.initDelegate.getId()
             }, function (data, status) {
               if (data && _typeof(data) == 'object') {
-                _this191.score = Number(data.mean).toFixed(1);
-                _this191.count = data.count;
-                _this191.myScore = data.myScore;
-                _this191.canVote = data.canVote;
+                _this192.score = Number(data.mean).toFixed(1);
+                _this192.count = data.count;
+                _this192.myScore = data.myScore;
+                _this192.canVote = data.canVote;
               }
 
-              _this191.updateHeader();
+              _this192.updateHeader();
 
-              _this191.updateRateButtons();
+              _this192.updateRateButtons();
             });
           });
         }
       }, {
         key: "updateVote",
         value: function updateVote() {
-          var _this192 = this;
+          var _this193 = this;
 
           this.buttons.forEach(function (item, index) {
-            item.className = index < _this192.myScore ? "starButton glyphicon glyphicon-star" : "starButton glyphicon glyphicon-star-empty";
+            item.className = index < _this193.myScore ? "starButton glyphicon glyphicon-star" : "starButton glyphicon glyphicon-star-empty";
           });
         }
       }]);
@@ -19081,13 +19103,13 @@ paella.addPlugin(function () {
       }, {
         key: "checkEnabled",
         value: function checkEnabled(onSuccess) {
-          var _this193 = this;
+          var _this194 = this;
 
           paella.data.read('relatedVideos', {
             id: paella.player.videoIdentifier
           }, function (data) {
-            _this193._relatedVideos = data;
-            onSuccess(Array.isArray(_this193._relatedVideos) && _this193._relatedVideos.length > 0);
+            _this194._relatedVideos = data;
+            onSuccess(Array.isArray(_this194._relatedVideos) && _this194._relatedVideos.length > 0);
           });
         }
       }, {
@@ -19174,26 +19196,26 @@ paella.addPlugin(function () {
     _inherits(RTMPVideo, _paella$VideoElementB5);
 
     function RTMPVideo(id, stream, left, top, width, height) {
-      var _this194;
+      var _this195;
 
       _classCallCheck(this, RTMPVideo);
 
-      _this194 = _possibleConstructorReturn(this, _getPrototypeOf(RTMPVideo).call(this, id, stream, 'div', left, top, width, height));
-      _this194._posterFrame = null;
-      _this194._currentQuality = null;
-      _this194._duration = 0;
-      _this194._paused = true;
-      _this194._streamName = null;
-      _this194._flashId = null;
-      _this194._swfContainer = null;
-      _this194._flashVideo = null;
-      _this194._volume = 1;
-      _this194._flashId = id + 'Movie';
-      _this194._streamName = 'rtmp';
+      _this195 = _possibleConstructorReturn(this, _getPrototypeOf(RTMPVideo).call(this, id, stream, 'div', left, top, width, height));
+      _this195._posterFrame = null;
+      _this195._currentQuality = null;
+      _this195._duration = 0;
+      _this195._paused = true;
+      _this195._streamName = null;
+      _this195._flashId = null;
+      _this195._swfContainer = null;
+      _this195._flashVideo = null;
+      _this195._volume = 1;
+      _this195._flashId = id + 'Movie';
+      _this195._streamName = 'rtmp';
 
-      var This = _assertThisInitialized(_this194);
+      var This = _assertThisInitialized(_this195);
 
-      _this194._stream.sources.rtmp.sort(function (a, b) {
+      _this195._stream.sources.rtmp.sort(function (a, b) {
         return a.res.h - b.res.h;
       });
 
@@ -19249,7 +19271,7 @@ paella.addPlugin(function () {
           eventReceived(params.eventName, params.values);
         }
       });
-      return _this194;
+      return _this195;
     }
 
     _createClass(RTMPVideo, [{
@@ -19302,14 +19324,14 @@ paella.addPlugin(function () {
     }, {
       key: "_deferredAction",
       value: function _deferredAction(action) {
-        var _this195 = this;
+        var _this196 = this;
 
         return new Promise(function (resolve, reject) {
-          if (_this195.ready) {
+          if (_this196.ready) {
             resolve(action());
           } else {
-            $(_this195.swfContainer).bind('paella:flashvideoready', function () {
-              _this195._ready = true;
+            $(_this196.swfContainer).bind('paella:flashvideoready', function () {
+              _this196._ready = true;
               resolve(action());
             });
           }
@@ -19337,11 +19359,11 @@ paella.addPlugin(function () {
     }, {
       key: "getVideoData",
       value: function getVideoData() {
-        var _this196 = this;
+        var _this197 = this;
 
         var FlashVideoPlugin = this;
         return new Promise(function (resolve, reject) {
-          _this196._deferredAction(function () {
+          _this197._deferredAction(function () {
             var videoData = {
               duration: FlashVideoPlugin.flashVideo.duration(),
               currentTime: FlashVideoPlugin.flashVideo.getCurrentTime(),
@@ -19438,16 +19460,16 @@ paella.addPlugin(function () {
     }, {
       key: "getQualities",
       value: function getQualities() {
-        var _this197 = this;
+        var _this198 = this;
 
         return new Promise(function (resolve, reject) {
           setTimeout(function () {
             var result = [];
-            var sources = _this197._stream.sources.rtmp;
+            var sources = _this198._stream.sources.rtmp;
             var index = -1;
             sources.forEach(function (s) {
               index++;
-              result.push(_this197._getQualityObject(index, s));
+              result.push(_this198._getQualityObject(index, s));
             });
             resolve(result);
           }, 50);
@@ -19456,18 +19478,18 @@ paella.addPlugin(function () {
     }, {
       key: "setQuality",
       value: function setQuality(index) {
-        var _this198 = this;
+        var _this199 = this;
 
         index = index !== undefined && index !== null ? index : 0;
         return new Promise(function (resolve, reject) {
-          var paused = _this198._paused;
-          var sources = _this198._stream.sources.rtmp;
-          _this198._currentQuality = index < sources.length ? index : 0;
+          var paused = _this199._paused;
+          var sources = _this199._stream.sources.rtmp;
+          _this199._currentQuality = index < sources.length ? index : 0;
           var source = sources[index];
-          _this198._ready = false;
-          _this198._isReady = false;
+          _this199._ready = false;
+          _this199._isReady = false;
 
-          _this198.load().then(function () {
+          _this199.load().then(function () {
             resolve();
           });
         });
@@ -19475,10 +19497,10 @@ paella.addPlugin(function () {
     }, {
       key: "getCurrentQuality",
       value: function getCurrentQuality() {
-        var _this199 = this;
+        var _this200 = this;
 
         return new Promise(function (resolve, reject) {
-          resolve(_this199._getQualityObject(_this199._currentQuality, _this199._stream.sources.rtmp[_this199._currentQuality]));
+          resolve(_this200._getQualityObject(_this200._currentQuality, _this200._stream.sources.rtmp[_this200._currentQuality]));
         });
       }
     }, {
@@ -20148,17 +20170,17 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this200 = this;
+          var _this201 = this;
 
           this.buttonItems = {};
           this.socialMedia = ['facebook', 'twitter', 'embed'];
           this.socialMedia.forEach(function (mediaData) {
-            var buttonItem = _this200.getSocialMediaItemButton(mediaData);
+            var buttonItem = _this201.getSocialMediaItemButton(mediaData);
 
-            _this200.buttonItems[_this200.socialMedia.indexOf(mediaData)] = buttonItem;
+            _this201.buttonItems[_this201.socialMedia.indexOf(mediaData)] = buttonItem;
             domElement.appendChild(buttonItem);
 
-            _this200.buttons.push(buttonItem);
+            _this201.buttons.push(buttonItem);
           });
           this.selected_button = this.buttons.length;
         }
@@ -20489,38 +20511,38 @@ paella.addDataDelegate("cameraTrack", function () {
         _inherits(Track4KPlugin, _paella$EventDrivenPl11);
 
         function Track4KPlugin() {
-          var _this201;
+          var _this202;
 
           _classCallCheck(this, Track4KPlugin);
 
-          _this201 = _possibleConstructorReturn(this, _getPrototypeOf(Track4KPlugin).call(this));
-          g_track4kPlugin = _assertThisInitialized(_this201);
-          _this201._videoData = {};
-          _this201._trackData = [];
-          _this201._enabled = true;
-          return _this201;
+          _this202 = _possibleConstructorReturn(this, _getPrototypeOf(Track4KPlugin).call(this));
+          g_track4kPlugin = _assertThisInitialized(_this202);
+          _this202._videoData = {};
+          _this202._trackData = [];
+          _this202._enabled = true;
+          return _this202;
         }
 
         _createClass(Track4KPlugin, [{
           key: "checkEnabled",
           value: function checkEnabled(cb) {
-            var _this202 = this;
+            var _this203 = this;
 
             paella.data.read('cameraTrack', {
               id: paella.initDelegate.getId()
             }, function (data) {
               if (data) {
-                _this202._videoData.width = data.width;
-                _this202._videoData.height = data.height;
-                _this202._videoData.originalWidth = data.originalWidth;
-                _this202._videoData.originalHeight = data.originalHeight;
-                _this202._trackData = data.positions;
-                _this202._enabled = true;
+                _this203._videoData.width = data.width;
+                _this203._videoData.height = data.height;
+                _this203._videoData.originalWidth = data.originalWidth;
+                _this203._videoData.originalHeight = data.originalHeight;
+                _this203._trackData = data.positions;
+                _this203._enabled = true;
               } else {
-                _this202._enabled = false;
+                _this203._enabled = false;
               }
 
-              cb(_this202._enabled);
+              cb(_this203._enabled);
             });
           }
         }, {
@@ -20661,7 +20683,7 @@ paella.addDataDelegate("cameraTrack", function () {
         }, {
           key: "buildContent",
           value: function buildContent(domElement) {
-            var _this203 = this;
+            var _this204 = this;
 
             this.changeIconClass("icon-mini-zoom-in");
 
@@ -20695,18 +20717,18 @@ paella.addDataDelegate("cameraTrack", function () {
             }
 
             domElement.appendChild(getZoomButton('zoom-in', function (evt) {
-              _this203.zoomIn();
+              _this204.zoomIn();
             }));
             domElement.appendChild(getZoomButton('zoom-out', function (evt) {
-              _this203.zoomOut();
+              _this204.zoomOut();
             }));
             domElement.appendChild(getZoomButton('picture', function (evt) {
-              _this203.resetZoom();
+              _this204.resetZoom();
             }));
             domElement.appendChild(getZoomButton('zoom-auto', function (evt) {
-              _this203.zoomAuto();
+              _this204.zoomAuto();
 
-              paella.player.controls.hidePopUp(_this203.getName());
+              paella.player.controls.hidePopUp(_this204.getName());
             }, "auto"));
           }
         }, {
@@ -20947,7 +20969,7 @@ paella.addPlugin(function () {
       }, {
         key: "log",
         value: function log(event, params) {
-          var _this204 = this;
+          var _this205 = this;
 
           var p = params;
 
@@ -20971,7 +20993,7 @@ paella.addPlugin(function () {
               params: p
             };
             paella.ajax.post({
-              url: _this204._url + "/" + _this204._index + "/" + _this204._type + "/",
+              url: _this205._url + "/" + _this205._index + "/" + _this205._type + "/",
               params: JSON.stringify(log)
             });
           });
@@ -21132,12 +21154,12 @@ paella.addPlugin(function () {
         _createClass(Video360Canvas, [{
           key: "loadVideo",
           value: function loadVideo(videoPlugin, stream) {
-            var _this205 = this;
+            var _this206 = this;
 
             return new Promise(function (resolve, reject) {
               var checkLoaded = function checkLoaded() {
-                if (_this205.video) {
-                  resolve(_this205);
+                if (_this206.video) {
+                  resolve(_this206);
                 } else {
                   setTimeout(checkLoaded, 100);
                 }
@@ -21310,12 +21332,12 @@ paella.addPlugin(function () {
         _createClass(Video360ThetaCanvas, [{
           key: "loadVideo",
           value: function loadVideo(videoPlugin, stream) {
-            var _this206 = this;
+            var _this207 = this;
 
             return new Promise(function (resolve, reject) {
               var checkLoaded = function checkLoaded() {
-                if (_this206.video) {
-                  resolve(_this206);
+                if (_this207.video) {
+                  resolve(_this207);
                 } else {
                   setTimeout(checkLoaded, 100);
                 }
@@ -21573,7 +21595,7 @@ paella.addPlugin(function () {
       }, {
         key: "setup",
         value: function setup() {
-          var _this207 = this;
+          var _this208 = this;
 
           var thisClass = this;
           this._thumbnails = [];
@@ -21597,30 +21619,30 @@ paella.addPlugin(function () {
           var players = paella.player.videoContainer.streamProvider.videoPlayers;
           players.forEach(function (player, index) {
             if (player.allowZoom()) {
-              _this207._available = player.zoomAvailable();
-              _this207._visible = _this207._available;
-              setupButtons.apply(_this207, [player]);
+              _this208._available = player.zoomAvailable();
+              _this208._visible = _this208._available;
+              setupButtons.apply(_this208, [player]);
               player.supportsCaptureFrame().then(function (supports) {
                 if (supports) {
                   var thumbContainer = document.createElement('div');
                   thumbContainer.className = "zoom-container";
-                  var thumb = getThumbnailContainer.apply(_this207, [index]);
-                  var zoomRect = getZoomRect.apply(_this207);
+                  var thumb = getThumbnailContainer.apply(_this208, [index]);
+                  var zoomRect = getZoomRect.apply(_this208);
 
-                  _this207.button.appendChild(thumbContainer);
+                  _this208.button.appendChild(thumbContainer);
 
                   thumbContainer.appendChild(thumb);
                   thumbContainer.appendChild(zoomRect);
                   $(thumbContainer).hide();
 
-                  _this207._thumbnails.push({
+                  _this208._thumbnails.push({
                     player: player,
                     thumbContainer: thumbContainer,
                     zoomRect: zoomRect,
                     canvas: thumb
                   });
 
-                  checkVisibility.apply(_this207);
+                  checkVisibility.apply(_this208);
                 }
               });
             }
@@ -21628,7 +21650,7 @@ paella.addPlugin(function () {
           var update = false;
           paella.events.bind(paella.events.play, function (evt) {
             var updateThumbs = function updateThumbs() {
-              _this207._thumbnails.forEach(function (item) {
+              _this208._thumbnails.forEach(function (item) {
                 updateThumbnail(item);
               });
 
@@ -21646,7 +21668,7 @@ paella.addPlugin(function () {
             update = false;
           });
           paella.events.bind(paella.events.videoZoomChanged, function (evt, target) {
-            _this207._thumbnails.some(function (thumb) {
+            _this208._thumbnails.some(function (thumb) {
               if (thumb.player == target.video) {
                 if (thumb.player.zoom > 100) {
                   $(thumb.thumbContainer).show();
@@ -21668,17 +21690,17 @@ paella.addPlugin(function () {
             });
           });
           paella.events.bind(paella.events.zoomAvailabilityChanged, function (evt, target) {
-            _this207._available = target.available;
-            _this207._visible = target.available;
-            checkVisibility.apply(_this207);
+            _this208._available = target.available;
+            _this208._visible = target.available;
+            checkVisibility.apply(_this208);
           });
           paella.events.bind(paella.events.controlBarDidHide, function () {
-            _this207._visible = false;
-            checkVisibility.apply(_this207);
+            _this208._visible = false;
+            checkVisibility.apply(_this208);
           });
           paella.events.bind(paella.events.controlBarDidShow, function () {
-            _this207._visible = true;
-            checkVisibility.apply(_this207);
+            _this208._visible = true;
+            checkVisibility.apply(_this208);
           });
         }
       }, {
@@ -21753,10 +21775,10 @@ paella.addPlugin(function () {
       }, {
         key: "buildContent",
         value: function buildContent(domElement) {
-          var _this208 = this;
+          var _this209 = this;
 
           paella.events.bind(paella.events.videoZoomChanged, function (evt, target) {
-            _this208.setText(Math.round(target.video.zoom) + "%");
+            _this209.setText(Math.round(target.video.zoom) + "%");
           });
           this.setText("100%");
 
@@ -21769,10 +21791,10 @@ paella.addPlugin(function () {
           }
 
           domElement.appendChild(getZoomButton('zoom-in', function (evt) {
-            _this208.targetPlayer.zoomIn();
+            _this209.targetPlayer.zoomIn();
           }));
           domElement.appendChild(getZoomButton('zoom-out', function (evt) {
-            _this208.targetPlayer.zoomOut();
+            _this209.targetPlayer.zoomOut();
           }));
         }
       }]);
@@ -21815,11 +21837,12 @@ paella.addPlugin(function () {
         key: "getName",
         value: function getName() {
           return "es.upv.paella.viewModePlugin";
-        }
+        } //getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
+
       }, {
         key: "getButtonType",
         value: function getButtonType() {
-          return paella.ButtonPlugin.type.popUpButton;
+          return paella.ButtonPlugin.type.menuButton;
         }
       }, {
         key: "getDefaultToolTip",
@@ -21880,104 +21903,60 @@ paella.addPlugin(function () {
           });
         }
       }, {
-        key: "rebuildProfileList",
-        value: function rebuildProfileList() {
-          var _this209 = this;
+        key: "getMenuContent",
+        value: function getMenuContent() {
+          var _this210 = this;
 
-          this.buttonItems = {};
-          this.domElement.innerText = "";
-          paella.profiles.profileList.forEach(function (profileData) {
+          var buttonItems = [];
+          paella.profiles.profileList.forEach(function (profileData, index) {
             if (profileData.hidden) return;
 
-            if (_this209.active_profiles) {
+            if (_this210.active_profiles) {
               var active = false;
 
-              _this209.active_profiles.forEach(function (ap) {
+              _this210.active_profiles.some(function (ap) {
                 if (ap == profile) {
-                  active = true;
+                  active = ap;
+                  return true;
                 }
               });
 
-              if (active == false) {
+              if (!active) {
                 return;
               }
             }
 
-            var buttonItem = _this209.getProfileItemButton(profileData.id, profileData);
+            var current = paella.profiles.currentProfileName;
 
-            _this209.buttonItems[profileData.id] = buttonItem;
+            var url = _this210.getButtonItemIcon(profileData);
 
-            _this209.domElement.appendChild(buttonItem);
-
-            _this209.buttons.push(buttonItem);
-
-            if (paella.player.selectedProfile == profileData.id) {
-              _this209.buttonItems[profileData.id].className = _this209.getButtonItemClass(profileData.id, true);
-            }
+            url = url.replace(/\\/ig, '/');
+            buttonItems.push({
+              id: profileData.id + "_button",
+              title: "",
+              value: profileData.id,
+              icon: url,
+              className: _this210.getButtonItemClass(profileData.id),
+              "default": current == profileData.id
+            });
           });
-          this.selected_button = this.buttons.length;
+          return buttonItems;
         }
       }, {
-        key: "buildContent",
-        value: function buildContent(domElement) {
-          var _this210 = this;
-
-          var thisClass = this;
-          this.domElement = domElement;
-          this.rebuildProfileList();
-          paella.events.bind(paella.events.profileListChanged, function () {
-            _this210.rebuildProfileList();
-          });
-        }
-      }, {
-        key: "getProfileItemButton",
-        value: function getProfileItemButton(profile, profileData) {
-          var elem = document.createElement('div');
-          elem.className = this.getButtonItemClass(profile, false);
-          var url = this.getButtonItemIcon(profileData);
-          url = url.replace(/\\/ig, '/');
-          elem.style.backgroundImage = "url(".concat(url, ")");
-          elem.id = profile + '_button';
-          elem.data = {
-            profile: profile,
-            profileData: profileData,
-            plugin: this
-          };
-          $(elem).click(function (event) {
-            this.data.plugin.onItemClick(this, this.data.profile, this.data.profileData);
-          });
-          return elem;
+        key: "menuItemSelected",
+        value: function menuItemSelected(itemData) {
+          paella.player.setProfile(itemData.value);
+          paella.player.controls.hidePopUp(this.getName());
         }
       }, {
         key: "onProfileChange",
         value: function onProfileChange(profileName) {
-          var thisClass = this;
-          var ButtonItem = this.buttonItems[profileName];
-          var n = this.buttonItems;
-          var arr = Object.keys(n);
-          arr.forEach(function (i) {
-            thisClass.buttonItems[i].className = thisClass.getButtonItemClass(i, false);
-          });
-
-          if (ButtonItem) {
-            ButtonItem.className = thisClass.getButtonItemClass(profileName, true);
-          }
-        }
-      }, {
-        key: "onItemClick",
-        value: function onItemClick(button, profile, profileData) {
-          var ButtonItem = this.buttonItems[profile];
-
-          if (ButtonItem) {
-            paella.player.setProfile(profile);
-          }
-
-          paella.player.controls.hidePopUp(this.getName());
+          this.rebuildMenu();
         }
       }, {
         key: "getButtonItemClass",
-        value: function getButtonItemClass(profileName, selected) {
-          return 'viewModeItemButton ' + profileName + (selected ? ' selected' : '');
+        value: function getButtonItemClass(profileName) {
+          return 'viewModeItemButton ' + profileName;
         }
       }, {
         key: "getButtonItemIcon",
