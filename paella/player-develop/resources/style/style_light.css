@@ -2841,44 +2841,11 @@ textarea {
   margin-top: 5px;
   margin-right: 5px;
 }
-/*.showMultipleQualitiesPlugin {
-	background-image: url(advanced_button.png);
-	background-size: 300%;
-}
-
-.buttonPluginPopUp.showMultipleQualitiesPlugin {
-	background-image:none;
-}
-
-.selectQuality {
-	padding: 10px;
-}*/
 .buttonPlugin.showMultipleQualitiesPlugin {
   text-align: center;
   font-size: 0.8em;
   line-height: 30px;
   min-width: 36px;
-}
-.buttonPluginPopUp.showMultipleQualitiesPlugin {
-  background-image: none;
-}
-.selectQuality {
-  padding: 10px;
-}
-.multipleQualityItem {
-  font-size: 19px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  cursor: pointer;
-}
-.multipleQualityItem:hover {
-  background-color: #faa166;
-}
-.multipleQualityItem.selected {
-  color: #fa8533;
-}
-.multipleQualityItem.selected:hover {
-  color: black;
 }
 .buttonPlugin.playButton {
   background-position: -500% -100%;

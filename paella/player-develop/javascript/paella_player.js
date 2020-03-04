@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 300f43e";
+paella.version = "6.4.0 - build: 3bd2b9b";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -18342,44 +18342,42 @@ paella.addPlugin(function () {
       }, {
         key: "getButtonType",
         value: function getButtonType() {
-          return paella.ButtonPlugin.type.popUpButton;
+          return paella.ButtonPlugin.type.menuButton;
         }
       }, {
-        key: "buildContent",
-        value: function buildContent(domElement) {
+        key: "getMenuContent",
+        value: function getMenuContent() {
           var _this181 = this;
 
-          this._available.forEach(function (q) {
+          var buttonItems = [];
+
+          this._available.forEach(function (q, index) {
             var resH = q.res && q.res.h || 0;
 
             if (resH >= _this181.config.minVisibleQuality || resH <= 0) {
-              domElement.appendChild(_this181.getItemButton(q));
+              buttonItems.push({
+                id: q.shortLabel(),
+                title: q.shortLabel(),
+                value: index,
+                icon: "",
+                className: _this181.getButtonItemClass(q.shortLabel()),
+                "default": false
+              });
             }
           });
+
+          return buttonItems;
         }
       }, {
-        key: "getItemButton",
-        value: function getItemButton(quality) {
+        key: "menuItemSelected",
+        value: function menuItemSelected(itemData) {
           var _this182 = this;
 
-          var elem = document.createElement('div');
-          var This = this;
-          paella.player.videoContainer.getCurrentQuality().then(function (currentIndex, currentData) {
-            var label = quality.shortLabel();
-            elem.className = _this182.getButtonItemClass(label, quality.index == currentIndex);
-            elem.id = label;
-            elem.innerText = label;
-            elem.data = quality;
-            $(elem).click(function (event) {
-              $('.multipleQualityItem').removeClass('selected');
-              $('.multipleQualityItem.' + this.data.toString()).addClass('selected');
-              paella.player.videoContainer.setQuality(this.data.index).then(function () {
-                paella.player.controls.hidePopUp(This.getName());
-                This.setQualityLabel();
-              });
-            });
+          paella.player.videoContainer.setQuality(itemData.value).then(function () {
+            paella.player.controls.hidePopUp(_this182.getName());
+
+            _this182.setQualityLabel();
           });
-          return elem;
         }
       }, {
         key: "setQualityLabel",
@@ -18392,8 +18390,8 @@ paella.addPlugin(function () {
         }
       }, {
         key: "getButtonItemClass",
-        value: function getButtonItemClass(profileName, selected) {
-          return 'multipleQualityItem ' + profileName + (selected ? ' selected' : '');
+        value: function getButtonItemClass(profileName) {
+          return 'multipleQualityItem ' + profileName;
         }
       }]);
 
