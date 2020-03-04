@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 1d481c8";
+paella.version = "6.4.0 - build: 300f43e";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -5340,6 +5340,10 @@ class ButtonPlugin extends paella.UIPlugin {
 		// Override if your plugin
 	}
 
+	getMenuContent() {
+		return [];
+	}
+
 	willShowContent() {
 		base.log.debug(this.getName() + " willDisplayContent");
 	}
@@ -5359,6 +5363,7 @@ class ButtonPlugin extends paella.UIPlugin {
 	getButtonType() {
 		//return paella.ButtonPlugin.type.popUpButton;
 		//return paella.ButtonPlugin.type.timeLineButton;
+		//return paella.ButtonPlugin.type.menuButton;
 		return paella.ButtonPlugin.type.actionButton;
 		
 	}
@@ -5406,6 +5411,9 @@ class ButtonPlugin extends paella.UIPlugin {
 		}
 		else if (this.getButtonType()==paella.ButtonPlugin.type.popUpButton) {
 			return paella.ButtonPlugin.kPopUpClassName + ' ' + this.getSubclass();
+		}
+		else if (this.getButtonType()==paella.ButtonPlugin.type.menuButton) {
+			return paella.ButtonPlugin.kPopUpClassName + ' menuContainer ' + this.getSubclass();
 		}
 	}
 
@@ -5514,6 +5522,47 @@ class ButtonPlugin extends paella.UIPlugin {
 		plugin.buildContent(elem);
 		return elem;
 	}
+
+	static BuildPluginMenu(parent,plugin,id) {
+		plugin.subclass = plugin.getSubclass();
+		var elem = document.createElement('div');
+		parent.appendChild(elem);
+		elem.className = plugin.getContainerClassName();
+		elem.id = id;
+		elem.plugin = plugin;
+		plugin._domElement = elem;
+
+		function getButtonItem(itemData) {
+			var elem = document.createElement('div');
+			elem.className = itemData.className +  " menuItem";
+			if(itemData.default) {
+				elem.className += " selected";
+			}
+
+			elem.id = itemData.id;
+			elem.innerText = itemData.title;
+			elem.data = {
+				itemData: itemData,
+				plugin: plugin
+			};
+			$(elem).click(function(event) {
+				this.data.plugin.menuItemSelected(this.data.itemData);
+				let buttons = this.parentElement.children;
+				for (let i=0; i<buttons.length; ++i) {
+					$(buttons[i]).removeClass('selected');
+				}
+				$(this).addClass('selected');
+			});
+			return elem;
+		}
+
+		let menuContent = plugin.getMenuContent();
+		menuContent.forEach((menuItem) => {
+			elem.appendChild(getButtonItem(menuItem));
+		});
+
+		return elem;
+	}
 }
 
 paella.ButtonPlugin = ButtonPlugin;
@@ -5528,7 +5577,8 @@ paella.ButtonPlugin.kTimeLineClassName = 'buttonTimeLine';
 paella.ButtonPlugin.type = {
 	actionButton:1,
 	popUpButton:2,
-	timeLineButton:3
+	timeLineButton:3,
+	menuButton:4
 };
 	
 class VideoOverlayButtonPlugin extends paella.ButtonPlugin {
@@ -7167,6 +7217,11 @@ class PlaybackControl extends paella.DomNode {
 					parent = this.timeLinePluginContainer.domElement;
 					var timeLineContent = paella.ButtonPlugin.BuildPluginPopUp(parent, plugin,id + '_timeline');
 					this.timeLinePluginContainer.registerContainer(plugin.getName(),timeLineContent,button,plugin);
+				}
+				else if (plugin.getButtonType()==paella.ButtonPlugin.type.menuButton) {
+					parent = this.popUpPluginContainer.domElement;
+					var popUpContent = paella.ButtonPlugin.BuildPluginMenu(parent,plugin,id + '_container');
+					this.popUpPluginContainer.registerContainer(plugin.getName(),popUpContent,button,plugin);
 				}
 			}
 			else {
@@ -13694,7 +13749,7 @@ paella.addPlugin(function() {
 		_loadDeps() {
 			return new Promise((resolve,reject) => {
 				if (!window.$paella_hls) {
-					require([paella.baseUrl +'resources/deps/hls.min.js'],function(hls) {
+					require([paella.baseUrl +'javascript/hls.min.js'],function(hls) {
 						window.$paella_hls = hls;
 						resolve(window.$paella_hls);
 					});
@@ -14706,7 +14761,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-screen'; }
 		getIndex() { return 140; }
 		getName() { return "es.upv.paella.playbackRatePlugin"; }
-		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
+		getButtonType() { return paella.ButtonPlugin.type.menuButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Set playback rate"); }
 
 		checkEnabled(onSuccess) {
@@ -14727,67 +14782,31 @@ paella.addPlugin(function() {
 			this.available_rates = this.config.availableRates || [0.75, 1, 1.25, 1.5];
 		}
 
-		buildContent(domElement) {
-			this._domElement = domElement;
-			this.buttonItems = {};
+		getMenuContent() {
+			let buttonItems = [];
 			this.available_rates.forEach((rate) => {
-				domElement.appendChild(this.getItemButton(rate+"x", rate));
+				let profileName = rate + "x";
+				buttonItems.push({
+					id: profileName,
+					title: profileName,
+					value: rate,
+					icon: "",
+					className: this.getButtonItemClass(profileName),
+					default: rate == 1.0
+				});
 			});
+
+			return buttonItems;
 		}
 
-		getItemButton(label,rate) {
-			var elem = document.createElement('div');
-			if(rate == 1.0){
-				elem.className = this.getButtonItemClass(label,true);
-			}
-			else{
-				elem.className = this.getButtonItemClass(label,false);
-			}
-			elem.id = label + '_button';
-			elem.innerText = label;
-			elem.data = {
-				label:label,
-				rate:rate,
-				plugin:this
-			};
-			$(elem).click(function(event) {
-				this.data.plugin.onItemClick(this,this.data.label,this.data.rate);
-			});
-			return elem;
-		}
-
-		onItemClick(button,label,rate) {
-			var self = this;
-			paella.player.videoContainer.setPlaybackRate(rate);
-			this.setText(label);
+		menuItemSelected(itemData) {
+			paella.player.videoContainer.setPlaybackRate(itemData.value);
+			this.setText(itemData.title);
 			paella.player.controls.hidePopUp(this.getName());
-
-
-			var arr = self._domElement.children;
-			for(var i=0; i < arr.length; i++){
-				arr[i].className = self.getButtonItemClass(i,false);
-			}
-			button.className = self.getButtonItemClass(i,true);
 		}
 
 		getText() {
 			return "1x";
-		}
-
-		getProfileItemButton(profile,profileData) {
-			var elem = document.createElement('div');
-			elem.className = this.getButtonItemClass(profile,false);
-			elem.id = profile + '_button';
-
-			elem.data = {
-				profile:profile,
-				profileData:profileData,
-				plugin:this
-			};
-			$(elem).click(function(event) {
-				this.data.plugin.onItemClick(this,this.data.profile,this.data.profileData);
-			});
-			return elem;
 		}
 
 		getButtonItemClass(profileName,selected) {

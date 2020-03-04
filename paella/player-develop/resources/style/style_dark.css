@@ -246,6 +246,24 @@ i.button-icon.icon-screen {
   position: absolute;
   bottom: -14px;
 }
+.buttonPluginPopUp.menuContainer .menuItem {
+  font-size: 19px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+}
+.buttonPluginPopUp.menuContainer .menuItem:hover {
+  background-color: #FF4C4C;
+}
+.buttonPluginPopUp.menuContainer .menuItem.selected {
+  color: #cc0000;
+}
+.buttonPluginPopUp.menuContainer .menuItem.selected:hover {
+  color: white;
+}
 .timelinePluginContainer {
   position: absolute;
   left: 0px;
@@ -2892,26 +2910,11 @@ textarea {
 .play-button-on-screen.dimmed .play-icon:hover {
   opacity: 1;
 }
-.playbackRateItem {
-  font-size: 19px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  cursor: pointer;
-}
-.playbackRateItem:hover {
-  background-color: #FF4C4C;
-}
 .buttonPlugin.showPlaybackRateButton {
   text-align: center;
   line-height: 30px;
   background-position: -600% -100%;
   font-size: 1em;
-}
-.playbackRateItem.selected {
-  color: #cc0000;
-}
-.playbackRateItem.selected:hover {
-  color: white;
 }
 .buttonPlugin.showPlaybackRateButton {
   min-width: 36px;
