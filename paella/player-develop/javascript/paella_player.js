@@ -47,7 +47,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 157bd42";
+paella.version = "6.4.0 - build: f02547c";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -7762,6 +7762,8 @@ function paella_DeferredNotImplemented() {
 
               doLoadCallback(videoPlugin.video).then(function () {
                 resolve(stream);
+              })["catch"](function (err) {
+                reject(err);
               });
             });
           }
@@ -7771,29 +7773,6 @@ function paella_DeferredNotImplemented() {
       }(paella.VideoCanvas)
     );
   });
-  /*
-  
-  paella.getVideoCanvas = function(type, stream) {
-      console.log("TODO: Remove paella.getVideoCanvas() function");
-      return new Promise((resolve,reject) => {
-          if (!window.$paella_bg) {
-              paella.require(`${ paella.baseUrl }javascript/bg2e-es2015.js`)
-                  .then(() => {
-                      window.$paella_bg = bg;
-                      loadCanvasPlugins();
-                      resolve(buildVideoCanvas(stream));
-                  })
-                  .catch((err) => {
-                      console.error(err);
-                      reject(err);
-                  });
-          }
-          else {
-              resolve(buildVideoCanvas(stream));
-          }
-      });
-  }
-  */
 })();
 /*  
 	Paella HTML 5 Multistream Player
@@ -17467,9 +17446,15 @@ paella.addPlugin(function () {
                 if (data.fatal) {
                   switch (data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
-                      console.error("paella.HLSPlayer: Fatal network error encountered, try to recover");
+                      if (data.details == Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
+                        // TODO: Manifest file not found
+                        console.error("paella.HLSPlayer: unrecoverable error in HLS Player. The video is not available.");
+                        reject(new Error("No such HLS stream: the video is not available"));
+                      } else {
+                        console.error("paella.HLSPlayer: Fatal network error encountered, try to recover");
 
-                      _this168._hls.startLoad();
+                        _this168._hls.startLoad();
+                      }
 
                       break;
 
