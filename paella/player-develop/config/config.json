@@ -191,7 +191,7 @@
         "colorSearch": false,
         "minWindowSize": 550
       },
-      "es.upv.paella.socialPlugin": {
+      "es.upv.paella.sharePlugin": {
         "enabled": true,
         "minWindowSize": 600
       },

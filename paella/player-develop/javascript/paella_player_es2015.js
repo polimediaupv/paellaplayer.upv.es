@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: f02547c";
+paella.version = "6.4.0 - build: 2287f86";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -15779,6 +15779,204 @@ paella.addPlugin(function() {
 	}
 });
 
+
+paella.addPlugin(function() {
+	return class SharePlugin extends paella.ButtonPlugin {
+		getAlignment() { return 'right'; }
+		getSubclass() { return 'shareButtonPlugin'; }
+		getIconClass() { return 'icon-social'; }
+		getIndex() { return 560; }
+		getName() { return 'es.upv.paella.sharePlugin'; }
+		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
+		getDefaultToolTip() { return base.dictionary.translate('Share this video'); }
+		
+		checkEnabled(onSuccess) { onSuccess(true); }
+		closeOnMouseOut() { return false; }
+
+		setup() {
+		}
+
+		buildEmbed() {
+			var self = this;
+			var embed = document.createElement('div');
+
+			embed.innerHTML = `
+				<div>
+					<div class="form-group">
+						<label class="control-label">
+							<input id="share-video-responsive" type="checkbox" value="3" name="mailId[]" > ${ base.dictionary.translate('Responsive design') }
+						</label>
+					</div>
+
+					<div id="share-video-block-size" class="form-group">
+						<label class="control-label"> ${ base.dictionary.translate('Video resolution') } </label>
+						
+						<div class="row">
+							<div class="col-sm-6">
+								<select id="share-video-size" class="form-control input-sm">
+									<option value="640x360">360p</option>
+									<option value="854x480">480p</option>
+									<option value="1280x720">720p (HD)</option>
+									<option value="1920x1080">1080p (Full HD)</option>
+									<option value="2560x1440">1440p (2.5K)</option>
+									<option value="3840x2160">2160p (4K UHD)</option>
+									<option value="custom">${ base.dictionary.translate('Custom size') }</option>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<input id="share-video-width" type="number" class="form-control input-sm" value="640" disabled="disabled">
+							</div>
+							<div class="col-sm-3">
+								<input id="share-video-height" type="number" class="form-control input-sm" value="360" disabled="disabled">
+							</div>
+						</div>
+					</div>	
+
+					<div id="share-video-block-resp" class="form-group" style="display:none;">
+						<label class="control-label"> ${ base.dictionary.translate('Video resolution') } </label>
+						
+						<select id="share-video-size-resp" class="form-control input-sm">
+							<option value="25">25%</option>
+							<option value="33">33%</option>
+							<option value="50">50%</option>
+							<option value="33">66%</option>
+							<option value="75">75%</option>
+							<option value="100">100%</option>
+						</select>						
+					</div>						
+					
+					<div class="form-group">
+						<label class="control-label">${ base.dictionary.translate('Embed code') }</label>
+						
+						<div id="share-video-embed" class="alert alert-share">
+						</div>
+					</div>
+				</div>
+			`;
+
+
+			embed.querySelector("#share-video-responsive").onchange=function(event){
+				var responsive = self._domElement.querySelector("#share-video-responsive").checked;
+				if (responsive) {
+					self._domElement.querySelector("#share-video-block-resp").style.display = "block";
+					self._domElement.querySelector("#share-video-block-size").style.display = "none";
+				}
+				else {
+					self._domElement.querySelector("#share-video-block-resp").style.display = "none";
+					self._domElement.querySelector("#share-video-block-size").style.display = "block";
+				}
+				self.updateEmbedCode(); 
+			}
+
+			embed.querySelector("#share-video-size-resp").onchange=function(event){ self.updateEmbedCode(); }
+			embed.querySelector("#share-video-width").onchange=function(event){ self.updateEmbedCode(); }
+			embed.querySelector("#share-video-height").onchange=function(event){ self.updateEmbedCode(); }
+			
+			embed.querySelector("#share-video-size").onchange=function(event){ 
+				var value = event.target? event.target.value: event.toElement.value;
+				
+				if (value == "custom") {
+					embed.querySelector("#share-video-width").disabled = false;
+					embed.querySelector("#share-video-height").disabled = false;
+				}
+				else {
+					embed.querySelector("#share-video-width").disabled = true;
+					embed.querySelector("#share-video-height").disabled = true;
+
+					var size = value.trim().split("x");
+					embed.querySelector("#share-video-width").value = size[0];
+					embed.querySelector("#share-video-height").value = size[1];
+				}
+				self.updateEmbedCode();
+			}
+			return embed;
+		}
+
+		buildSocial() {
+			var self = this;
+			var social = document.createElement('div');
+			social.innerHTML = `
+				<div>
+					<div class="form-group">
+						<label class="control-label">${ base.dictionary.translate('Share on social networks') }</label>
+						<div class="row" style="margin:0;">	
+							<span id="share-btn-facebook" class="share-button button-icon icon-facebook" ></span>
+							<span id="share-btn-twitter" class="share-button button-icon icon-twitter" ></span>
+							<span id="share-btn-linkedin" class="share-button button-icon icon-linkedin" ></span>
+						</div>
+					</div>
+				</div>
+			`;
+
+			social.querySelector("#share-btn-facebook").onclick=function(event){ self.onSocialClick('facebook'); }
+			social.querySelector("#share-btn-twitter").onclick=function(event){ self.onSocialClick('twitter'); }
+			social.querySelector("#share-btn-linkedin").onclick=function(event){ self.onSocialClick('linkedin'); }
+			return social;
+		}
+
+
+		buildContent(domElement) {
+			var hideSocial = this.config && this.config.hideSocial;
+			this._domElement = domElement;
+
+			domElement.appendChild(this.buildEmbed());
+			if (!hideSocial) {
+				domElement.appendChild(this.buildSocial());
+			}
+
+			this.updateEmbedCode();
+		}
+
+
+		getVideoUrl() {
+			var url = document.location.href;
+			return url;
+		}
+
+		onSocialClick(network) {
+			var videoUrl = encodeURIComponent(this.getVideoUrl());
+			var title = encodeURIComponent("");
+			var shareUrl;
+
+			switch (network) {
+				case ('twitter'):
+					shareUrl = `http://twitter.com/share?url=${videoUrl}&text=${title}`;
+					break;
+				case ('facebook'):
+					shareUrl = `http://www.facebook.com/sharer.php?u=${videoUrl}&p[title]=${title}`;
+					break;
+				case ('linkedin'):
+					shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${videoUrl}&title=${title}`;
+					break;
+			}
+			
+			if (shareUrl) {
+				window.open(shareUrl);
+			}
+			paella.player.controls.hidePopUp(this.getName());
+		}
+
+		updateEmbedCode() {
+			var videoUrl = this.getVideoUrl();
+			var responsive = this._domElement.querySelector("#share-video-responsive").checked;
+			var width = this._domElement.querySelector("#share-video-width").value;
+			var height = this._domElement.querySelector("#share-video-height").value;
+			var respSize = this._domElement.querySelector("#share-video-size-resp").value;
+			
+			var embedCode = '';
+			if (responsive) {
+				embedCode = `<div style="width:${respSize}%"><div style="position:relative;display:block;height:0;padding:0;overflow:hidden;padding-bottom:56.25%"> <iframe allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" src="${videoUrl}" style="border:0px #FFFFFF none; position:absolute; width:100%; height:100%" name="Paella Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="100%" height="100%"></iframe> </div></div>`;
+			}
+			else {
+				embedCode = `<iframe allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" src="${videoUrl}" style="border:0px #FFFFFF none;" name="Paella Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="${width}" height="${height}"></iframe>`;
+			}
+
+			this._domElement.querySelector("#share-video-embed").innerText = embedCode;
+		}
+
+	}
+});
+
 paella.addPlugin(function() {
 	return class ShowEditorPlugin extends paella.VideoOverlayButtonPlugin {
 		getName() {
@@ -15810,188 +16008,6 @@ paella.addPlugin(function() {
 	}
 });
 
-
-paella.addPlugin(function() {
-	return class SocialPlugin extends paella.ButtonPlugin {
-		getAlignment() { return 'right'; }
-		getSubclass() { return "showSocialPluginButton"; }
-		getIconClass() { return 'icon-social'; }
-		getIndex() { return 560; }
-		getName() { return "es.upv.paella.socialPlugin"; }
-		checkEnabled(onSuccess) { onSuccess(true); }
-		getDefaultToolTip() { return base.dictionary.translate("Share this video"); }
-		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-		
-		closeOnMouseOut() { return true; }
-		
-		setup() {
-			this.buttonItems = null;
-			this.socialMedia = null;
-			this.buttons = [];
-			this.selected_button = null;
-			
-			if (base.dictionary.currentLanguage()=='es') {
-				var esDict = {
-					'Custom size:': 'Tamaño personalizado:',
-					'Choose your embed size. Copy the text and paste it in your html page.': 'Elija el tamaño del video a embeber. Copie el texto y péguelo en su página html.',
-					'Width:':'Ancho:',
-					'Height:':'Alto:'
-				};
-				base.dictionary.addDictionary(esDict);
-			}
-			var thisClass = this;
-
-			var Keys = {Tab:9,Return:13,Esc:27,End:35,Home:36,Left:37,Up:38,Right:39,Down:40};
-
-			$(this.button).keyup(function(event) {
-				if(thisClass.isPopUpOpen()) {
-					if (event.keyCode == Keys.Up) {
-					if(thisClass.selected_button>0){
-							if(thisClass.selected_button<thisClass.buttons.length)
-								thisClass.buttons[thisClass.selected_button].className = 'socialItemButton '+thisClass.buttons[thisClass.selected_button].data.mediaData;
-
-							thisClass.selected_button--;
-							thisClass.buttons[thisClass.selected_button].className = thisClass.buttons[thisClass.selected_button].className+' selected';
-						}
-					}
-					else if (event.keyCode == Keys.Down) {
-						if(thisClass.selected_button<thisClass.buttons.length-1){
-							if(thisClass.selected_button>=0)
-								thisClass.buttons[thisClass.selected_button].className = 'socialItemButton '+thisClass.buttons[thisClass.selected_button].data.mediaData;
-
-							thisClass.selected_button++;
-							thisClass.buttons[thisClass.selected_button].className = thisClass.buttons[thisClass.selected_button].className+' selected';
-						}
-					}
-					else if (event.keyCode == Keys.Return) {
-						thisClass.onItemClick(thisClass.buttons[thisClass.selected_button].data.mediaData);
-					}
-				}
-			});
-		}
-
-		buildContent(domElement) {
-			this.buttonItems = {};
-			this.socialMedia = ['facebook','twitter', 'embed'];
-			this.socialMedia.forEach((mediaData) => {
-			var buttonItem = this.getSocialMediaItemButton(mediaData);
-			this.buttonItems[this.socialMedia.indexOf(mediaData)] = buttonItem;
-			domElement.appendChild(buttonItem);
-			this.buttons.push(buttonItem);
-			});
-			this.selected_button = this.buttons.length;
-		}
-
-		getSocialMediaItemButton(mediaData) {
-			var elem = document.createElement('div');
-			elem.className = 'socialItemButton ' + mediaData;
-			elem.id = mediaData + '_button';
-			elem.data = {
-				mediaData:mediaData,
-				plugin:this
-			};
-			$(elem).click(function(event) {
-				this.data.plugin.onItemClick(this.data.mediaData);
-			});
-			return elem;
-		}
-
-		onItemClick(mediaData) {
-			var url = this.getVideoUrl();
-			switch (mediaData) {
-				case ('twitter'):
-					window.open('http://twitter.com/home?status=' + url);
-					break;
-				case ('facebook'):
-					window.open('http://www.facebook.com/sharer.php?u=' + url);
-					break;
-				case ('embed'):
-					this.embedPress();
-					break;
-			}
-			paella.player.controls.hidePopUp(this.getName());
-		}
-
-		getVideoUrl() {
-			var url = document.location.href;
-			return url;
-		}
-
-		embedPress() {
-			var host = document.location.protocol + "//" +document.location.host;
-			var pathname = document.location.pathname;
-
-			var p = pathname.split("/");
-			if (p.length > 0){p[p.length-1] = "embed.html";}
-			var id = paella.initDelegate.getId();
-			var url = host+p.join("/")+"?id="+id;
-			//var paused = paella.player.videoContainer.paused();
-			//$(document).trigger(paella.events.pause);
-
-
-			var divSelectSize="<div style='display:inline-block;'> " +
-				"    <div class='embedSizeButton' style='width:110px; height:73px;'> <span style='display:flex; align-items:center; justify-content:center; width:100%; height:100%;'> 620x349 </span></div>" +
-				"    <div class='embedSizeButton' style='width:100px; height:65px;'> <span style='display:flex; align-items:center; justify-content:center; width:100%; height:100%;'> 540x304 </span></div>" +
-				"    <div class='embedSizeButton' style='width:90px;  height:58px;'> <span style='display:flex; align-items:center; justify-content:center; width:100%; height:100%;'> 460x259 </span></div>" +
-				"    <div class='embedSizeButton' style='width:80px;  height:50px;'> <span style='display:flex; align-items:center; justify-content:center; width:100%; height:100%;'> 380x214 </span></div>" +
-				"    <div class='embedSizeButton' style='width:70px;  height:42px;'> <span style='display:flex; align-items:center; justify-content:center; width:100%; height:100%;'> 300x169 </span></div>" +
-				"</div><div style='display:inline-block; vertical-align:bottom; margin-left:10px;'>"+
-				"    <div>"+base.dictionary.translate("Custom size:")+"</div>" +
-				"    <div>"+base.dictionary.translate("Width:")+" <input id='social_embed_width-input' class='embedSizeInput' maxlength='4' type='text' name='Costum width min 300px' alt='Costum width min 300px' title='Costum width min 300px' value=''></div>" +
-				"    <div>"+base.dictionary.translate("Height:")+" <input id='social_embed_height-input' class='embedSizeInput' maxlength='4' type='text' name='Costum width min 300px' alt='Costum width min 300px' title='Costum width min 300px' value=''></div>" +
-				"</div>";
-
-
-			var divEmbed = "<div id='embedContent' style='text-align:left; font-size:14px; color:black;'><div id=''>"+divSelectSize+"</div> <div id=''>"+base.dictionary.translate("Choose your embed size. Copy the text and paste it in your html page.")+"</div> <div id=''><textarea id='social_embed-textarea' class='social_embed-textarea' rows='4' cols='1' style='font-size:12px; width:95%; overflow:auto; margin-top:5px; color:black;'></textarea></div>  </div>";
-
-
-			paella.messageBox.showMessage(divEmbed, {
-				closeButton:true,
-				width:'750px',
-				height:'210px',
-				onClose() {
-				//      if (paused == false) {$(document).trigger(paella.events.play);}
-				}
-			});
-			var w_e = $('#social_embed_width-input')[0];
-			var h_e = $('#social_embed_height-input')[0];
-			w_e.onkeyup = function(event){
-				var width = parseInt(w_e.value);
-				var height = parseInt(h_e.value);
-				if (isNaN(width)){
-					w_e.value="";
-				}
-				else{
-					if (width<300){
-						$("#social_embed-textarea")[0].value = "Embed width too low. The minimum value is a width of 300.";
-					}
-					else{
-						if (isNaN(height)){
-							height = (width/(16/9)).toFixed();
-							h_e.value = height;
-						}
-						$("#social_embed-textarea")[0].value = '<iframe allowfullscreen src="'+url+'" style="border:0px #FFFFFF none;" name="Paella Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="'+width+'" height="'+height+'"></iframe>';
-					}
-				}
-			};
-			var embs = $(".embedSizeButton");
-			for (var i=0; i< embs.length; i=i+1){
-				var e = embs[i];
-				e.onclick=function(event){
-					var value = event.target? event.target.textContent: event.toElement.textContent;
-					if (value) {
-						var size = value.trim().split("x");
-
-						w_e.value = size[0];
-						h_e.value = size[1];
-						$("#social_embed-textarea")[0].value = '<iframe allowfullscreen src="'+url+'" style="border:0px #FFFFFF none;" name="Paella Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="'+size[0]+'" height="'+size[1]+'"></iframe>';
-					}
-				};
-			}
-		}
-	}
-
-});
 
 paella.addPlugin(function() {
 	return class ThemeChooserPlugin extends paella.ButtonPlugin {

@@ -3024,59 +3024,30 @@ svg rect {
 .noResults {
   margin: 5px;
 }
-.buttonPlugin.showSocialPluginButton {
-  background-position: -800% 0%;
-}
-.buttonPluginPopUp.showSocialPluginButton {
-  background-image: none;
-}
-.socialItemButton {
-  /*crea el popup*/
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  background-image: url(../images/paella_icons_light.png);
-  background-size: 2000% 1000%;
-  background-position: 0px 0px;
-}
-.socialItemButton.selected {
-  /*background-color: rgba(90,90,90,0.8);
-	border: 3px solid #23ff00;*/
-  background-color: rgba(90, 90, 90, 0.8);
-  box-shadow: inset 0px 0px 2px 2px #fa8533;
-}
-.socialItemButton:hover {
-  background-color: #faa166;
-}
-.socialItemButton.facebook {
-  background-position: -1600% 0%;
-}
-.socialItemButton.twitter {
-  background-position: -1400% 0%;
-}
-.socialItemButton.embed {
-  background-position: -1500% 0%;
-}
-.embedSizeButton {
-  display: inline-block;
-  background-color: #fa8533;
-  border: 1px solid #313135;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-right: 5px;
-  vertical-align: middle;
-  font-size: 14px;
+.buttonPlugin.shareButtonPlugin {
   text-align: center;
-  color: white;
+  background-position: -700% -200%;
+  font-size: 0.8em;
+  line-height: 20px;
 }
-.embedSizeInput {
-  background-color: #ffffff;
-  width: 40px;
-  height: 20px;
-  color: #000000;
-  font-size: 12px;
-  margin: 0px;
-  padding: 0px;
+.buttonPluginPopUp.shareButtonPlugin {
+  right: 0;
+  min-width: 500px;
+  padding: 10px;
+}
+.alert-share {
+  background-color: #a4a4a4;
+  border-color: #4b4b4b;
+  color: #333333;
+  user-select: text;
+}
+.share-button {
+  color: white;
+  font-size: 18px;
+  padding: 3px;
+}
+.share-button:hover {
+  background-color: #cc0000;
 }
 .buttonPlugin.themeChooserPlugin {
   background-position: -800% -100%;
