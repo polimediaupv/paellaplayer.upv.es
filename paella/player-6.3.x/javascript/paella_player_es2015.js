@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.2 - build: 3c49d0f";
+paella.version = "6.3.3 - build: 2375af5";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3573,7 +3573,7 @@ class VideoWrapper extends paella.DomNode {
 			$(this.domElement).show();
 		}
 		else if (!visible && animate) {
-			$(this.domElement).animate({opacity:0.0},300);
+			$(this.domElement).animate({opacity:0.0},300, () => $(this.domElement).hide());
 		}
 		else if (!visible && !animate) {
 			$(this.domElement).hide();
@@ -11130,7 +11130,7 @@ paella.addPlugin(() => {
 			paella.player.videoContainer.trimming()
 				.then((trimming) => {
 					if (trimming.enabled) {
-						paella.player.videoContainer.seekToTime(time + trimming.start);
+						paella.player.videoContainer.seekToTime(time - trimming.start);
 					}
 					else {
 						paella.player.videoContainer.seekToTime(time);
