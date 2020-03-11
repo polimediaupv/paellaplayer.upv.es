@@ -5,6 +5,14 @@
 CHANGELOG
 =========
 
+* Paella 6.2.6
+
+  * Fixed a bug with hiding videos in the profile manager
+
+* Paella 6.2.5
+
+  * Bug fixed in breaks plugin
+  
 * Paella 6.2.4
 
   * Update dependencies
