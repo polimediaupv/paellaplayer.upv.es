@@ -52,6 +52,7 @@
 	"This video is not compatible with any codec installed in your system": "Este vídeo no es compatible con ningún codec instalado en su sistema",
 	"Could not load the video": "No se ha podido cargar el vídeo",
 	"Error! Captions format not supported.": "Error! El formato de los subtitulos no está soportado.",
+	"No such HLS stream: the video is not available": "No se ha encontrado el stream de emisión en vivo: el vídeo no está disponible",
 	"Trimming": "Ajuste de inicio y fin",
 	"Breaks": "Descansos",
 	"Break": "Descanso",

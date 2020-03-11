@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: b6271d8";
+paella.version = "6.4.0 - build: fc79a7f";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -8323,8 +8323,9 @@ paella.ControlsContainer = ControlsContainer;
 							}
 						})
 						.catch((error) => {
-							console.log(error);
-							paella.messageBox.showError(base.dictionary.translate("Could not load the video"));
+							console.error(error);
+							let msg = error.message || "Could not load the video";
+							paella.messageBox.showError(base.dictionary.translate(msg));
 						});
 				});
 			}
