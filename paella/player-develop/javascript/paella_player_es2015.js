@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: fc79a7f";
+paella.version = "6.4.0 - build: a19ee5d";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -807,6 +807,49 @@ paella.data = null;
 	
 	paella.MessageBox = MessageBox;
 	paella.messageBox = new paella.MessageBox();
+
+	paella.tabIndex = new (class TabIndexManager {
+		constructor() {
+			this._last = 0;
+		}
+
+		get next() {
+			return this._last++;
+		}
+
+		get last() {
+			return this._last;
+		}
+
+		get tabIndexElements() {
+			return Array.from($('[tabindex]'));
+		}
+
+		// Insert 'count' tabindexes after domElem.tabIndex, and displace the 
+		// tabIndex of the following elements 'count' units.
+		insertAfter(domElem,count = 1) {
+			if (!domElem.tabIndex) {
+				return this.next;
+			}
+			else if (domElem.tabIndex==-1) {
+				let result = this._last;
+				this._last += count;
+				return result;
+			}
+			else {
+				let target = domElem.tabIndex;
+				this.tabIndexElements.forEach((elem) => {
+					if (elem.tabIndex>=(target + count)) {
+						elem.tabIndex += count;
+					}
+					if (elem.tabIndex>=this._last) {
+						this._last++;
+					}
+				});
+				return target + 1;
+			}
+		}
+	})();
 
 })();
 
