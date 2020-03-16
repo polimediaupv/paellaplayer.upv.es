@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: a19ee5d";
+paella.version = "6.4.0 - build: c81ba90";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -810,7 +810,7 @@ paella.data = null;
 
 	paella.tabIndex = new (class TabIndexManager {
 		constructor() {
-			this._last = 0;
+			this._last = 1;
 		}
 
 		get next() {
@@ -818,36 +818,49 @@ paella.data = null;
 		}
 
 		get last() {
-			return this._last;
+			return this._last - 1;
 		}
 
 		get tabIndexElements() {
-			return Array.from($('[tabindex]'));
+			let result = Array.from($('[tabindex]'));
+
+			// Sort by tabIndex
+			result.sort((a,b) => {
+				return a.tabIndex-b.tabIndex;
+			});
+
+			return result;
 		}
 
-		// Insert 'count' tabindexes after domElem.tabIndex, and displace the 
-		// tabIndex of the following elements 'count' units.
-		insertAfter(domElem,count = 1) {
-			if (!domElem.tabIndex) {
-				return this.next;
+		insertAfter(target,elements) {
+			if (target.tabIndex==null || target.tabIndex==-1) {
+				throw Error("Insert tab index: the target element does not have a valid tabindex.");
 			}
-			else if (domElem.tabIndex==-1) {
-				let result = this._last;
-				this._last += count;
-				return result;
-			}
-			else {
-				let target = domElem.tabIndex;
-				this.tabIndexElements.forEach((elem) => {
-					if (elem.tabIndex>=(target + count)) {
-						elem.tabIndex += count;
-					}
-					if (elem.tabIndex>=this._last) {
-						this._last++;
-					}
-				});
-				return target + 1;
-			}
+
+			let targetIndex = -1;
+			let newTabIndexElements = this.tabIndexElements;
+			newTabIndexElements.some((elem,i) => {
+				if (elem==target) {
+					targetIndex = i;
+					return true;
+				}
+			});
+			newTabIndexElements.splice(targetIndex + 1, 0, ...elements);
+			newTabIndexElements.forEach((elem,index) => {
+				elem.tabIndex = index; + 1
+			});
+			this._last = newTabIndexElements.length;
+		}
+
+		removeTabIndex(elements) {
+			Array.from(elements).forEach((e) => {
+				e.removeAttribute("tabindex");
+			});
+
+			this.tabIndexElements.forEach((elem,index) => {
+				elem.tabIndex = index + 1;
+				this._last = elem.tabIndex + 1;
+			});
 		}
 	})();
 
@@ -2602,7 +2615,7 @@ class Html5Video extends paella.VideoElementBase {
 
 		this.video.preload = "auto";
 		this.video.setAttribute("playsinline","");
-		this.video.setAttribute("tabindex","-1");
+		//this.video.setAttribute("tabindex","-1");
 
 		this._configureVideoEvents(this.video);
 	}
@@ -5121,6 +5134,48 @@ paella.FastLoadPlugin = FastLoadPlugin;
 paella.EarlyLoadPlugin = EarlyLoadPlugin;
 paella.DeferredLoadPlugin = DeferredLoadPlugin;
 
+function addMenuItemTabindex(plugin) {
+	paella.tabIndex.insertAfter(plugin.button,plugin.menuContent.children);
+}
+
+function removeMenuItemTabindexplugin(plugin) {
+	paella.tabIndex.removeTabIndex(plugin.menuContent.children);
+}
+
+function hideContainer(identifier,container) {
+	paella.events.trigger(paella.events.hidePopUp,{container:container});
+	container.plugin.willHideContent();
+	if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton) {
+		removeMenuItemTabindexplugin(container.plugin);
+	}
+	$(container.element).hide();
+	$(this.domElement).css({width:'0px'});
+	container.button.className = container.button.className.replace(' selected','');
+	this.currentContainerId = -1;
+	container.plugin.didHideContent();
+}
+
+function showContainer(identifier,container,button) {
+	paella.events.trigger(paella.events.showPopUp,{container:container});
+	container.plugin.willShowContent();
+	container.button.className = container.button.className + ' selected';
+	$(container.element).show();
+	if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton) {
+	 	addMenuItemTabindex(container.plugin);
+	}
+	let width = $(container.element).width();
+	if (container.plugin.getAlignment() == 'right') {
+		var right = $(button.parentElement).width() - $(button).position().left - $(button).width();
+		$(this.domElement).css({width:width + 'px', right:right + 'px', left:''});				
+	}
+	else {
+		var left = $(button).position().left;
+		$(this.domElement).css({width:width + 'px', left:left + 'px', right:''});						
+	}			
+	this.currentContainerId = identifier;
+	container.plugin.didShowContent();			
+}
+
 class PopUpContainer extends paella.DomNode {
 
 	constructor(id,className) {
@@ -5137,60 +5192,21 @@ class PopUpContainer extends paella.DomNode {
 
 	hideContainer(identifier,button) {
 		var container = this.containers[identifier];
-		if (container && this.currentContainerId==identifier) {
-			container.identifier = identifier;
-			paella.events.trigger(paella.events.hidePopUp,{container:container});
-			container.plugin.willHideContent();
-			$(container.element).hide();
-			container.button.className = container.button.className.replace(' selected','');
-			$(this.domElement).css({width:'0px'});
-			this.currentContainerId = -1;
-			container.plugin.didHideContent();
-		}
+		hideContainer.apply(this,[identifier,container]);
 	}
 
 	showContainer(identifier, button) {
-		var thisClass = this;
-		var width = 0;
-		
-		function hideContainer(container) {
-			paella.events.trigger(paella.events.hidePopUp,{container:container});
-			container.plugin.willHideContent();
-			$(container.element).hide();
-			$(thisClass.domElement).css({width:'0px'});
-			container.button.className = container.button.className.replace(' selected','');
-			thisClass.currentContainerId = -1;
-			container.plugin.didHideContent();			
-		}
-		function showContainer(container) {
-			paella.events.trigger(paella.events.showPopUp,{container:container});
-			container.plugin.willShowContent();
-			container.button.className = container.button.className + ' selected';
-			$(container.element).show();
-			width = $(container.element).width();			
-			if (container.plugin.getAlignment() == 'right') {
-				var right = $(button.parentElement).width() - $(button).position().left - $(button).width();
-				$(thisClass.domElement).css({width:width + 'px', right:right + 'px', left:''});				
-			}
-			else {
-				var left = $(button).position().left;
-				$(thisClass.domElement).css({width:width + 'px', left:left + 'px', right:''});						
-			}			
-			thisClass.currentContainerId = identifier;
-			container.plugin.didShowContent();			
-		}
-		
 		var container = this.containers[identifier];
 		if (container && this.currentContainerId!=identifier && this.currentContainerId!=-1) {
 			var prevContainer = this.containers[this.currentContainerId];
-			hideContainer(prevContainer);
-			showContainer(container);
+			hideContainer.apply(this,[this.currentContainerId,prevContainer]);
+			showContainer.apply(this,[identifier,container,button]);
 		}
 		else if (container && this.currentContainerId==identifier) {
-			hideContainer(container);
+			hideContainer.apply(this,[identifier,container]);
 		}
 		else if (container) {
-			showContainer(container);
+			showContainer.apply(this,[identifier,container,button]);
 		}
 	}
 
@@ -5223,9 +5239,15 @@ class PopUpContainer extends paella.DomNode {
 				paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier,this);
 			}
 		});
-		$(button).keyup(function(event) {
+		$(button).keypress(function(event) {
 			if ( (event.keyCode == 13) && (!this.plugin.isPopUpOpen()) ){
-				paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier,this);
+				if (this.plugin.isPopUpOpen()) {
+					paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier,this);
+				}
+				else {
+					paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier,this);
+				}
+				event.preventDefault();
 			}
 			else if ( (event.keyCode == 27)){
 				paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier,this);
@@ -5506,7 +5528,8 @@ class ButtonPlugin extends paella.UIPlugin {
 		buttonText.plugin = plugin;
 		elem.appendChild(buttonText);
 		if (ariaLabel) {
-			elem.setAttribute("tabindex", 1000 + plugin.getIndex());
+			let tabIndex = paella.tabIndex.next;
+			elem.setAttribute("tabindex", tabIndex);
 			elem.setAttribute("aria-label",ariaLabel);
 		}	
 		elem.setAttribute("alt", "");
@@ -5528,13 +5551,16 @@ class ButtonPlugin extends paella.UIPlugin {
 			self.plugin.action(self);
 		}
 		
-		$(elem).click(function(event) {
-			onAction(this);
-		});
-		$(elem).keyup(function(event) {
+		if (plugin.getButtonType() == paella.ButtonPlugin.type.actionButton) {
+			$(elem).click(function(event) {
+				onAction(this);
+			});
+			$(elem).keypress(function(event) {
+				 onAction(this);
+				 event.preventDefault();
+			});
+		}
 
-			event.preventDefault();
-		});
 		$(elem).focus(function(event) {
 			plugin.expand();
 		});
@@ -5614,6 +5640,9 @@ class ButtonPlugin extends paella.UIPlugin {
 				}
 				$(this).addClass('selected');
 			});
+			$(elem).keypress(function(event) {
+				//
+			});
 			return elem;
 		}
 
@@ -5621,7 +5650,7 @@ class ButtonPlugin extends paella.UIPlugin {
 		this.menuContent.innerHTML = "";
 		menuContent.forEach((menuItem) => {
 			this.menuContent.appendChild(getButtonItem(menuItem,this));
-		})
+		});
 	}
 }
 
@@ -6778,7 +6807,7 @@ class PlaybackBar extends paella.DomNode {
 		this.domElement.setAttribute("aria-valuemin", "0");
 		this.domElement.setAttribute("aria-valuemax", "100");
 		this.domElement.setAttribute("aria-valuenow", "0");
-		this.domElement.setAttribute("tabindex", "1100");
+		this.domElement.setAttribute("tabindex", paella.tabIndex.next);
 		$(this.domElement).keyup((event) => {
 			var currentTime = 0;
 			var duration = 0;

@@ -4,6 +4,14 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
@@ -47,7 +55,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: a19ee5d";
+paella.version = "6.4.0 - build: c81ba90";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -982,37 +990,43 @@ paella.data = null;
     function TabIndexManager() {
       _classCallCheck(this, TabIndexManager);
 
-      this._last = 0;
+      this._last = 1;
     }
 
     _createClass(TabIndexManager, [{
       key: "insertAfter",
-      // Insert 'count' tabindexes after domElem.tabIndex, and displace the 
-      // tabIndex of the following elements 'count' units.
-      value: function insertAfter(domElem) {
+      value: function insertAfter(target, elements) {
+        if (target.tabIndex == null || target.tabIndex == -1) {
+          throw Error("Insert tab index: the target element does not have a valid tabindex.");
+        }
+
+        var targetIndex = -1;
+        var newTabIndexElements = this.tabIndexElements;
+        newTabIndexElements.some(function (elem, i) {
+          if (elem == target) {
+            targetIndex = i;
+            return true;
+          }
+        });
+        newTabIndexElements.splice.apply(newTabIndexElements, [targetIndex + 1, 0].concat(_toConsumableArray(elements)));
+        newTabIndexElements.forEach(function (elem, index) {
+          elem.tabIndex = index;
+          +1;
+        });
+        this._last = newTabIndexElements.length;
+      }
+    }, {
+      key: "removeTabIndex",
+      value: function removeTabIndex(elements) {
         var _this4 = this;
 
-        var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-        if (!domElem.tabIndex) {
-          return this.next;
-        } else if (domElem.tabIndex == -1) {
-          var result = this._last;
-          this._last += count;
-          return result;
-        } else {
-          var target = domElem.tabIndex;
-          this.tabIndexElements.forEach(function (elem) {
-            if (elem.tabIndex >= target + count) {
-              elem.tabIndex += count;
-            }
-
-            if (elem.tabIndex >= _this4._last) {
-              _this4._last++;
-            }
-          });
-          return target + 1;
-        }
+        Array.from(elements).forEach(function (e) {
+          e.removeAttribute("tabindex");
+        });
+        this.tabIndexElements.forEach(function (elem, index) {
+          elem.tabIndex = index + 1;
+          _this4._last = elem.tabIndex + 1;
+        });
       }
     }, {
       key: "next",
@@ -1022,12 +1036,17 @@ paella.data = null;
     }, {
       key: "last",
       get: function get() {
-        return this._last;
+        return this._last - 1;
       }
     }, {
       key: "tabIndexElements",
       get: function get() {
-        return Array.from($('[tabindex]'));
+        var result = Array.from($('[tabindex]')); // Sort by tabIndex
+
+        result.sort(function (a, b) {
+          return a.tabIndex - b.tabIndex;
+        });
+        return result;
       }
     }]);
 
@@ -3336,9 +3355,8 @@ function paella_DeferredNotImplemented() {
 
       _this26.video.preload = "auto";
 
-      _this26.video.setAttribute("playsinline", "");
+      _this26.video.setAttribute("playsinline", ""); //this.video.setAttribute("tabindex","-1");
 
-      _this26.video.setAttribute("tabindex", "-1");
 
       _this26._configureVideoEvents(_this26.video);
 
@@ -6503,6 +6521,67 @@ function paella_DeferredNotImplemented() {
   paella.EarlyLoadPlugin = EarlyLoadPlugin;
   paella.DeferredLoadPlugin = DeferredLoadPlugin;
 
+  function addMenuItemTabindex(plugin) {
+    paella.tabIndex.insertAfter(plugin.button, plugin.menuContent.children);
+  }
+
+  function removeMenuItemTabindexplugin(plugin) {
+    paella.tabIndex.removeTabIndex(plugin.menuContent.children);
+  }
+
+  function _hideContainer(identifier, container) {
+    paella.events.trigger(paella.events.hidePopUp, {
+      container: container
+    });
+    container.plugin.willHideContent();
+
+    if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton) {
+      removeMenuItemTabindexplugin(container.plugin);
+    }
+
+    $(container.element).hide();
+    $(this.domElement).css({
+      width: '0px'
+    });
+    container.button.className = container.button.className.replace(' selected', '');
+    this.currentContainerId = -1;
+    container.plugin.didHideContent();
+  }
+
+  function _showContainer(identifier, container, button) {
+    paella.events.trigger(paella.events.showPopUp, {
+      container: container
+    });
+    container.plugin.willShowContent();
+    container.button.className = container.button.className + ' selected';
+    $(container.element).show();
+
+    if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton) {
+      addMenuItemTabindex(container.plugin);
+    }
+
+    var width = $(container.element).width();
+
+    if (container.plugin.getAlignment() == 'right') {
+      var right = $(button.parentElement).width() - $(button).position().left - $(button).width();
+      $(this.domElement).css({
+        width: width + 'px',
+        right: right + 'px',
+        left: ''
+      });
+    } else {
+      var left = $(button).position().left;
+      $(this.domElement).css({
+        width: width + 'px',
+        left: left + 'px',
+        right: ''
+      });
+    }
+
+    this.currentContainerId = identifier;
+    container.plugin.didShowContent();
+  }
+
   var PopUpContainer = /*#__PURE__*/function (_paella$DomNode8) {
     _inherits(PopUpContainer, _paella$DomNode8);
 
@@ -6525,80 +6604,23 @@ function paella_DeferredNotImplemented() {
       value: function hideContainer(identifier, button) {
         var container = this.containers[identifier];
 
-        if (container && this.currentContainerId == identifier) {
-          container.identifier = identifier;
-          paella.events.trigger(paella.events.hidePopUp, {
-            container: container
-          });
-          container.plugin.willHideContent();
-          $(container.element).hide();
-          container.button.className = container.button.className.replace(' selected', '');
-          $(this.domElement).css({
-            width: '0px'
-          });
-          this.currentContainerId = -1;
-          container.plugin.didHideContent();
-        }
+        _hideContainer.apply(this, [identifier, container]);
       }
     }, {
       key: "showContainer",
       value: function showContainer(identifier, button) {
-        var thisClass = this;
-        var width = 0;
-
-        function hideContainer(container) {
-          paella.events.trigger(paella.events.hidePopUp, {
-            container: container
-          });
-          container.plugin.willHideContent();
-          $(container.element).hide();
-          $(thisClass.domElement).css({
-            width: '0px'
-          });
-          container.button.className = container.button.className.replace(' selected', '');
-          thisClass.currentContainerId = -1;
-          container.plugin.didHideContent();
-        }
-
-        function showContainer(container) {
-          paella.events.trigger(paella.events.showPopUp, {
-            container: container
-          });
-          container.plugin.willShowContent();
-          container.button.className = container.button.className + ' selected';
-          $(container.element).show();
-          width = $(container.element).width();
-
-          if (container.plugin.getAlignment() == 'right') {
-            var right = $(button.parentElement).width() - $(button).position().left - $(button).width();
-            $(thisClass.domElement).css({
-              width: width + 'px',
-              right: right + 'px',
-              left: ''
-            });
-          } else {
-            var left = $(button).position().left;
-            $(thisClass.domElement).css({
-              width: width + 'px',
-              left: left + 'px',
-              right: ''
-            });
-          }
-
-          thisClass.currentContainerId = identifier;
-          container.plugin.didShowContent();
-        }
-
         var container = this.containers[identifier];
 
         if (container && this.currentContainerId != identifier && this.currentContainerId != -1) {
           var prevContainer = this.containers[this.currentContainerId];
-          hideContainer(prevContainer);
-          showContainer(container);
+
+          _hideContainer.apply(this, [this.currentContainerId, prevContainer]);
+
+          _showContainer.apply(this, [identifier, container, button]);
         } else if (container && this.currentContainerId == identifier) {
-          hideContainer(container);
+          _hideContainer.apply(this, [identifier, container]);
         } else if (container) {
-          showContainer(container);
+          _showContainer.apply(this, [identifier, container, button]);
         }
       }
     }, {
@@ -6631,9 +6653,15 @@ function paella_DeferredNotImplemented() {
             paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
           }
         });
-        $(button).keyup(function (event) {
+        $(button).keypress(function (event) {
           if (event.keyCode == 13 && !this.plugin.isPopUpOpen()) {
-            paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this);
+            if (this.plugin.isPopUpOpen()) {
+              paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
+            } else {
+              paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this);
+            }
+
+            event.preventDefault();
           } else if (event.keyCode == 27) {
             paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
           }
@@ -7021,6 +7049,8 @@ function paella_DeferredNotImplemented() {
 
             $(this).addClass('selected');
           });
+          $(elem).keypress(function (event) {//
+          });
           return elem;
         }
 
@@ -7058,7 +7088,8 @@ function paella_DeferredNotImplemented() {
         elem.appendChild(buttonText);
 
         if (ariaLabel) {
-          elem.setAttribute("tabindex", 1000 + plugin.getIndex());
+          var tabIndex = paella.tabIndex.next;
+          elem.setAttribute("tabindex", tabIndex);
           elem.setAttribute("aria-label", ariaLabel);
         }
 
@@ -7079,12 +7110,16 @@ function paella_DeferredNotImplemented() {
           self.plugin.action(self);
         }
 
-        $(elem).click(function (event) {
-          onAction(this);
-        });
-        $(elem).keyup(function (event) {
-          event.preventDefault();
-        });
+        if (plugin.getButtonType() == paella.ButtonPlugin.type.actionButton) {
+          $(elem).click(function (event) {
+            onAction(this);
+          });
+          $(elem).keypress(function (event) {
+            onAction(this);
+            event.preventDefault();
+          });
+        }
+
         $(elem).focus(function (event) {
           plugin.expand();
         });
@@ -8575,7 +8610,7 @@ function paella_DeferredNotImplemented() {
 
       _this111.domElement.setAttribute("aria-valuenow", "0");
 
-      _this111.domElement.setAttribute("tabindex", "1100");
+      _this111.domElement.setAttribute("tabindex", paella.tabIndex.next);
 
       $(_this111.domElement).keyup(function (event) {
         var currentTime = 0;
