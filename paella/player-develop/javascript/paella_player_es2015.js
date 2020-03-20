@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 9aac140";
+paella.version = "6.4.0 - build: ac40181";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -5135,11 +5135,15 @@ paella.EarlyLoadPlugin = EarlyLoadPlugin;
 paella.DeferredLoadPlugin = DeferredLoadPlugin;
 
 function addMenuItemTabindex(plugin) {
-	paella.tabIndex.insertAfter(plugin.button,plugin.menuContent.children);
+	if (plugin.button.tabIndex>0) {
+		paella.tabIndex.insertAfter(plugin.button,plugin.menuContent.children);
+	}
 }
 
 function removeMenuItemTabindexplugin(plugin) {
-	paella.tabIndex.removeTabIndex(plugin.menuContent.children);
+	if (plugin.button.tabIndex>0) {
+		paella.tabIndex.removeTabIndex(plugin.menuContent.children);
+	}
 }
 
 function hideContainer(identifier,container,swapFocus) {
