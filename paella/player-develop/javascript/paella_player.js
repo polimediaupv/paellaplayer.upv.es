@@ -55,7 +55,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 75ae01a";
+paella.version = "6.4.0 - build: 9aac140";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6529,7 +6529,7 @@ function paella_DeferredNotImplemented() {
     paella.tabIndex.removeTabIndex(plugin.menuContent.children);
   }
 
-  function _hideContainer(identifier, container) {
+  function _hideContainer(identifier, container, swapFocus) {
     paella.events.trigger(paella.events.hidePopUp, {
       container: container
     });
@@ -6546,9 +6546,13 @@ function paella_DeferredNotImplemented() {
     container.button.className = container.button.className.replace(' selected', '');
     this.currentContainerId = -1;
     container.plugin.didHideContent();
+
+    if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton && swapFocus) {
+      $(container.button).focus();
+    }
   }
 
-  function _showContainer(identifier, container, button) {
+  function _showContainer(identifier, container, button, swapFocus) {
     paella.events.trigger(paella.events.showPopUp, {
       container: container
     });
@@ -6579,6 +6583,11 @@ function paella_DeferredNotImplemented() {
     }
 
     this.currentContainerId = identifier;
+
+    if (container.plugin.getButtonType() == paella.ButtonPlugin.type.menuButton && container.plugin.menuContent.children.length > 0 && swapFocus) {
+      $(container.plugin.menuContent.children[0]).focus();
+    }
+
     container.plugin.didShowContent();
   }
 
@@ -6602,25 +6611,27 @@ function paella_DeferredNotImplemented() {
     _createClass(PopUpContainer, [{
       key: "hideContainer",
       value: function hideContainer(identifier, button) {
+        var swapFocus = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         var container = this.containers[identifier];
 
-        _hideContainer.apply(this, [identifier, container]);
+        _hideContainer.apply(this, [identifier, container, swapFocus]);
       }
     }, {
       key: "showContainer",
       value: function showContainer(identifier, button) {
+        var swapFocus = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         var container = this.containers[identifier];
 
         if (container && this.currentContainerId != identifier && this.currentContainerId != -1) {
           var prevContainer = this.containers[this.currentContainerId];
 
-          _hideContainer.apply(this, [this.currentContainerId, prevContainer]);
+          _hideContainer.apply(this, [this.currentContainerId, prevContainer, swapFocus]);
 
-          _showContainer.apply(this, [identifier, container, button]);
+          _showContainer.apply(this, [identifier, container, button, swapFocus]);
         } else if (container && this.currentContainerId == identifier) {
-          _hideContainer.apply(this, [identifier, container]);
+          _hideContainer.apply(this, [identifier, container, swapFocus]);
         } else if (container) {
-          _showContainer.apply(this, [identifier, container, button]);
+          _showContainer.apply(this, [identifier, container, button, swapFocus]);
         }
       }
     }, {
@@ -6648,23 +6659,26 @@ function paella_DeferredNotImplemented() {
         button.sourcePlugin = plugin;
         $(button).click(function (event) {
           if (!this.plugin.isPopUpOpen()) {
-            paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this);
+            paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this, false);
           } else {
-            paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
+            paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this, false);
           }
         });
         $(button).keypress(function (event) {
           if (event.keyCode == 13 && !this.plugin.isPopUpOpen()) {
             if (this.plugin.isPopUpOpen()) {
-              paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
+              paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this, true);
             } else {
-              paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this);
+              paella.player.controls.playbackControl().showPopUp(this.popUpIdentifier, this, true);
             }
-
-            event.preventDefault();
           } else if (event.keyCode == 27) {
-            paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this);
+            paella.player.controls.playbackControl().hidePopUp(this.popUpIdentifier, this, true);
           }
+
+          event.preventDefault();
+        });
+        $(button).keyup(function (event) {
+          event.preventDefault();
         });
         plugin.containerManager = this;
       }
@@ -7039,17 +7053,34 @@ function paella_DeferredNotImplemented() {
             itemData: itemData,
             plugin: plugin
           };
-          $(elem).click(function (event) {
-            this.data.plugin.menuItemSelected(this.data.itemData);
-            var buttons = this.parentElement ? this.parentElement.children : [];
+
+          function menuItemSelect(button, data, event) {
+            data.plugin.menuItemSelected(data.itemData);
+            var buttons = button.parentElement ? button.parentElement.children : [];
 
             for (var i = 0; i < buttons.length; ++i) {
               $(buttons[i]).removeClass('selected');
             }
 
-            $(this).addClass('selected');
+            $(button).addClass('selected');
+          }
+
+          $(elem).click(function (event) {
+            menuItemSelect(this, this.data, event);
           });
-          $(elem).keypress(function (event) {//
+          $(elem).keypress(function (event) {
+            if (event.keyCode == 13) {
+              menuItemSelect(this, this.data, event);
+            }
+
+            event.preventDefault();
+          });
+          $(elem).keyup(function (event) {
+            if (event.keyCode == 27) {
+              paella.player.controls.hidePopUp(this.data.plugin.getName(), null, true);
+            }
+
+            event.preventDefault();
           });
           return elem;
         }
@@ -9173,14 +9204,16 @@ function paella_DeferredNotImplemented() {
     _createClass(PlaybackControl, [{
       key: "showPopUp",
       value: function showPopUp(identifier, button) {
-        this.popUpPluginContainer.showContainer(identifier, button);
-        this.timeLinePluginContainer.showContainer(identifier, button);
+        var swapFocus = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+        this.popUpPluginContainer.showContainer(identifier, button, swapFocus);
+        this.timeLinePluginContainer.showContainer(identifier, button, swapFocus);
       }
     }, {
       key: "hidePopUp",
       value: function hidePopUp(identifier, button) {
-        this.popUpPluginContainer.hideContainer(identifier, button);
-        this.timeLinePluginContainer.hideContainer(identifier, button);
+        var swapFocus = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+        this.popUpPluginContainer.hideContainer(identifier, button, swapFocus);
+        this.timeLinePluginContainer.hideContainer(identifier, button, swapFocus);
       }
     }, {
       key: "playbackBar",
