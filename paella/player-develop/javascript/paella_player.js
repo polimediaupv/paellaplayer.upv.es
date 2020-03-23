@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 11910eb";
+paella.version = "6.4.0 - build: e7d766b";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -2295,6 +2295,11 @@ function paella_DeferredNotImplemented() {
         return Promise.resolve();
       }
     }, {
+      key: "buffered",
+      get: function get() {
+        return this.audio && this.audio.buffered;
+      }
+    }, {
       key: "audio",
       get: function get() {
         return this._audio;
@@ -3879,6 +3884,11 @@ function paella_DeferredNotImplemented() {
         return paella_DeferredNotImplemented();
       }
     }, {
+      key: "buffered",
+      get: function get() {
+        return this.video && this.video.buffered;
+      }
+    }, {
       key: "video",
       get: function get() {
         if (this.domElementType == 'video') {
@@ -5334,6 +5344,22 @@ function paella_DeferredNotImplemented() {
 
   paella.LimitedSizeProfileFrameStrategy = LimitedSizeProfileFrameStrategy;
 
+  function updateBuffers() {
+    // Initial implementation: use the mainStream buffered property
+    var mainBuffered = this.mainPlayer && this.mainPlayer.buffered;
+
+    if (mainBuffered) {
+      this._bufferedData = [];
+
+      for (var i = 0; i < mainBuffered.length; ++i) {
+        this._bufferedData.push({
+          start: mainBuffered.start(i),
+          end: mainBuffered.end(i)
+        });
+      }
+    }
+  }
+
   var StreamProvider = /*#__PURE__*/function () {
     function StreamProvider(videoData) {
       _classCallCheck(this, StreamProvider);
@@ -5348,6 +5374,29 @@ function paella_DeferredNotImplemented() {
       this._players = [];
       this._autoplay = base.parameters.get('autoplay') == 'true' || this.isLiveStreaming;
       this._startTime = 0;
+      this._bufferedData = [];
+      var streamProvider = this;
+      this._buffered = {
+        start: function start(index) {
+          if (index < 0 || index >= streamProvider._bufferedData.length) {
+            throw new Error("Buffered index out of bounds.");
+          }
+
+          return streamProvider._bufferedData[index].start;
+        },
+        end: function end(index) {
+          if (index < 0 || index >= streamProvider._bufferedData.length) {
+            throw new Error("Buffered index out of bounds.");
+          }
+
+          return streamProvider._bufferedData[index].end;
+        }
+      };
+      Object.defineProperty(this._buffered, "length", {
+        get: function get() {
+          return streamProvider._bufferedData.length;
+        }
+      });
     }
 
     _createClass(StreamProvider, [{
@@ -5507,6 +5556,12 @@ function paella_DeferredNotImplemented() {
         });
       }
     }, {
+      key: "buffered",
+      get: function get() {
+        updateBuffers.apply(this);
+        return this._buffered;
+      }
+    }, {
       key: "startTime",
       get: function get() {
         return this._startTime;
@@ -5564,6 +5619,11 @@ function paella_DeferredNotImplemented() {
       key: "mainAudioPlayer",
       get: function get() {
         return this._audioPlayer;
+      }
+    }, {
+      key: "mainPlayer",
+      get: function get() {
+        return this.mainVideoPlayer || this.mainAudioPlayer;
       }
     }, {
       key: "isLiveStreaming",
