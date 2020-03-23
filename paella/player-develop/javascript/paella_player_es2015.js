@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: b7bfa10";
+paella.version = "6.4.0 - build: 11910eb";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6903,6 +6903,7 @@ class PlaybackBar extends paella.DomNode {
 		}, false);
 		this.domElement.addEventListener('touchend',(event) => {
 			paella.utils.mouseManager.up(event);
+			thisClass.clearTimeOverlay();
 		}, false);
 	
 		$(this.domElement).bind('mouseup',function(event) {
@@ -6927,6 +6928,10 @@ class PlaybackBar extends paella.DomNode {
 	}
 
 	mouseOut(event){
+		this.clearTimeOverlay();
+	}
+
+	clearTimeOverlay() {
 		if(this._hasSlides) {
 			$("#divTimeImageOverlay").remove();
 		}
@@ -7002,7 +7007,8 @@ class PlaybackBar extends paella.DomNode {
 			var pos = p.offset();
 
 			var width = p.width();
-			var left = (event.clientX-pos.left);
+			let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+			var left = (clientX-pos.left);
 			left = (left < 0) ? 0 : left;
 			var position = left * 100 / width; // GET % OF THE STREAM
 
@@ -7045,11 +7051,11 @@ class PlaybackBar extends paella.DomNode {
 			// UPDATE POSITION IMAGE OVERLAY
 			if (This._hasSlides) {
 				var ancho = $("#divTimeImageOverlay").width();
-				var posx = event.clientX-(ancho/2);
-				if(event.clientX > (ancho/2 + pos.left)  &&  event.clientX < (pos.left+width - ancho/2) ) { // LEFT
+				var posx = clientX-(ancho/2);
+				if(clientX > (ancho/2 + pos.left)  &&  clientX < (pos.left+width - ancho/2) ) { // LEFT
 					$("#divTimeImageOverlay").css("left",posx); // CENTER THE DIV HOVER THE MOUSE
 				}
-				else if(event.clientX < width / 2)
+				else if(clientX < width / 2)
 					$("#divTimeImageOverlay").css("left",pos.left);
 				else
 					$("#divTimeImageOverlay").css("left",pos.left + width - ancho);
@@ -7057,11 +7063,11 @@ class PlaybackBar extends paella.DomNode {
 
 			// UPDATE POSITION TIME OVERLAY
 			var ancho2 = $("#divTimeOverlay").width();
-			var posx2 = event.clientX-(ancho2/2);
-			if(event.clientX > ancho2/2 + pos.left  && event.clientX < (pos.left+width - ancho2/2) ){
+			var posx2 = clientX-(ancho2/2);
+			if(clientX > ancho2/2 + pos.left  && clientX < (pos.left+width - ancho2/2) ){
 				$("#divTimeOverlay").css("left",posx2); // CENTER THE DIV HOVER THE MOUSE
 			}
-			else if(event.clientX < width / 2)
+			else if(clientX < width / 2)
 				$("#divTimeOverlay").css("left",pos.left);
 			else
 				$("#divTimeOverlay").css("left",pos.left + width - ancho2-2);

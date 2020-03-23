@@ -18,9 +18,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -59,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: b7bfa10";
+paella.version = "6.4.0 - build: 11910eb";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -602,10 +606,12 @@ paella.addDataDelegate(["default", "trimming"], function () {
   paella.dataDelegates.DefaultDataDelegate = /*#__PURE__*/function (_paella$DataDelegate) {
     _inherits(CookieDataDelegate, _paella$DataDelegate);
 
+    var _super = _createSuper(CookieDataDelegate);
+
     function CookieDataDelegate() {
       _classCallCheck(this, CookieDataDelegate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(CookieDataDelegate).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     _createClass(CookieDataDelegate, [{
@@ -1168,6 +1174,8 @@ function paella_DeferredNotImplemented() {
   var DomNode = /*#__PURE__*/function (_paella$Node) {
     _inherits(DomNode, _paella$Node);
 
+    var _super2 = _createSuper(DomNode);
+
     _createClass(DomNode, [{
       key: "domElement",
       get: function get() {
@@ -1200,7 +1208,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, DomNode);
 
-      _this5 = _possibleConstructorReturn(this, _getPrototypeOf(DomNode).call(this, id));
+      _this5 = _super2.call(this, id);
       _this5._elementType = elementType;
       _this5._domElement = document.createElement(elementType);
       _this5.domElement.id = id;
@@ -1241,6 +1249,8 @@ function paella_DeferredNotImplemented() {
   var Button = /*#__PURE__*/function (_paella$DomNode) {
     _inherits(Button, _paella$DomNode);
 
+    var _super3 = _createSuper(Button);
+
     _createClass(Button, [{
       key: "isToggle",
       get: function get() {
@@ -1257,7 +1267,7 @@ function paella_DeferredNotImplemented() {
       _classCallCheck(this, Button);
 
       var style = {};
-      _this6 = _possibleConstructorReturn(this, _getPrototypeOf(Button).call(this, 'div', id, style));
+      _this6 = _super3.call(this, 'div', id, style);
       _this6.isToggle = isToggle;
       _this6.domElement.className = className;
 
@@ -1752,10 +1762,12 @@ function paella_DeferredNotImplemented() {
   var BestFitVideoQualityStrategy = /*#__PURE__*/function (_paella$VideoQualityS) {
     _inherits(BestFitVideoQualityStrategy, _paella$VideoQualityS);
 
+    var _super4 = _createSuper(BestFitVideoQualityStrategy);
+
     function BestFitVideoQualityStrategy() {
       _classCallCheck(this, BestFitVideoQualityStrategy);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(BestFitVideoQualityStrategy).apply(this, arguments));
+      return _super4.apply(this, arguments);
     }
 
     _createClass(BestFitVideoQualityStrategy, [{
@@ -1801,10 +1813,12 @@ function paella_DeferredNotImplemented() {
   var LimitedBestFitVideoQualityStrategy = /*#__PURE__*/function (_paella$VideoQualityS2) {
     _inherits(LimitedBestFitVideoQualityStrategy, _paella$VideoQualityS2);
 
+    var _super5 = _createSuper(LimitedBestFitVideoQualityStrategy);
+
     function LimitedBestFitVideoQualityStrategy() {
       _classCallCheck(this, LimitedBestFitVideoQualityStrategy);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(LimitedBestFitVideoQualityStrategy).apply(this, arguments));
+      return _super5.apply(this, arguments);
     }
 
     _createClass(LimitedBestFitVideoQualityStrategy, [{
@@ -1903,12 +1917,14 @@ function paella_DeferredNotImplemented() {
   var AudioElementBase = /*#__PURE__*/function (_paella$DomNode2) {
     _inherits(AudioElementBase, _paella$DomNode2);
 
+    var _super6 = _createSuper(AudioElementBase);
+
     function AudioElementBase(id, stream) {
       var _this12;
 
       _classCallCheck(this, AudioElementBase);
 
-      _this12 = _possibleConstructorReturn(this, _getPrototypeOf(AudioElementBase).call(this, 'div', id));
+      _this12 = _super6.call(this, 'div', id);
       _this12._stream = stream;
       _this12._ready = false;
       return _this12;
@@ -2136,12 +2152,14 @@ function paella_DeferredNotImplemented() {
   var MultiformatAudioElement = /*#__PURE__*/function (_paella$AudioElementB) {
     _inherits(MultiformatAudioElement, _paella$AudioElementB);
 
+    var _super7 = _createSuper(MultiformatAudioElement);
+
     function MultiformatAudioElement(id, stream) {
       var _this13;
 
       _classCallCheck(this, MultiformatAudioElement);
 
-      _this13 = _possibleConstructorReturn(this, _getPrototypeOf(MultiformatAudioElement).call(this, id, stream));
+      _this13 = _super7.call(this, id, stream);
       _this13._streamName = "audio";
       _this13._audio = document.createElement('audio');
 
@@ -2461,12 +2479,14 @@ function paella_DeferredNotImplemented() {
   var VideoRect = /*#__PURE__*/function (_paella$DomNode3) {
     _inherits(VideoRect, _paella$DomNode3);
 
+    var _super8 = _createSuper(VideoRect);
+
     function VideoRect(id, domType, left, top, width, height) {
       var _this24;
 
       _classCallCheck(this, VideoRect);
 
-      _this24 = _possibleConstructorReturn(this, _getPrototypeOf(VideoRect).call(this, domType, id, {}));
+      _this24 = _super8.call(this, domType, id, {});
       var zoomSettings = paella.player.config.player.videoZoom || {};
 
       var zoomEnabled = (zoomSettings.enabled !== undefined ? zoomSettings.enabled : true) && _this24.allowZoom();
@@ -2975,12 +2995,14 @@ function paella_DeferredNotImplemented() {
   var VideoElementBase = /*#__PURE__*/function (_paella$VideoRect) {
     _inherits(VideoElementBase, _paella$VideoRect);
 
+    var _super9 = _createSuper(VideoElementBase);
+
     function VideoElementBase(id, stream, containerType, left, top, width, height) {
       var _this25;
 
       _classCallCheck(this, VideoElementBase);
 
-      _this25 = _possibleConstructorReturn(this, _getPrototypeOf(VideoElementBase).call(this, id, containerType, left, top, width, height));
+      _this25 = _super9.call(this, id, containerType, left, top, width, height);
       _this25._stream = stream;
       _this25._ready = false;
       _this25._autoplay = false;
@@ -3216,10 +3238,12 @@ function paella_DeferredNotImplemented() {
   var EmptyVideo = /*#__PURE__*/function (_paella$VideoElementB) {
     _inherits(EmptyVideo, _paella$VideoElementB);
 
+    var _super10 = _createSuper(EmptyVideo);
+
     function EmptyVideo(id, stream, left, top, width, height) {
       _classCallCheck(this, EmptyVideo);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(EmptyVideo).call(this, id, stream, 'div', left, top, width, height));
+      return _super10.call(this, id, stream, 'div', left, top, width, height);
     } // Initialization functions
 
 
@@ -3314,10 +3338,12 @@ function paella_DeferredNotImplemented() {
   var EmptyVideoFactory = /*#__PURE__*/function (_paella$VideoFactory) {
     _inherits(EmptyVideoFactory, _paella$VideoFactory);
 
+    var _super11 = _createSuper(EmptyVideoFactory);
+
     function EmptyVideoFactory() {
       _classCallCheck(this, EmptyVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(EmptyVideoFactory).apply(this, arguments));
+      return _super11.apply(this, arguments);
     }
 
     _createClass(EmptyVideoFactory, [{
@@ -3340,12 +3366,14 @@ function paella_DeferredNotImplemented() {
   var Html5Video = /*#__PURE__*/function (_paella$VideoElementB2) {
     _inherits(Html5Video, _paella$VideoElementB2);
 
+    var _super12 = _createSuper(Html5Video);
+
     function Html5Video(id, stream, left, top, width, height, streamName) {
       var _this26;
 
       _classCallCheck(this, Html5Video);
 
-      _this26 = _possibleConstructorReturn(this, _getPrototypeOf(Html5Video).call(this, id, stream, 'video', left, top, width, height));
+      _this26 = _super12.call(this, id, stream, 'video', left, top, width, height);
       _this26._currentQuality = null;
       _this26._autoplay = false;
       _this26._streamName = streamName || 'mp4';
@@ -3960,12 +3988,14 @@ function paella_DeferredNotImplemented() {
   var ImageVideo = /*#__PURE__*/function (_paella$VideoElementB3) {
     _inherits(ImageVideo, _paella$VideoElementB3);
 
+    var _super13 = _createSuper(ImageVideo);
+
     function ImageVideo(id, stream, left, top, width, height) {
       var _this47;
 
       _classCallCheck(this, ImageVideo);
 
-      _this47 = _possibleConstructorReturn(this, _getPrototypeOf(ImageVideo).call(this, id, stream, 'img', left, top, width, height));
+      _this47 = _super13.call(this, id, stream, 'img', left, top, width, height);
       _this47._posterFrame = null;
       _this47._currentQuality = null;
       _this47._currentTime = 0;
@@ -4376,19 +4406,21 @@ function paella_DeferredNotImplemented() {
   var BackgroundContainer = /*#__PURE__*/function (_paella$DomNode4) {
     _inherits(BackgroundContainer, _paella$DomNode4);
 
+    var _super14 = _createSuper(BackgroundContainer);
+
     function BackgroundContainer(id, image) {
       var _this60;
 
       _classCallCheck(this, BackgroundContainer);
 
-      _this60 = _possibleConstructorReturn(this, _getPrototypeOf(BackgroundContainer).call(this, 'img', id, {
+      _this60 = _super14.call(this, 'img', id, {
         position: 'relative',
         top: '0px',
         left: '0px',
         right: '0px',
         bottom: '0px',
         zIndex: GlobalParams.background.zIndex
-      }));
+      });
 
       _this60.domElement.setAttribute('src', image);
 
@@ -4415,6 +4447,8 @@ function paella_DeferredNotImplemented() {
 
   var VideoOverlay = /*#__PURE__*/function (_paella$DomNode5) {
     _inherits(VideoOverlay, _paella$DomNode5);
+
+    var _super15 = _createSuper(VideoOverlay);
 
     _createClass(VideoOverlay, [{
       key: "size",
@@ -4444,7 +4478,7 @@ function paella_DeferredNotImplemented() {
         overflow: 'hidden',
         zIndex: 10
       };
-      _this61 = _possibleConstructorReturn(this, _getPrototypeOf(VideoOverlay).call(this, 'div', 'overlayContainer', style));
+      _this61 = _super15.call(this, 'div', 'overlayContainer', style);
 
       _this61.domElement.setAttribute("role", "main");
 
@@ -4554,6 +4588,8 @@ function paella_DeferredNotImplemented() {
   var VideoWrapper = /*#__PURE__*/function (_paella$DomNode6) {
     _inherits(VideoWrapper, _paella$DomNode6);
 
+    var _super16 = _createSuper(VideoWrapper);
+
     function VideoWrapper(id, left, top, width, height) {
       var _this62;
 
@@ -4573,7 +4609,7 @@ function paella_DeferredNotImplemented() {
         zIndex: GlobalParams.video.zIndex,
         overflow: 'hidden'
       };
-      _this62 = _possibleConstructorReturn(this, _getPrototypeOf(VideoWrapper).call(this, 'div', id, style));
+      _this62 = _super16.call(this, 'div', id, style);
       _this62._rect = {
         left: left,
         top: top,
@@ -4686,6 +4722,8 @@ function paella_DeferredNotImplemented() {
   var VideoContainerBase = /*#__PURE__*/function (_paella$DomNode7) {
     _inherits(VideoContainerBase, _paella$DomNode7);
 
+    var _super17 = _createSuper(VideoContainerBase);
+
     function VideoContainerBase(id) {
       var _this64;
 
@@ -4699,7 +4737,7 @@ function paella_DeferredNotImplemented() {
         bottom: '0px',
         overflow: 'hidden'
       };
-      _this64 = _possibleConstructorReturn(this, _getPrototypeOf(VideoContainerBase).call(this, 'div', id, style));
+      _this64 = _super17.call(this, 'div', id, style);
       _this64._trimming = {
         enabled: false,
         start: 0,
@@ -5263,10 +5301,12 @@ function paella_DeferredNotImplemented() {
   var LimitedSizeProfileFrameStrategy = /*#__PURE__*/function (_ProfileFrameStrategy) {
     _inherits(LimitedSizeProfileFrameStrategy, _ProfileFrameStrategy);
 
+    var _super18 = _createSuper(LimitedSizeProfileFrameStrategy);
+
     function LimitedSizeProfileFrameStrategy() {
       _classCallCheck(this, LimitedSizeProfileFrameStrategy);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(LimitedSizeProfileFrameStrategy).apply(this, arguments));
+      return _super18.apply(this, arguments);
     }
 
     _createClass(LimitedSizeProfileFrameStrategy, [{
@@ -5585,6 +5625,8 @@ function paella_DeferredNotImplemented() {
   var VideoContainer = /*#__PURE__*/function (_paella$VideoContaine) {
     _inherits(VideoContainer, _paella$VideoContaine);
 
+    var _super19 = _createSuper(VideoContainer);
+
     _createClass(VideoContainer, [{
       key: "streamProvider",
       get: function get() {
@@ -5632,7 +5674,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, VideoContainer);
 
-      _this79 = _possibleConstructorReturn(this, _getPrototypeOf(VideoContainer).call(this, id));
+      _this79 = _super19.call(this, id);
       _this79._streamProvider = new paella.StreamProvider();
       _this79._ready = false;
       _this79._videoWrappers = [];
@@ -6488,10 +6530,12 @@ function paella_DeferredNotImplemented() {
   var FastLoadPlugin = /*#__PURE__*/function (_paella$Plugin) {
     _inherits(FastLoadPlugin, _paella$Plugin);
 
+    var _super20 = _createSuper(FastLoadPlugin);
+
     function FastLoadPlugin() {
       _classCallCheck(this, FastLoadPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FastLoadPlugin).apply(this, arguments));
+      return _super20.apply(this, arguments);
     }
 
     return FastLoadPlugin;
@@ -6500,10 +6544,12 @@ function paella_DeferredNotImplemented() {
   var EarlyLoadPlugin = /*#__PURE__*/function (_paella$Plugin2) {
     _inherits(EarlyLoadPlugin, _paella$Plugin2);
 
+    var _super21 = _createSuper(EarlyLoadPlugin);
+
     function EarlyLoadPlugin() {
       _classCallCheck(this, EarlyLoadPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(EarlyLoadPlugin).apply(this, arguments));
+      return _super21.apply(this, arguments);
     }
 
     return EarlyLoadPlugin;
@@ -6512,10 +6558,12 @@ function paella_DeferredNotImplemented() {
   var DeferredLoadPlugin = /*#__PURE__*/function (_paella$Plugin3) {
     _inherits(DeferredLoadPlugin, _paella$Plugin3);
 
+    var _super22 = _createSuper(DeferredLoadPlugin);
+
     function DeferredLoadPlugin() {
       _classCallCheck(this, DeferredLoadPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(DeferredLoadPlugin).apply(this, arguments));
+      return _super22.apply(this, arguments);
     }
 
     return DeferredLoadPlugin;
@@ -6602,13 +6650,15 @@ function paella_DeferredNotImplemented() {
   var PopUpContainer = /*#__PURE__*/function (_paella$DomNode8) {
     _inherits(PopUpContainer, _paella$DomNode8);
 
+    var _super23 = _createSuper(PopUpContainer);
+
     function PopUpContainer(id, className) {
       var _this94;
 
       _classCallCheck(this, PopUpContainer);
 
       var style = {};
-      _this94 = _possibleConstructorReturn(this, _getPrototypeOf(PopUpContainer).call(this, 'div', id, style));
+      _this94 = _super23.call(this, 'div', id, style);
       _this94.containers = null;
       _this94.currentContainerId = -1;
       _this94.domElement.className = className;
@@ -6700,10 +6750,12 @@ function paella_DeferredNotImplemented() {
   var TimelineContainer = /*#__PURE__*/function (_paella$PopUpContaine) {
     _inherits(TimelineContainer, _paella$PopUpContaine);
 
+    var _super24 = _createSuper(TimelineContainer);
+
     function TimelineContainer() {
       _classCallCheck(this, TimelineContainer);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(TimelineContainer).apply(this, arguments));
+      return _super24.apply(this, arguments);
     }
 
     _createClass(TimelineContainer, [{
@@ -6789,10 +6841,12 @@ function paella_DeferredNotImplemented() {
   var UIPlugin = /*#__PURE__*/function (_paella$DeferredLoadP) {
     _inherits(UIPlugin, _paella$DeferredLoadP);
 
+    var _super25 = _createSuper(UIPlugin);
+
     function UIPlugin() {
       _classCallCheck(this, UIPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(UIPlugin).apply(this, arguments));
+      return _super25.apply(this, arguments);
     }
 
     _createClass(UIPlugin, [{
@@ -6847,6 +6901,8 @@ function paella_DeferredNotImplemented() {
   var ButtonPlugin = /*#__PURE__*/function (_paella$UIPlugin) {
     _inherits(ButtonPlugin, _paella$UIPlugin);
 
+    var _super26 = _createSuper(ButtonPlugin);
+
     _createClass(ButtonPlugin, [{
       key: "type",
       get: function get() {
@@ -6859,7 +6915,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, ButtonPlugin);
 
-      _this95 = _possibleConstructorReturn(this, _getPrototypeOf(ButtonPlugin).call(this));
+      _this95 = _super26.call(this);
       _this95.subclass = '';
       _this95.container = null;
       _this95.containerManager = null;
@@ -7229,10 +7285,12 @@ function paella_DeferredNotImplemented() {
   var VideoOverlayButtonPlugin = /*#__PURE__*/function (_paella$ButtonPlugin) {
     _inherits(VideoOverlayButtonPlugin, _paella$ButtonPlugin);
 
+    var _super27 = _createSuper(VideoOverlayButtonPlugin);
+
     function VideoOverlayButtonPlugin() {
       _classCallCheck(this, VideoOverlayButtonPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VideoOverlayButtonPlugin).apply(this, arguments));
+      return _super27.apply(this, arguments);
     }
 
     _createClass(VideoOverlayButtonPlugin, [{
@@ -7270,6 +7328,8 @@ function paella_DeferredNotImplemented() {
   var EventDrivenPlugin = /*#__PURE__*/function (_paella$EarlyLoadPlug) {
     _inherits(EventDrivenPlugin, _paella$EarlyLoadPlug);
 
+    var _super28 = _createSuper(EventDrivenPlugin);
+
     _createClass(EventDrivenPlugin, [{
       key: "type",
       get: function get() {
@@ -7282,7 +7342,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, EventDrivenPlugin);
 
-      _this97 = _possibleConstructorReturn(this, _getPrototypeOf(EventDrivenPlugin).call(this));
+      _this97 = _super28.call(this);
 
       var events = _this97.getEvents();
 
@@ -7348,12 +7408,14 @@ function paella_DeferredNotImplemented() {
       var WebGLCanvas = /*#__PURE__*/function (_bg$app$WindowControl) {
         _inherits(WebGLCanvas, _bg$app$WindowControl);
 
+        var _super29 = _createSuper(WebGLCanvas);
+
         function WebGLCanvas(stream) {
           var _this98;
 
           _classCallCheck(this, WebGLCanvas);
 
-          _this98 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
+          _this98 = _super29.call(this);
           _this98._stream = stream;
           return _this98;
         }
@@ -7575,12 +7637,14 @@ function paella_DeferredNotImplemented() {
       var WebGLCanvas = /*#__PURE__*/function (_bg$app$WindowControl2) {
         _inherits(WebGLCanvas, _bg$app$WindowControl2);
 
+        var _super30 = _createSuper(WebGLCanvas);
+
         function WebGLCanvas(stream) {
           var _this101;
 
           _classCallCheck(this, WebGLCanvas);
 
-          _this101 = _possibleConstructorReturn(this, _getPrototypeOf(WebGLCanvas).call(this));
+          _this101 = _super30.call(this);
           _this101._stream = stream;
           return _this101;
         }
@@ -7861,10 +7925,12 @@ function paella_DeferredNotImplemented() {
     return /*#__PURE__*/function (_paella$VideoCanvas) {
       _inherits(VideoCanvas, _paella$VideoCanvas);
 
+      var _super31 = _createSuper(VideoCanvas);
+
       function VideoCanvas(stream) {
         _classCallCheck(this, VideoCanvas);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(VideoCanvas).call(this, stream));
+        return _super31.call(this, stream);
       }
 
       _createClass(VideoCanvas, [{
@@ -7961,12 +8027,14 @@ function paella_DeferredNotImplemented() {
   var SearchCallback = /*#__PURE__*/function (_base$AsyncLoaderCall) {
     _inherits(SearchCallback, _base$AsyncLoaderCall);
 
+    var _super32 = _createSuper(SearchCallback);
+
     function SearchCallback(caption, text) {
       var _this104;
 
       _classCallCheck(this, SearchCallback);
 
-      _this104 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
+      _this104 = _super32.call(this);
       _this104.name = "captionSearchCallback";
       _this104.caption = caption;
       _this104.text = text;
@@ -8230,10 +8298,12 @@ function paella_DeferredNotImplemented() {
   var CaptionParserPlugIn = /*#__PURE__*/function (_paella$FastLoadPlugi) {
     _inherits(CaptionParserPlugIn, _paella$FastLoadPlugi);
 
+    var _super33 = _createSuper(CaptionParserPlugIn);
+
     function CaptionParserPlugIn() {
       _classCallCheck(this, CaptionParserPlugIn);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(CaptionParserPlugIn).apply(this, arguments));
+      return _super33.apply(this, arguments);
     }
 
     _createClass(CaptionParserPlugIn, [{
@@ -8298,12 +8368,14 @@ function paella_DeferredNotImplemented() {
   var SearchCallback = /*#__PURE__*/function (_base$AsyncLoaderCall2) {
     _inherits(SearchCallback, _base$AsyncLoaderCall2);
 
+    var _super34 = _createSuper(SearchCallback);
+
     function SearchCallback(plugin, text) {
       var _this107;
 
       _classCallCheck(this, SearchCallback);
 
-      _this107 = _possibleConstructorReturn(this, _getPrototypeOf(SearchCallback).call(this));
+      _this107 = _super34.call(this);
       _this107.name = "searchCallback";
       _this107.plugin = plugin;
       _this107.text = text;
@@ -8353,10 +8425,12 @@ function paella_DeferredNotImplemented() {
   var SearchServicePlugIn = /*#__PURE__*/function (_paella$FastLoadPlugi2) {
     _inherits(SearchServicePlugIn, _paella$FastLoadPlugi2);
 
+    var _super35 = _createSuper(SearchServicePlugIn);
+
     function SearchServicePlugIn() {
       _classCallCheck(this, SearchServicePlugIn);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(SearchServicePlugIn).apply(this, arguments));
+      return _super35.apply(this, arguments);
     }
 
     _createClass(SearchServicePlugIn, [{
@@ -8423,10 +8497,12 @@ function paella_DeferredNotImplemented() {
   var SaverPlugIn = /*#__PURE__*/function (_paella$FastLoadPlugi3) {
     _inherits(SaverPlugIn, _paella$FastLoadPlugi3);
 
+    var _super36 = _createSuper(SaverPlugIn);
+
     function SaverPlugIn() {
       _classCallCheck(this, SaverPlugIn);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(SaverPlugIn).apply(this, arguments));
+      return _super36.apply(this, arguments);
     }
 
     _createClass(SaverPlugIn, [{
@@ -8558,14 +8634,16 @@ function paella_DeferredNotImplemented() {
   var TimeControl = /*#__PURE__*/function (_paella$DomNode9) {
     _inherits(TimeControl, _paella$DomNode9);
 
+    var _super37 = _createSuper(TimeControl);
+
     function TimeControl(id) {
       var _this110;
 
       _classCallCheck(this, TimeControl);
 
-      _this110 = _possibleConstructorReturn(this, _getPrototypeOf(TimeControl).call(this, 'div', id, {
+      _this110 = _super37.call(this, 'div', id, {
         left: "0%"
-      }));
+      });
       _this110.domElement.className = 'timeControlOld';
       _this110.domElement.className = 'timeControl'; //this.domElement.innerText = "0:00:00";
 
@@ -8613,13 +8691,15 @@ function paella_DeferredNotImplemented() {
   var PlaybackBar = /*#__PURE__*/function (_paella$DomNode10) {
     _inherits(PlaybackBar, _paella$DomNode10);
 
+    var _super38 = _createSuper(PlaybackBar);
+
     function PlaybackBar(id) {
       var _this111;
 
       _classCallCheck(this, PlaybackBar);
 
       var style = {};
-      _this111 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackBar).call(this, 'div', id, style));
+      _this111 = _super38.call(this, 'div', id, style);
       _this111.playbackFullId = '';
       _this111.updatePlayBar = true;
       _this111.timeControlId = '';
@@ -8727,6 +8807,7 @@ function paella_DeferredNotImplemented() {
 
       _this111.domElement.addEventListener('touchend', function (event) {
         paella.utils.mouseManager.up(event);
+        thisClass.clearTimeOverlay();
       }, false);
 
       $(_this111.domElement).bind('mouseup', function (event) {
@@ -8753,6 +8834,11 @@ function paella_DeferredNotImplemented() {
     _createClass(PlaybackBar, [{
       key: "mouseOut",
       value: function mouseOut(event) {
+        this.clearTimeOverlay();
+      }
+    }, {
+      key: "clearTimeOverlay",
+      value: function clearTimeOverlay() {
         if (this._hasSlides) {
           $("#divTimeImageOverlay").remove();
         } else {
@@ -8838,7 +8924,8 @@ function paella_DeferredNotImplemented() {
           var p = $(This.domElement);
           var pos = p.offset();
           var width = p.width();
-          var left = event.clientX - pos.left;
+          var clientX = event.touches ? event.touches[0].clientX : event.clientX;
+          var left = clientX - pos.left;
           left = left < 0 ? 0 : left;
           var position = left * 100 / width; // GET % OF THE STREAM
 
@@ -8873,21 +8960,21 @@ function paella_DeferredNotImplemented() {
 
           if (This._hasSlides) {
             var ancho = $("#divTimeImageOverlay").width();
-            var posx = event.clientX - ancho / 2;
+            var posx = clientX - ancho / 2;
 
-            if (event.clientX > ancho / 2 + pos.left && event.clientX < pos.left + width - ancho / 2) {
+            if (clientX > ancho / 2 + pos.left && clientX < pos.left + width - ancho / 2) {
               // LEFT
               $("#divTimeImageOverlay").css("left", posx); // CENTER THE DIV HOVER THE MOUSE
-            } else if (event.clientX < width / 2) $("#divTimeImageOverlay").css("left", pos.left);else $("#divTimeImageOverlay").css("left", pos.left + width - ancho);
+            } else if (clientX < width / 2) $("#divTimeImageOverlay").css("left", pos.left);else $("#divTimeImageOverlay").css("left", pos.left + width - ancho);
           } // UPDATE POSITION TIME OVERLAY
 
 
           var ancho2 = $("#divTimeOverlay").width();
-          var posx2 = event.clientX - ancho2 / 2;
+          var posx2 = clientX - ancho2 / 2;
 
-          if (event.clientX > ancho2 / 2 + pos.left && event.clientX < pos.left + width - ancho2 / 2) {
+          if (clientX > ancho2 / 2 + pos.left && clientX < pos.left + width - ancho2 / 2) {
             $("#divTimeOverlay").css("left", posx2); // CENTER THE DIV HOVER THE MOUSE
-          } else if (event.clientX < width / 2) $("#divTimeOverlay").css("left", pos.left);else $("#divTimeOverlay").css("left", pos.left + width - ancho2 - 2);
+          } else if (clientX < width / 2) $("#divTimeOverlay").css("left", pos.left);else $("#divTimeOverlay").css("left", pos.left + width - ancho2 - 2);
 
           if (This._hasSlides) {
             $("#divTimeImageOverlay").css("bottom", $('.playbackControls').height());
@@ -9112,6 +9199,8 @@ function paella_DeferredNotImplemented() {
   var PlaybackControl = /*#__PURE__*/function (_paella$DomNode11) {
     _inherits(PlaybackControl, _paella$DomNode11);
 
+    var _super39 = _createSuper(PlaybackControl);
+
     _createClass(PlaybackControl, [{
       key: "addPlugin",
       value: function addPlugin(plugin) {
@@ -9173,7 +9262,7 @@ function paella_DeferredNotImplemented() {
       _classCallCheck(this, PlaybackControl);
 
       var style = {};
-      _this114 = _possibleConstructorReturn(this, _getPrototypeOf(PlaybackControl).call(this, 'div', id, style));
+      _this114 = _super39.call(this, 'div', id, style);
       _this114.playbackBarId = '';
       _this114.pluginsContainer = null;
       _this114._popUpPluginContainer = null;
@@ -9280,6 +9369,8 @@ function paella_DeferredNotImplemented() {
   var ControlsContainer = /*#__PURE__*/function (_paella$DomNode12) {
     _inherits(ControlsContainer, _paella$DomNode12);
 
+    var _super40 = _createSuper(ControlsContainer);
+
     _createClass(ControlsContainer, [{
       key: "addPlugin",
       value: function addPlugin(plugin) {
@@ -9303,7 +9394,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, ControlsContainer);
 
-      _this116 = _possibleConstructorReturn(this, _getPrototypeOf(ControlsContainer).call(this, 'div', id));
+      _this116 = _super40.call(this, 'div', id);
       _this116.playbackControlId = '';
       _this116.editControlId = '';
       _this116.isEnabled = true;
@@ -9606,12 +9697,14 @@ function paella_DeferredNotImplemented() {
   var LoaderContainer = /*#__PURE__*/function (_paella$DomNode13) {
     _inherits(LoaderContainer, _paella$DomNode13);
 
+    var _super41 = _createSuper(LoaderContainer);
+
     function LoaderContainer(id) {
       var _this119;
 
       _classCallCheck(this, LoaderContainer);
 
-      _this119 = _possibleConstructorReturn(this, _getPrototypeOf(LoaderContainer).call(this, 'div', id, {
+      _this119 = _super41.call(this, 'div', id, {
         position: 'fixed',
         backgroundColor: 'white',
         opacity: '0.7',
@@ -9620,7 +9713,7 @@ function paella_DeferredNotImplemented() {
         right: '0px',
         bottom: '0px',
         zIndex: 10000
-      }));
+      });
       _this119.timer = null;
       _this119.loader = null;
       _this119.loaderPosition = 0;
@@ -9697,10 +9790,12 @@ function paella_DeferredNotImplemented() {
   var KeyPlugin = /*#__PURE__*/function (_paella$FastLoadPlugi4) {
     _inherits(KeyPlugin, _paella$FastLoadPlugi4);
 
+    var _super42 = _createSuper(KeyPlugin);
+
     function KeyPlugin() {
       _classCallCheck(this, KeyPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(KeyPlugin).apply(this, arguments));
+      return _super42.apply(this, arguments);
     }
 
     _createClass(KeyPlugin, [{
@@ -10208,6 +10303,8 @@ function paella_DeferredNotImplemented() {
   var PaellaPlayer = /*#__PURE__*/function (_paella$PlayerBase) {
     _inherits(PaellaPlayer, _paella$PlayerBase);
 
+    var _super43 = _createSuper(PaellaPlayer);
+
     _createClass(PaellaPlayer, [{
       key: "getPlayerMode",
       value: function getPlayerMode() {
@@ -10341,7 +10438,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, PaellaPlayer);
 
-      _this124 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayer).call(this, playerId));
+      _this124 = _super43.call(this, playerId);
       _this124.player = null;
       _this124.videoIdentifier = '';
       _this124.loader = null; // Video data:
@@ -10671,6 +10768,8 @@ function paella_DeferredNotImplemented() {
   var LazyThumbnailContainer = /*#__PURE__*/function (_paella$DomNode14) {
     _inherits(LazyThumbnailContainer, _paella$DomNode14);
 
+    var _super44 = _createSuper(LazyThumbnailContainer);
+
     _createClass(LazyThumbnailContainer, null, [{
       key: "GetIconElement",
       value: function GetIconElement() {
@@ -10691,7 +10790,7 @@ function paella_DeferredNotImplemented() {
 
       _classCallCheck(this, LazyThumbnailContainer);
 
-      _this127 = _possibleConstructorReturn(this, _getPrototypeOf(LazyThumbnailContainer).call(this, 'img', 'lazyLoadThumbnailContainer', {}));
+      _this127 = _super44.call(this, 'img', 'lazyLoadThumbnailContainer', {});
       _this127.domElement.src = src;
       _this127.domElement.alt = "";
       _this127.container = LazyThumbnailContainer.GetIconElement();
@@ -10730,12 +10829,14 @@ function paella_DeferredNotImplemented() {
   var PaellaPlayerLazy = /*#__PURE__*/function (_PaellaPlayer) {
     _inherits(PaellaPlayerLazy, _PaellaPlayer);
 
+    var _super45 = _createSuper(PaellaPlayerLazy);
+
     function PaellaPlayerLazy(playerId, initDelegate) {
       var _this128;
 
       _classCallCheck(this, PaellaPlayerLazy);
 
-      _this128 = _possibleConstructorReturn(this, _getPrototypeOf(PaellaPlayerLazy).call(this, playerId, initDelegate));
+      _this128 = _super45.call(this, playerId, initDelegate);
       g_lazyLoadInstance = _assertThisInitialized(_this128);
       return _this128;
     }
@@ -10834,12 +10935,14 @@ function paella_DeferredNotImplemented() {
   var DefaultVideoLoader = /*#__PURE__*/function (_paella$VideoLoader) {
     _inherits(DefaultVideoLoader, _paella$VideoLoader);
 
+    var _super46 = _createSuper(DefaultVideoLoader);
+
     function DefaultVideoLoader(data) {
       var _this130;
 
       _classCallCheck(this, DefaultVideoLoader);
 
-      _this130 = _possibleConstructorReturn(this, _getPrototypeOf(DefaultVideoLoader).call(this, data));
+      _this130 = _super46.call(this, data);
       _this130._url = null;
 
       if (_typeof(data) == "object") {
@@ -11088,10 +11191,12 @@ function paella_DeferredNotImplemented() {
   var DefaultInitDelegate = /*#__PURE__*/function (_paella$InitDelegate) {
     _inherits(DefaultInitDelegate, _paella$InitDelegate);
 
+    var _super47 = _createSuper(DefaultInitDelegate);
+
     function DefaultInitDelegate() {
       _classCallCheck(this, DefaultInitDelegate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(DefaultInitDelegate).apply(this, arguments));
+      return _super47.apply(this, arguments);
     }
 
     return DefaultInitDelegate;
@@ -11234,10 +11339,12 @@ function paella_DeferredNotImplemented() {
   var RightBarPlugin = /*#__PURE__*/function (_paella$DeferredLoadP2) {
     _inherits(RightBarPlugin, _paella$DeferredLoadP2);
 
+    var _super48 = _createSuper(RightBarPlugin);
+
     function RightBarPlugin() {
       _classCallCheck(this, RightBarPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(RightBarPlugin).apply(this, arguments));
+      return _super48.apply(this, arguments);
     }
 
     _createClass(RightBarPlugin, [{
@@ -11263,10 +11370,12 @@ function paella_DeferredNotImplemented() {
   var TabBarPlugin = /*#__PURE__*/function (_paella$DeferredLoadP3) {
     _inherits(TabBarPlugin, _paella$DeferredLoadP3);
 
+    var _super49 = _createSuper(TabBarPlugin);
+
     function TabBarPlugin() {
       _classCallCheck(this, TabBarPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(TabBarPlugin).apply(this, arguments));
+      return _super49.apply(this, arguments);
     }
 
     _createClass(TabBarPlugin, [{
@@ -11623,10 +11732,12 @@ paella.addPlugin(function () {
   var FlexSkipPlugin = /*#__PURE__*/function (_paella$ButtonPlugin2) {
     _inherits(FlexSkipPlugin, _paella$ButtonPlugin2);
 
+    var _super50 = _createSuper(FlexSkipPlugin);
+
     function FlexSkipPlugin() {
       _classCallCheck(this, FlexSkipPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FlexSkipPlugin).apply(this, arguments));
+      return _super50.apply(this, arguments);
     }
 
     _createClass(FlexSkipPlugin, [{
@@ -11688,10 +11799,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$plugins$FlexS) {
     _inherits(FlexSkipForwardPlugin, _paella$plugins$FlexS);
 
+    var _super51 = _createSuper(FlexSkipForwardPlugin);
+
     function FlexSkipForwardPlugin() {
       _classCallCheck(this, FlexSkipForwardPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FlexSkipForwardPlugin).apply(this, arguments));
+      return _super51.apply(this, arguments);
     }
 
     _createClass(FlexSkipForwardPlugin, [{
@@ -11738,10 +11851,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$CaptionParser) {
     _inherits(WebVTTParserPlugin, _paella$CaptionParser);
 
+    var _super52 = _createSuper(WebVTTParserPlugin);
+
     function WebVTTParserPlugin() {
       _classCallCheck(this, WebVTTParserPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(WebVTTParserPlugin).apply(this, arguments));
+      return _super52.apply(this, arguments);
     }
 
     _createClass(WebVTTParserPlugin, [{
@@ -11840,10 +11955,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$) {
     _inherits(xAPISaverPlugin, _paella$userTracking$);
 
+    var _super53 = _createSuper(xAPISaverPlugin);
+
     function xAPISaverPlugin() {
       _classCallCheck(this, xAPISaverPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(xAPISaverPlugin).apply(this, arguments));
+      return _super53.apply(this, arguments);
     }
 
     _createClass(xAPISaverPlugin, [{
@@ -12429,10 +12546,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl) {
     _inherits(SingleStreamProfilePlugin, _paella$EventDrivenPl);
 
+    var _super54 = _createSuper(SingleStreamProfilePlugin);
+
     function SingleStreamProfilePlugin() {
       _classCallCheck(this, SingleStreamProfilePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(SingleStreamProfilePlugin).apply(this, arguments));
+      return _super54.apply(this, arguments);
     }
 
     _createClass(SingleStreamProfilePlugin, [{
@@ -12604,10 +12723,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl2) {
     _inherits(DualStreamProfilePlugin, _paella$EventDrivenPl2);
 
+    var _super55 = _createSuper(DualStreamProfilePlugin);
+
     function DualStreamProfilePlugin() {
       _classCallCheck(this, DualStreamProfilePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(DualStreamProfilePlugin).apply(this, arguments));
+      return _super55.apply(this, arguments);
     }
 
     _createClass(DualStreamProfilePlugin, [{
@@ -12992,10 +13113,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl3) {
     _inherits(TripleStreamProfilePlugin, _paella$EventDrivenPl3);
 
+    var _super56 = _createSuper(TripleStreamProfilePlugin);
+
     function TripleStreamProfilePlugin() {
       _classCallCheck(this, TripleStreamProfilePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(TripleStreamProfilePlugin).apply(this, arguments));
+      return _super56.apply(this, arguments);
     }
 
     _createClass(TripleStreamProfilePlugin, [{
@@ -13443,10 +13566,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl4) {
     _inherits(TrimmingLoaderPlugin, _paella$EventDrivenPl4);
 
+    var _super57 = _createSuper(TrimmingLoaderPlugin);
+
     function TrimmingLoaderPlugin() {
       _classCallCheck(this, TrimmingLoaderPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(TrimmingLoaderPlugin).apply(this, arguments));
+      return _super57.apply(this, arguments);
     }
 
     _createClass(TrimmingLoaderPlugin, [{
@@ -13511,10 +13636,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin3) {
     _inherits(AirPlayPlugin, _paella$ButtonPlugin3);
 
+    var _super58 = _createSuper(AirPlayPlugin);
+
     function AirPlayPlugin() {
       _classCallCheck(this, AirPlayPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(AirPlayPlugin).apply(this, arguments));
+      return _super58.apply(this, arguments);
     }
 
     _createClass(AirPlayPlugin, [{
@@ -13606,10 +13733,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl5) {
     _inherits(ArrowSlidesNavigator, _paella$EventDrivenPl5);
 
+    var _super59 = _createSuper(ArrowSlidesNavigator);
+
     function ArrowSlidesNavigator() {
       _classCallCheck(this, ArrowSlidesNavigator);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ArrowSlidesNavigator).apply(this, arguments));
+      return _super59.apply(this, arguments);
     }
 
     _createClass(ArrowSlidesNavigator, [{
@@ -13841,10 +13970,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin4) {
     _inherits(AudioSelector, _paella$ButtonPlugin4);
 
+    var _super60 = _createSuper(AudioSelector);
+
     function AudioSelector() {
       _classCallCheck(this, AudioSelector);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(AudioSelector).apply(this, arguments));
+      return _super60.apply(this, arguments);
     }
 
     _createClass(AudioSelector, [{
@@ -13945,10 +14076,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl6) {
     _inherits(BlackBoard2, _paella$EventDrivenPl6);
 
+    var _super61 = _createSuper(BlackBoard2);
+
     function BlackBoard2() {
       _classCallCheck(this, BlackBoard2);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(BlackBoard2).apply(this, arguments));
+      return _super61.apply(this, arguments);
     }
 
     _createClass(BlackBoard2, [{
@@ -14316,10 +14449,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl7) {
     _inherits(BreaksPlayerPlugin, _paella$EventDrivenPl7);
 
+    var _super62 = _createSuper(BreaksPlayerPlugin);
+
     function BreaksPlayerPlugin() {
       _classCallCheck(this, BreaksPlayerPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(BreaksPlayerPlugin).apply(this, arguments));
+      return _super62.apply(this, arguments);
     }
 
     _createClass(BreaksPlayerPlugin, [{
@@ -14445,10 +14580,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$CaptionParser2) {
     _inherits(DFXPParserPlugin, _paella$CaptionParser2);
 
+    var _super63 = _createSuper(DFXPParserPlugin);
+
     function DFXPParserPlugin() {
       _classCallCheck(this, DFXPParserPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(DFXPParserPlugin).apply(this, arguments));
+      return _super63.apply(this, arguments);
     }
 
     _createClass(DFXPParserPlugin, [{
@@ -14531,10 +14668,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin5) {
     _inherits(CaptionsPlugin, _paella$ButtonPlugin5);
 
+    var _super64 = _createSuper(CaptionsPlugin);
+
     function CaptionsPlugin() {
       _classCallCheck(this, CaptionsPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(CaptionsPlugin).apply(this, arguments));
+      return _super64.apply(this, arguments);
     }
 
     _createClass(CaptionsPlugin, [{
@@ -15009,10 +15148,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl8) {
     _inherits(CaptionsOnScreen, _paella$EventDrivenPl8);
 
+    var _super65 = _createSuper(CaptionsOnScreen);
+
     function CaptionsOnScreen() {
       _classCallCheck(this, CaptionsOnScreen);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(CaptionsOnScreen).apply(this, arguments));
+      return _super65.apply(this, arguments);
     }
 
     _createClass(CaptionsOnScreen, [{
@@ -15185,12 +15326,14 @@ paella.addPlugin(function () {
     var ChromaVideoCanvas = /*#__PURE__*/function (_bg$app$WindowControl3) {
       _inherits(ChromaVideoCanvas, _bg$app$WindowControl3);
 
+      var _super66 = _createSuper(ChromaVideoCanvas);
+
       function ChromaVideoCanvas(stream) {
         var _this141;
 
         _classCallCheck(this, ChromaVideoCanvas);
 
-        _this141 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideoCanvas).call(this));
+        _this141 = _super66.call(this);
         _this141.stream = stream;
         _this141._chroma = bg.Color.White();
         _this141._crop = new bg.Vector4(0.3, 0.01, 0.3, 0.01);
@@ -15352,12 +15495,14 @@ paella.addPlugin(function () {
   var ChromaVideo = /*#__PURE__*/function (_paella$VideoElementB4) {
     _inherits(ChromaVideo, _paella$VideoElementB4);
 
+    var _super67 = _createSuper(ChromaVideo);
+
     function ChromaVideo(id, stream, left, top, width, height, streamName) {
       var _this144;
 
       _classCallCheck(this, ChromaVideo);
 
-      _this144 = _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideo).call(this, id, stream, 'canvas', left, top, width, height));
+      _this144 = _super67.call(this, id, stream, 'canvas', left, top, width, height);
       _this144._posterFrame = null;
       _this144._currentQuality = null;
       _this144._autoplay = false;
@@ -15769,10 +15914,12 @@ paella.addPlugin(function () {
   var ChromaVideoFactory = /*#__PURE__*/function (_paella$VideoFactory2) {
     _inherits(ChromaVideoFactory, _paella$VideoFactory2);
 
+    var _super68 = _createSuper(ChromaVideoFactory);
+
     function ChromaVideoFactory() {
       _classCallCheck(this, ChromaVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ChromaVideoFactory).apply(this, arguments));
+      return _super68.apply(this, arguments);
     }
 
     _createClass(ChromaVideoFactory, [{
@@ -16269,10 +16416,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin6) {
     _inherits(extendedTabAdapterPlugin, _paella$ButtonPlugin6);
 
+    var _super69 = _createSuper(extendedTabAdapterPlugin);
+
     function extendedTabAdapterPlugin() {
       _classCallCheck(this, extendedTabAdapterPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(extendedTabAdapterPlugin).apply(this, arguments));
+      return _super69.apply(this, arguments);
     }
 
     _createClass(extendedTabAdapterPlugin, [{
@@ -16372,10 +16521,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin7) {
     _inherits(FootPrintsPlugin, _paella$ButtonPlugin7);
 
+    var _super70 = _createSuper(FootPrintsPlugin);
+
     function FootPrintsPlugin() {
       _classCallCheck(this, FootPrintsPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FootPrintsPlugin).apply(this, arguments));
+      return _super70.apply(this, arguments);
     }
 
     _createClass(FootPrintsPlugin, [{
@@ -16651,10 +16802,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$SearchService) {
     _inherits(FrameCaptionsSearchPlugIn, _paella$SearchService);
 
+    var _super71 = _createSuper(FrameCaptionsSearchPlugIn);
+
     function FrameCaptionsSearchPlugIn() {
       _classCallCheck(this, FrameCaptionsSearchPlugIn);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FrameCaptionsSearchPlugIn).apply(this, arguments));
+      return _super71.apply(this, arguments);
     }
 
     _createClass(FrameCaptionsSearchPlugIn, [{
@@ -16695,10 +16848,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin8) {
     _inherits(FrameControlPlugin, _paella$ButtonPlugin8);
 
+    var _super72 = _createSuper(FrameControlPlugin);
+
     function FrameControlPlugin() {
       _classCallCheck(this, FrameControlPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FrameControlPlugin).apply(this, arguments));
+      return _super72.apply(this, arguments);
     }
 
     _createClass(FrameControlPlugin, [{
@@ -17155,10 +17310,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin9) {
     _inherits(FullScreenPlugin, _paella$ButtonPlugin9);
 
+    var _super73 = _createSuper(FullScreenPlugin);
+
     function FullScreenPlugin() {
       _classCallCheck(this, FullScreenPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(FullScreenPlugin).apply(this, arguments));
+      return _super73.apply(this, arguments);
     }
 
     _createClass(FullScreenPlugin, [{
@@ -17296,10 +17453,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin10) {
     _inherits(HelpPlugin, _paella$ButtonPlugin10);
 
+    var _super74 = _createSuper(HelpPlugin);
+
     function HelpPlugin() {
       _classCallCheck(this, HelpPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(HelpPlugin).apply(this, arguments));
+      return _super74.apply(this, arguments);
     }
 
     _createClass(HelpPlugin, [{
@@ -17369,6 +17528,8 @@ paella.addPlugin(function () {
 
   var HLSPlayer = /*#__PURE__*/function (_paella$Html5Video) {
     _inherits(HLSPlayer, _paella$Html5Video);
+
+    var _super75 = _createSuper(HLSPlayer);
 
     _createClass(HLSPlayer, [{
       key: "config",
@@ -17450,7 +17611,7 @@ paella.addPlugin(function () {
     function HLSPlayer(id, stream, left, top, width, height) {
       _classCallCheck(this, HLSPlayer);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(HLSPlayer).call(this, id, stream, left, top, width, height, 'hls'));
+      return _super75.call(this, id, stream, left, top, width, height, 'hls');
     }
 
     _createClass(HLSPlayer, [{
@@ -17796,10 +17957,12 @@ paella.addPlugin(function () {
   var HLSVideoFactory = /*#__PURE__*/function (_paella$VideoFactory3) {
     _inherits(HLSVideoFactory, _paella$VideoFactory3);
 
+    var _super76 = _createSuper(HLSVideoFactory);
+
     function HLSVideoFactory() {
       _classCallCheck(this, HLSVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(HLSVideoFactory).apply(this, arguments));
+      return _super76.apply(this, arguments);
     }
 
     _createClass(HLSVideoFactory, [{
@@ -17858,10 +18021,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$KeyPlugin) {
     _inherits(DefaultKeyPlugin, _paella$KeyPlugin);
 
+    var _super77 = _createSuper(DefaultKeyPlugin);
+
     function DefaultKeyPlugin() {
       _classCallCheck(this, DefaultKeyPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(DefaultKeyPlugin).apply(this, arguments));
+      return _super77.apply(this, arguments);
     }
 
     _createClass(DefaultKeyPlugin, [{
@@ -17974,10 +18139,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$VideoOverlayB) {
     _inherits(LegalPlugin, _paella$VideoOverlayB);
 
+    var _super78 = _createSuper(LegalPlugin);
+
     function LegalPlugin() {
       _classCallCheck(this, LegalPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(LegalPlugin).apply(this, arguments));
+      return _super78.apply(this, arguments);
     }
 
     _createClass(LegalPlugin, [{
@@ -18034,10 +18201,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$VideoOverlayB2) {
     _inherits(LiveStreamIndicator, _paella$VideoOverlayB2);
 
+    var _super79 = _createSuper(LiveStreamIndicator);
+
     function LiveStreamIndicator() {
       _classCallCheck(this, LiveStreamIndicator);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(LiveStreamIndicator).apply(this, arguments));
+      return _super79.apply(this, arguments);
     }
 
     _createClass(LiveStreamIndicator, [{
@@ -18093,12 +18262,14 @@ paella.addPlugin(function () {
   var MpegDashVideo = /*#__PURE__*/function (_paella$Html5Video2) {
     _inherits(MpegDashVideo, _paella$Html5Video2);
 
+    var _super80 = _createSuper(MpegDashVideo);
+
     function MpegDashVideo(id, stream, left, top, width, height) {
       var _this177;
 
       _classCallCheck(this, MpegDashVideo);
 
-      _this177 = _possibleConstructorReturn(this, _getPrototypeOf(MpegDashVideo).call(this, id, stream, left, top, width, height, 'mpd'));
+      _this177 = _super80.call(this, id, stream, left, top, width, height, 'mpd');
       _this177._posterFrame = null;
       _this177._player = null;
       return _this177;
@@ -18356,10 +18527,12 @@ paella.addPlugin(function () {
   var MpegDashVideoFactory = /*#__PURE__*/function (_paella$VideoFactory4) {
     _inherits(MpegDashVideoFactory, _paella$VideoFactory4);
 
+    var _super81 = _createSuper(MpegDashVideoFactory);
+
     function MpegDashVideoFactory() {
       _classCallCheck(this, MpegDashVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MpegDashVideoFactory).apply(this, arguments));
+      return _super81.apply(this, arguments);
     }
 
     _createClass(MpegDashVideoFactory, [{
@@ -18395,10 +18568,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin11) {
     _inherits(MultipleQualitiesPlugin, _paella$ButtonPlugin11);
 
+    var _super82 = _createSuper(MultipleQualitiesPlugin);
+
     function MultipleQualitiesPlugin() {
       _classCallCheck(this, MultipleQualitiesPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MultipleQualitiesPlugin).apply(this, arguments));
+      return _super82.apply(this, arguments);
     }
 
     _createClass(MultipleQualitiesPlugin, [{
@@ -18520,10 +18695,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin12) {
     _inherits(PIPModePlugin, _paella$ButtonPlugin12);
 
+    var _super83 = _createSuper(PIPModePlugin);
+
     function PIPModePlugin() {
       _classCallCheck(this, PIPModePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PIPModePlugin).apply(this, arguments));
+      return _super83.apply(this, arguments);
     }
 
     _createClass(PIPModePlugin, [{
@@ -18604,12 +18781,14 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin13) {
     _inherits(PlayPauseButtonPlugin, _paella$ButtonPlugin13);
 
+    var _super84 = _createSuper(PlayPauseButtonPlugin);
+
     function PlayPauseButtonPlugin() {
       var _this187;
 
       _classCallCheck(this, PlayPauseButtonPlugin);
 
-      _this187 = _possibleConstructorReturn(this, _getPrototypeOf(PlayPauseButtonPlugin).call(this));
+      _this187 = _super84.call(this);
       _this187.playIconClass = 'icon-play';
       _this187.replayIconClass = 'icon-loop2';
       _this187.pauseIconClass = 'icon-pause';
@@ -18704,12 +18883,14 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl9) {
     _inherits(PlayButtonOnScreen, _paella$EventDrivenPl9);
 
+    var _super85 = _createSuper(PlayButtonOnScreen);
+
     function PlayButtonOnScreen() {
       var _this189;
 
       _classCallCheck(this, PlayButtonOnScreen);
 
-      _this189 = _possibleConstructorReturn(this, _getPrototypeOf(PlayButtonOnScreen).call(this));
+      _this189 = _super85.call(this);
       _this189.containerId = 'paella_plugin_PlayButtonOnScreen';
       _this189.container = null;
       _this189.enabled = true;
@@ -18848,10 +19029,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin14) {
     _inherits(PlaybackRate, _paella$ButtonPlugin14);
 
+    var _super86 = _createSuper(PlaybackRate);
+
     function PlaybackRate() {
       _classCallCheck(this, PlaybackRate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PlaybackRate).apply(this, arguments));
+      return _super86.apply(this, arguments);
     }
 
     _createClass(PlaybackRate, [{
@@ -18957,10 +19140,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin15) {
     _inherits(RatePlugin, _paella$ButtonPlugin15);
 
+    var _super87 = _createSuper(RatePlugin);
+
     function RatePlugin() {
       _classCallCheck(this, RatePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(RatePlugin).apply(this, arguments));
+      return _super87.apply(this, arguments);
     }
 
     _createClass(RatePlugin, [{
@@ -19154,10 +19339,12 @@ paella.addDataDelegate("relatedVideos", function () {
   return /*#__PURE__*/function (_paella$DataDelegate2) {
     _inherits(RelatedVideoDataDelegate, _paella$DataDelegate2);
 
+    var _super88 = _createSuper(RelatedVideoDataDelegate);
+
     function RelatedVideoDataDelegate() {
       _classCallCheck(this, RelatedVideoDataDelegate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(RelatedVideoDataDelegate).apply(this, arguments));
+      return _super88.apply(this, arguments);
     }
 
     _createClass(RelatedVideoDataDelegate, [{
@@ -19178,10 +19365,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl10) {
     _inherits(RelatedVideoPlugin, _paella$EventDrivenPl10);
 
+    var _super89 = _createSuper(RelatedVideoPlugin);
+
     function RelatedVideoPlugin() {
       _classCallCheck(this, RelatedVideoPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(RelatedVideoPlugin).apply(this, arguments));
+      return _super89.apply(this, arguments);
     }
 
     _createClass(RelatedVideoPlugin, [{
@@ -19283,12 +19472,14 @@ paella.addPlugin(function () {
   var RTMPVideo = /*#__PURE__*/function (_paella$VideoElementB5) {
     _inherits(RTMPVideo, _paella$VideoElementB5);
 
+    var _super90 = _createSuper(RTMPVideo);
+
     function RTMPVideo(id, stream, left, top, width, height) {
       var _this197;
 
       _classCallCheck(this, RTMPVideo);
 
-      _this197 = _possibleConstructorReturn(this, _getPrototypeOf(RTMPVideo).call(this, id, stream, 'div', left, top, width, height));
+      _this197 = _super90.call(this, id, stream, 'div', left, top, width, height);
       _this197._posterFrame = null;
       _this197._currentQuality = null;
       _this197._duration = 0;
@@ -19733,10 +19924,12 @@ paella.addPlugin(function () {
   var RTMPVideoFactory = /*#__PURE__*/function (_paella$VideoFactory5) {
     _inherits(RTMPVideoFactory, _paella$VideoFactory5);
 
+    var _super91 = _createSuper(RTMPVideoFactory);
+
     function RTMPVideoFactory() {
       _classCallCheck(this, RTMPVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(RTMPVideoFactory).apply(this, arguments));
+      return _super91.apply(this, arguments);
     }
 
     _createClass(RTMPVideoFactory, [{
@@ -19774,10 +19967,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$SearchService2) {
     _inherits(CaptionsSearchPlugIn, _paella$SearchService2);
 
+    var _super92 = _createSuper(CaptionsSearchPlugIn);
+
     function CaptionsSearchPlugIn() {
       _classCallCheck(this, CaptionsSearchPlugIn);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(CaptionsSearchPlugIn).apply(this, arguments));
+      return _super92.apply(this, arguments);
     }
 
     _createClass(CaptionsSearchPlugIn, [{
@@ -19799,10 +19994,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin16) {
     _inherits(SearchPlugin, _paella$ButtonPlugin16);
 
+    var _super93 = _createSuper(SearchPlugin);
+
     function SearchPlugin() {
       _classCallCheck(this, SearchPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(SearchPlugin).apply(this, arguments));
+      return _super93.apply(this, arguments);
     }
 
     _createClass(SearchPlugin, [{
@@ -20087,10 +20284,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin17) {
     _inherits(SharePlugin, _paella$ButtonPlugin17);
 
+    var _super94 = _createSuper(SharePlugin);
+
     function SharePlugin() {
       _classCallCheck(this, SharePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(SharePlugin).apply(this, arguments));
+      return _super94.apply(this, arguments);
     }
 
     _createClass(SharePlugin, [{
@@ -20292,10 +20491,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$VideoOverlayB3) {
     _inherits(ShowEditorPlugin, _paella$VideoOverlayB3);
 
+    var _super95 = _createSuper(ShowEditorPlugin);
+
     function ShowEditorPlugin() {
       _classCallCheck(this, ShowEditorPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ShowEditorPlugin).apply(this, arguments));
+      return _super95.apply(this, arguments);
     }
 
     _createClass(ShowEditorPlugin, [{
@@ -20356,10 +20557,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin18) {
     _inherits(ThemeChooserPlugin, _paella$ButtonPlugin18);
 
+    var _super96 = _createSuper(ThemeChooserPlugin);
+
     function ThemeChooserPlugin() {
       _classCallCheck(this, ThemeChooserPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ThemeChooserPlugin).apply(this, arguments));
+      return _super96.apply(this, arguments);
     }
 
     _createClass(ThemeChooserPlugin, [{
@@ -20436,10 +20639,12 @@ paella.addDataDelegate("cameraTrack", function () {
   return /*#__PURE__*/function (_paella$DataDelegate3) {
     _inherits(TrackCameraDataDelegate, _paella$DataDelegate3);
 
+    var _super97 = _createSuper(TrackCameraDataDelegate);
+
     function TrackCameraDataDelegate() {
       _classCallCheck(this, TrackCameraDataDelegate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(TrackCameraDataDelegate).apply(this, arguments));
+      return _super97.apply(this, arguments);
     }
 
     _createClass(TrackCameraDataDelegate, [{
@@ -20564,12 +20769,14 @@ paella.addDataDelegate("cameraTrack", function () {
     return /*#__PURE__*/function (_paella$EventDrivenPl11) {
       _inherits(Track4KPlugin, _paella$EventDrivenPl11);
 
+      var _super98 = _createSuper(Track4KPlugin);
+
       function Track4KPlugin() {
         var _this203;
 
         _classCallCheck(this, Track4KPlugin);
 
-        _this203 = _possibleConstructorReturn(this, _getPrototypeOf(Track4KPlugin).call(this));
+        _this203 = _super98.call(this);
         g_track4kPlugin = _assertThisInitialized(_this203);
         _this203._videoData = {};
         _this203._trackData = [];
@@ -20667,10 +20874,12 @@ paella.addDataDelegate("cameraTrack", function () {
     return /*#__PURE__*/function (_paella$ButtonPlugin19) {
       _inherits(VideoZoomTrack4KPlugin, _paella$ButtonPlugin19);
 
+      var _super99 = _createSuper(VideoZoomTrack4KPlugin);
+
       function VideoZoomTrack4KPlugin() {
         _classCallCheck(this, VideoZoomTrack4KPlugin);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(VideoZoomTrack4KPlugin).apply(this, arguments));
+        return _super99.apply(this, arguments);
       }
 
       _createClass(VideoZoomTrack4KPlugin, [{
@@ -20991,10 +21200,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$2) {
     _inherits(ElasticsearchSaverPlugin, _paella$userTracking$2);
 
+    var _super100 = _createSuper(ElasticsearchSaverPlugin);
+
     function ElasticsearchSaverPlugin() {
       _classCallCheck(this, ElasticsearchSaverPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ElasticsearchSaverPlugin).apply(this, arguments));
+      return _super100.apply(this, arguments);
     }
 
     _createClass(ElasticsearchSaverPlugin, [{
@@ -21059,10 +21270,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$3) {
     _inherits(GoogleAnalyticsTracking, _paella$userTracking$3);
 
+    var _super101 = _createSuper(GoogleAnalyticsTracking);
+
     function GoogleAnalyticsTracking() {
       _classCallCheck(this, GoogleAnalyticsTracking);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(GoogleAnalyticsTracking).apply(this, arguments));
+      return _super101.apply(this, arguments);
     }
 
     _createClass(GoogleAnalyticsTracking, [{
@@ -21130,10 +21343,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$4) {
     _inherits(PiwikAnalyticsTracking, _paella$userTracking$4);
 
+    var _super102 = _createSuper(PiwikAnalyticsTracking);
+
     function PiwikAnalyticsTracking() {
       _classCallCheck(this, PiwikAnalyticsTracking);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PiwikAnalyticsTracking).apply(this, arguments));
+      return _super102.apply(this, arguments);
     }
 
     _createClass(PiwikAnalyticsTracking, [{
@@ -21194,10 +21409,12 @@ paella.addPlugin(function () {
     return /*#__PURE__*/function (_paella$WebGLCanvas) {
       _inherits(Video360Canvas, _paella$WebGLCanvas);
 
+      var _super103 = _createSuper(Video360Canvas);
+
       function Video360Canvas(stream) {
         _classCallCheck(this, Video360Canvas);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(Video360Canvas).call(this, stream));
+        return _super103.call(this, stream);
       }
 
       _createClass(Video360Canvas, [{
@@ -21371,10 +21588,12 @@ paella.addPlugin(function () {
     return /*#__PURE__*/function (_paella$WebGLCanvas2) {
       _inherits(Video360ThetaCanvas, _paella$WebGLCanvas2);
 
+      var _super104 = _createSuper(Video360ThetaCanvas);
+
       function Video360ThetaCanvas(stream) {
         _classCallCheck(this, Video360ThetaCanvas);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(Video360ThetaCanvas).call(this, stream));
+        return _super104.call(this, stream);
       }
 
       _createClass(Video360ThetaCanvas, [{
@@ -21436,10 +21655,12 @@ paella.addDataDelegate('metadata', function () {
   return /*#__PURE__*/function (_paella$DataDelegate4) {
     _inherits(VideoManifestMetadataDataDelegate, _paella$DataDelegate4);
 
+    var _super105 = _createSuper(VideoManifestMetadataDataDelegate);
+
     function VideoManifestMetadataDataDelegate() {
       _classCallCheck(this, VideoManifestMetadataDataDelegate);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VideoManifestMetadataDataDelegate).apply(this, arguments));
+      return _super105.apply(this, arguments);
     }
 
     _createClass(VideoManifestMetadataDataDelegate, [{
@@ -21467,10 +21688,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$VideoOverlayB4) {
     _inherits(VideoDataPlugin, _paella$VideoOverlayB4);
 
+    var _super106 = _createSuper(VideoDataPlugin);
+
     function VideoDataPlugin() {
       _classCallCheck(this, VideoDataPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VideoDataPlugin).apply(this, arguments));
+      return _super106.apply(this, arguments);
     }
 
     _createClass(VideoDataPlugin, [{
@@ -21606,10 +21829,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$VideoOverlayB5) {
     _inherits(VideoZoomPlugin, _paella$VideoOverlayB5);
 
+    var _super107 = _createSuper(VideoZoomPlugin);
+
     function VideoZoomPlugin() {
       _classCallCheck(this, VideoZoomPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VideoZoomPlugin).apply(this, arguments));
+      return _super107.apply(this, arguments);
     }
 
     _createClass(VideoZoomPlugin, [{
@@ -21766,10 +21991,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin20) {
     _inherits(VideoZoomToolbarPlugin, _paella$ButtonPlugin20);
 
+    var _super108 = _createSuper(VideoZoomToolbarPlugin);
+
     function VideoZoomToolbarPlugin() {
       _classCallCheck(this, VideoZoomToolbarPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VideoZoomToolbarPlugin).apply(this, arguments));
+      return _super108.apply(this, arguments);
     }
 
     _createClass(VideoZoomToolbarPlugin, [{
@@ -21850,10 +22077,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin21) {
     _inherits(ViewModePlugin, _paella$ButtonPlugin21);
 
+    var _super109 = _createSuper(ViewModePlugin);
+
     function ViewModePlugin() {
       _classCallCheck(this, ViewModePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(ViewModePlugin).apply(this, arguments));
+      return _super109.apply(this, arguments);
     }
 
     _createClass(ViewModePlugin, [{
@@ -22015,10 +22244,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$ButtonPlugin22) {
     _inherits(VolumeRangePlugin, _paella$ButtonPlugin22);
 
+    var _super110 = _createSuper(VolumeRangePlugin);
+
     function VolumeRangePlugin() {
       _classCallCheck(this, VolumeRangePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(VolumeRangePlugin).apply(this, arguments));
+      return _super110.apply(this, arguments);
     }
 
     _createClass(VolumeRangePlugin, [{
@@ -22188,10 +22419,12 @@ paella.addPlugin(function () {
   var WebmVideoFactory = /*#__PURE__*/function (_paella$VideoFactory6) {
     _inherits(WebmVideoFactory, _paella$VideoFactory6);
 
+    var _super111 = _createSuper(WebmVideoFactory);
+
     function WebmVideoFactory() {
       _classCallCheck(this, WebmVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(WebmVideoFactory).apply(this, arguments));
+      return _super111.apply(this, arguments);
     }
 
     _createClass(WebmVideoFactory, [{
@@ -22235,10 +22468,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$EventDrivenPl12) {
     _inherits(WindowTitlePlugin, _paella$EventDrivenPl12);
 
+    var _super112 = _createSuper(WindowTitlePlugin);
+
     function WindowTitlePlugin() {
       _classCallCheck(this, WindowTitlePlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(WindowTitlePlugin).apply(this, arguments));
+      return _super112.apply(this, arguments);
     }
 
     _createClass(WindowTitlePlugin, [{
@@ -22274,12 +22509,14 @@ paella.addPlugin(function () {
   var YoutubeVideo = /*#__PURE__*/function (_paella$VideoElementB6) {
     _inherits(YoutubeVideo, _paella$VideoElementB6);
 
+    var _super113 = _createSuper(YoutubeVideo);
+
     function YoutubeVideo(id, stream, left, top, width, height) {
       var _this215;
 
       _classCallCheck(this, YoutubeVideo);
 
-      _this215 = _possibleConstructorReturn(this, _getPrototypeOf(YoutubeVideo).call(this, id, stream, 'div', left, top, width, height));
+      _this215 = _super113.call(this, id, stream, 'div', left, top, width, height);
       _this215._posterFrame = null;
       _this215._currentQuality = null;
       _this215._autoplay = false;
@@ -22724,10 +22961,12 @@ paella.addPlugin(function () {
   var YoutubeVideoFactory = /*#__PURE__*/function (_paella$VideoFactory7) {
     _inherits(YoutubeVideoFactory, _paella$VideoFactory7);
 
+    var _super114 = _createSuper(YoutubeVideoFactory);
+
     function YoutubeVideoFactory() {
       _classCallCheck(this, YoutubeVideoFactory);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(YoutubeVideoFactory).apply(this, arguments));
+      return _super114.apply(this, arguments);
     }
 
     _createClass(YoutubeVideoFactory, [{
@@ -22780,10 +23019,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$5) {
     _inherits(MatomoTracking, _paella$userTracking$5);
 
+    var _super115 = _createSuper(MatomoTracking);
+
     function MatomoTracking() {
       _classCallCheck(this, MatomoTracking);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MatomoTracking).apply(this, arguments));
+      return _super115.apply(this, arguments);
     }
 
     _createClass(MatomoTracking, [{
@@ -22957,10 +23198,12 @@ paella.addPlugin(function () {
   return /*#__PURE__*/function (_paella$userTracking$6) {
     _inherits(X5gonTracking, _paella$userTracking$6);
 
+    var _super116 = _createSuper(X5gonTracking);
+
     function X5gonTracking() {
       _classCallCheck(this, X5gonTracking);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(X5gonTracking).apply(this, arguments));
+      return _super116.apply(this, arguments);
     }
 
     _createClass(X5gonTracking, [{
