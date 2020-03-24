@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: e7d766b";
+paella.version = "6.4.0 - build: 1d68ebc";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6868,6 +6868,75 @@ class TimeControl extends paella.DomNode {
 
 paella.TimeControl = TimeControl;
 
+class PlaybackCanvasPlugin extends paella.DeferredLoadPlugin {
+	get type() { return 'playbackCanvas'; }
+
+	constructor() {
+		super();
+	}
+
+	drawCanvas(context,width,height) {
+
+	}
+}
+paella.PlaybackCanvasPlugin = PlaybackCanvasPlugin;
+
+class PlaybackBarCanvas {
+	constructor(canvasElem) {
+		this._parent = canvasElem;
+		this._plugins = [];
+
+		paella.pluginManager.setTarget('playbackCanvas', this);
+	}
+
+	addPlugin(plugin) {
+		plugin._playbackBarCanvas = this;
+		plugin.checkEnabled((isEnabled) => {
+			if (isEnabled) {
+				plugin.setup();
+				this._plugins.push(plugin);
+			}
+		});
+	}
+
+	get parent() { return this._parent; }
+
+	get canvas() {
+		if (!this._canvas) {
+			this._canvas = document.createElement("canvas");
+			this._canvas.className = "playerContainer_controls_playback_playbackBar_canvas";
+			this._canvas.id = "playerContainer_controls_playback_playbackBar_canvas";
+			this._canvas.width = $(this.parent).width();
+			this._canvas.height = $(this.parent).height();
+			$(this._parent).prepend(this._canvas);
+		}
+		return this._canvas;
+	}
+
+	get context() { return this.canvas.getContext("2d"); }
+
+	resize(w,h) {
+		this.canvas.width = w;
+		this.canvas.height = h;
+		this.drawCanvas();
+	}
+
+	drawCanvas(){
+		let ctx = this.context;
+		let w = this.canvas.width;
+		let h = this.canvas.height;
+		this.clearCanvas();
+		this._plugins.forEach((plugin) => {
+			plugin.drawCanvas(ctx,w,h);
+		});
+	}
+
+	clearCanvas() {
+		var ctx = this.context;
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+}
+
 class PlaybackBar extends paella.DomNode {
 
 	constructor(id) {
@@ -6878,7 +6947,6 @@ class PlaybackBar extends paella.DomNode {
 		this.updatePlayBar = true;
 		this.timeControlId = '';
 		this._images = null;
-		this._keys = null;
 		this._prev = null;
 		this._next = null;
 		this._videoLength = null;
@@ -6981,6 +7049,8 @@ class PlaybackBar extends paella.DomNode {
 				$(playbackFull.domElement).addClass("disabled");
 			}
 		});
+
+		this._canvas = new PlaybackBarCanvas(this.domElement);
 	}
 
 	mouseOut(event){
@@ -6994,64 +7064,6 @@ class PlaybackBar extends paella.DomNode {
 		else {
 			$("#divTimeOverlay").remove();
 		}
-	}
-
-	drawTimeMarks(){
-		let trimming = {};
-		paella.player.videoContainer.trimming()
-			.then((t) => {
-				trimming = t;
-				return this.imageSetup();
-			})
-			
-			.then(() => {
-				// Updated duration value. The duration may change during playback, because it's
-				// possible to set the trimming during playback (for instance, using a plugin)
-				let duration = trimming.enabled ? trimming.end - trimming.start : this._videoLength;
-				let parent = $("#playerContainer_controls_playback_playbackBar");
-				this.clearCanvas();
-				if (this._keys && paella.player.config.player.slidesMarks.enabled) {
-					this._keys.forEach((l) => {
-						let timeInstant = parseInt(l) - trimming.start;
-						if (timeInstant>0) {
-							var aux = (timeInstant * parent.width()) / this._videoLength; // conversion to canvas
-							this.drawTimeMark(aux);
-						}
-					});
-				}
-			});
-	}
-
-	drawTimeMark(sec){
-		var ht = 12; //default height value
-		var ctx = this.getCanvasContext();
-		ctx.fillStyle = paella.player.config.player.slidesMarks.color;
-		ctx.fillRect(sec,0,1,ht);	
-	}
-
-	clearCanvas() {
-		if (this._canvas) {
-			var ctx = this.getCanvasContext();
-			ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-		}
-	}
-
-	getCanvas(){
-		if (!this._canvas) {
-			var parent = $("#playerContainer_controls_playback_playbackBar");
-			var canvas = document.createElement("canvas");
-			canvas.className = "playerContainer_controls_playback_playbackBar_canvas";
-			canvas.id = ("playerContainer_controls_playback_playbackBar_canvas");
-			canvas.width = parent.width();
-			var ht = canvas.height = parent.height();
-			parent.prepend(canvas);
-			this._canvas = document.getElementById("playerContainer_controls_playback_playbackBar_canvas");
-		}
-		return this._canvas;
-	}
-
-	getCanvasContext(){
-		return this.getCanvas().getContext("2d");
 	}
 
 	movePassive(event){
@@ -7337,9 +7349,9 @@ class PlaybackBar extends paella.DomNode {
 	}
 
 	onresize() {
-		let playbackBar = $("#playerContainer_controls_playback_playbackBar");
-		this.getCanvas().width = playbackBar.width();
-		this.drawTimeMarks();
+		this.imageSetup();
+		let elem = $(this.domElement);
+		this._canvas.resize(elem.width(),elem.height());
 	}
 }
 
@@ -16217,6 +16229,52 @@ paella.addPlugin(function() {
 				
 				domElement.appendChild(elem);			
 			});
+		}
+	}
+});
+
+
+paella.addPlugin(() => {
+	return class TimeMarksPlaybackCanvasPlugin extends paella.PlaybackCanvasPlugin {
+		getName() { return "es.upv.paella.timeMarksPlaybackCanvasPlugin"; }
+
+		get playbackBarCanvas() { return this._playbackBarCanvas; }
+
+		setup() {
+			this._frameList = paella.initDelegate.initParams.videoLoader.frameList;
+			this._frameKeys = Object.keys(this._frameList);
+			if( !this._frameList || !this._frameKeys.length) {
+				this._hasSlides = false;
+			}
+			else {
+				this._hasSlides = paella.player.config.player.slidesMarks.enabled;
+				this._frameKeys = this._frameKeys.sort((a, b) => parseInt(a)-parseInt(b));
+			}
+		}
+
+		drawCanvas(context,width,height) {
+			let duration = 0;
+			paella.player.videoContainer.duration(true)
+				.then((d) => {
+					duration = d;
+					return paella.player.videoContainer.trimming();
+				})
+				.then((trimming) => {
+					if (this._hasSlides) {
+						this._frameKeys.forEach((l) => {
+							let timeInstant = parseInt(l) - trimming.start;
+							if (timeInstant>0) {
+								let left = timeInstant * width / duration;
+								this.drawTimeMark(context, left, height);
+							}
+						});
+					}
+				});
+		}
+
+		drawTimeMark(ctx,left,height){
+			ctx.fillStyle = paella.player.config.player.slidesMarks.color;
+			ctx.fillRect(left,0,1,height);	
 		}
 	}
 });

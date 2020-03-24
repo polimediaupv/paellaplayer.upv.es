@@ -238,6 +238,9 @@
       "es.upv.paella.airPlayPlugin": {
         "enabled": true
       },
+      "es.upv.paella.timeMarksPlaybackCanvasPlugin": {
+        "enabled": true
+      },
       "//***** Video Overlay Button Plugins": "",
       "es.upv.paella.liveStreamingIndicatorPlugin": {
         "enabled": true
