@@ -90,11 +90,7 @@
         "enabled": true
       }
     ],
-    "defaultAudioTag": "",
-    "slidesMarks": {
-      "enabled": true,
-      "color": "gray"
-    }
+    "defaultAudioTag": ""
   },
   "defaultProfile": "presenter_presentation",
   "data": {
@@ -239,7 +235,8 @@
         "enabled": true
       },
       "es.upv.paella.timeMarksPlaybackCanvasPlugin": {
-        "enabled": true
+        "enabled": true,
+        "color": "gray"
       },
       "//***** Video Overlay Button Plugins": "",
       "es.upv.paella.liveStreamingIndicatorPlugin": {

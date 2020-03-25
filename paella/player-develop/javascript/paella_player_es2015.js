@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 1d68ebc";
+paella.version = "6.4.0 - build: e47f894";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6871,6 +6871,8 @@ paella.TimeControl = TimeControl;
 class PlaybackCanvasPlugin extends paella.DeferredLoadPlugin {
 	get type() { return 'playbackCanvas'; }
 
+	get playbackBarCanvas() { return this._playbackBarCanvas; }
+	
 	constructor() {
 		super();
 	}
@@ -16238,16 +16240,15 @@ paella.addPlugin(() => {
 	return class TimeMarksPlaybackCanvasPlugin extends paella.PlaybackCanvasPlugin {
 		getName() { return "es.upv.paella.timeMarksPlaybackCanvasPlugin"; }
 
-		get playbackBarCanvas() { return this._playbackBarCanvas; }
-
 		setup() {
+            console.log(this.config);
 			this._frameList = paella.initDelegate.initParams.videoLoader.frameList;
 			this._frameKeys = Object.keys(this._frameList);
 			if( !this._frameList || !this._frameKeys.length) {
 				this._hasSlides = false;
 			}
 			else {
-				this._hasSlides = paella.player.config.player.slidesMarks.enabled;
+				this._hasSlides = true;
 				this._frameKeys = this._frameKeys.sort((a, b) => parseInt(a)-parseInt(b));
 			}
 		}
@@ -16261,9 +16262,12 @@ paella.addPlugin(() => {
 				})
 				.then((trimming) => {
 					if (this._hasSlides) {
+						if (trimming.enabled) {
+							duration = trimming.end - trimming.start;
+						}
 						this._frameKeys.forEach((l) => {
 							let timeInstant = parseInt(l) - trimming.start;
-							if (timeInstant>0) {
+							if (timeInstant>0 && timeInstant<duration) {
 								let left = timeInstant * width / duration;
 								this.drawTimeMark(context, left, height);
 							}
@@ -16273,7 +16277,7 @@ paella.addPlugin(() => {
 		}
 
 		drawTimeMark(ctx,left,height){
-			ctx.fillStyle = paella.player.config.player.slidesMarks.color;
+			ctx.fillStyle = this.config.color;
 			ctx.fillRect(left,0,1,height);	
 		}
 	}

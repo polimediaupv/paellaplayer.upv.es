@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: 1d68ebc";
+paella.version = "6.4.0 - build: e47f894";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -8757,6 +8757,11 @@ function paella_DeferredNotImplemented() {
       key: "type",
       get: function get() {
         return 'playbackCanvas';
+      }
+    }, {
+      key: "playbackBarCanvas",
+      get: function get() {
+        return this._playbackBarCanvas;
       }
     }]);
 
@@ -20752,13 +20757,14 @@ paella.addPlugin(function () {
     }, {
       key: "setup",
       value: function setup() {
+        console.log(this.config);
         this._frameList = paella.initDelegate.initParams.videoLoader.frameList;
         this._frameKeys = Object.keys(this._frameList);
 
         if (!this._frameList || !this._frameKeys.length) {
           this._hasSlides = false;
         } else {
-          this._hasSlides = paella.player.config.player.slidesMarks.enabled;
+          this._hasSlides = true;
           this._frameKeys = this._frameKeys.sort(function (a, b) {
             return parseInt(a) - parseInt(b);
           });
@@ -20775,10 +20781,14 @@ paella.addPlugin(function () {
           return paella.player.videoContainer.trimming();
         }).then(function (trimming) {
           if (_this203._hasSlides) {
+            if (trimming.enabled) {
+              duration = trimming.end - trimming.start;
+            }
+
             _this203._frameKeys.forEach(function (l) {
               var timeInstant = parseInt(l) - trimming.start;
 
-              if (timeInstant > 0) {
+              if (timeInstant > 0 && timeInstant < duration) {
                 var left = timeInstant * width / duration;
 
                 _this203.drawTimeMark(context, left, height);
@@ -20790,13 +20800,8 @@ paella.addPlugin(function () {
     }, {
       key: "drawTimeMark",
       value: function drawTimeMark(ctx, left, height) {
-        ctx.fillStyle = paella.player.config.player.slidesMarks.color;
+        ctx.fillStyle = this.config.color;
         ctx.fillRect(left, 0, 1, height);
-      }
-    }, {
-      key: "playbackBarCanvas",
-      get: function get() {
-        return this._playbackBarCanvas;
       }
     }]);
 
