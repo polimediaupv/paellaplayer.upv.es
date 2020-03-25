@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: e47f894";
+paella.version = "6.4.0 - build: 1097d47";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6872,13 +6872,21 @@ class PlaybackCanvasPlugin extends paella.DeferredLoadPlugin {
 	get type() { return 'playbackCanvas'; }
 
 	get playbackBarCanvas() { return this._playbackBarCanvas; }
-	
+
 	constructor() {
 		super();
 	}
 
-	drawCanvas(context,width,height) {
-
+	drawCanvas(context,width,height,videoData) {
+		// videoData: {
+		//		duration: fullDuration,
+		//		trimming: {
+		//			enabled: true | false,
+		//			start: trimmingStart,
+		//			end: trimmingEnd,
+		//			duration: trimmedDuration | duration if trimming is not enabled
+		//		}
+		//	}
 	}
 }
 paella.PlaybackCanvasPlugin = PlaybackCanvasPlugin;
@@ -6924,13 +6932,35 @@ class PlaybackBarCanvas {
 	}
 
 	drawCanvas(){
-		let ctx = this.context;
-		let w = this.canvas.width;
-		let h = this.canvas.height;
-		this.clearCanvas();
-		this._plugins.forEach((plugin) => {
-			plugin.drawCanvas(ctx,w,h);
-		});
+		let duration = 0;
+		paella.player.videoContainer.duration(true)
+			.then((d) => {
+				duration = d;
+				return paella.player.videoContainer.trimming();
+			})
+
+			.then((trimming) => {
+				let trimmedDuration = 0;
+				if (trimming.enabled) {
+					trimmedDuration = trimming.end - trimming.start;
+				}
+				let videoData = {
+					duration: duration,
+					trimming: {
+						enabled: trimming.enabled,
+						start: trimming.start,
+						end: trimming.end,
+						duration: trimming.enabled ? trimming.end - trimming.start : duration
+					}
+				}
+				let ctx = this.context;
+				let w = this.canvas.width;
+				let h = this.canvas.height;
+				this.clearCanvas();
+				this._plugins.forEach((plugin) => {
+					plugin.drawCanvas(ctx,w,h,videoData);
+				});
+			})
 	}
 
 	clearCanvas() {
@@ -11491,6 +11521,35 @@ paella.addPlugin(() => {
 	}
 });
 
+
+paella.addPlugin(() => {
+    return class BufferedPlaybackCanvasPlugin extends paella.PlaybackCanvasPlugin {
+        getName() { return "es.upv.paella.BufferedPlaybackCanvasPlugin"; }
+
+        setup() {
+
+        }
+
+        drawCanvas(context,width,height,videoData) {
+            function trimmedInstant(t) {
+                t = videoData.trimming.enabled ? t - videoData.trimming.start : t;
+                return t * width / videoData.trimming.duration;
+            }
+
+            let buffered = paella.player.videoContainer.streamProvider.buffered; 
+            for (let i = 0; i<buffered.length; ++i) {
+                let start = trimmedInstant(buffered.start(i));
+                let end = trimmedInstant(buffered.end(i));
+                this.drawBuffer(context,start,end,height);
+            }
+        }
+
+        drawBuffer(context,start,end,height) {
+            context.fillStyle = this.config.color;
+            context.fillRect(start, 0, end, height);
+        }
+    }
+})
 paella.addPlugin(function() {
 		
 	/////////////////////////////////////////////////
@@ -16241,7 +16300,6 @@ paella.addPlugin(() => {
 		getName() { return "es.upv.paella.timeMarksPlaybackCanvasPlugin"; }
 
 		setup() {
-            console.log(this.config);
 			this._frameList = paella.initDelegate.initParams.videoLoader.frameList;
 			this._frameKeys = Object.keys(this._frameList);
 			if( !this._frameList || !this._frameKeys.length) {
@@ -16253,27 +16311,18 @@ paella.addPlugin(() => {
 			}
 		}
 
-		drawCanvas(context,width,height) {
-			let duration = 0;
-			paella.player.videoContainer.duration(true)
-				.then((d) => {
-					duration = d;
-					return paella.player.videoContainer.trimming();
-				})
-				.then((trimming) => {
-					if (this._hasSlides) {
-						if (trimming.enabled) {
-							duration = trimming.end - trimming.start;
-						}
-						this._frameKeys.forEach((l) => {
-							let timeInstant = parseInt(l) - trimming.start;
-							if (timeInstant>0 && timeInstant<duration) {
-								let left = timeInstant * width / duration;
-								this.drawTimeMark(context, left, height);
-							}
-						});
+		drawCanvas(context,width,height,videoData) {
+			if (this._hasSlides) {
+				this._frameKeys.forEach((l) => {
+					l = parseInt(l);
+					let timeInstant = videoData.trimming.enabled ? l - videoData.trimming.start : l;
+					if (timeInstant>0 && timeInstant<videoData.trimming.duration) {
+						let left = timeInstant * width / videoData.trimming.duration;
+						this.drawTimeMark(context, left, height);
 					}
-				});
+
+				})
+			}
 		}
 
 		drawTimeMark(ctx,left,height){
