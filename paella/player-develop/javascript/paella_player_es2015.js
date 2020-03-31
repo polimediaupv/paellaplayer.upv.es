@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.0 - build: f69505c";
+paella.version = "6.4.0 - build: d84ed67";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -864,6 +864,59 @@ paella.data = null;
 		}
 	})();
 
+	paella.URL = class PaellaURL {
+		constructor(urlText) {
+			this._urlText = urlText;
+		}
+
+		get text() {
+			return this._urlText;
+		}
+
+		get isAbsolute() {
+			return new RegExp('^([a-z]+://|//)', 'i').test(this._urlText) ||
+					/^\//.test(this._urlText);	// We consider that the URLs starting with / are absolute and local to this server
+		}
+
+		get isExternal() {
+			let thisUrl = new URL(this.absoluteUrl);
+			let localUrl = new URL(location.href);
+			return thisUrl.hostname != localUrl.hostname;
+		}
+
+		get absoluteUrl() {
+			let result = "";
+			if (new RegExp('^([a-z]+://|//)', 'i').test(this._urlText)) {
+				result = this._urlText;
+			}
+			else if (/^\//.test(this._urlText)) {
+				result = `${ location.origin }${ this._urlText }`
+			}
+			else {
+				let pathname = location.pathname;
+				if (pathname.lastIndexOf(".")>pathname.lastIndexOf("/")) {
+					pathname = pathname.substring(0,pathname.lastIndexOf("/")) + '/';
+				}
+				result = `${ location.origin }${ pathname }${ this._urlText }`;
+			}
+			result = (new URL(result)).href;
+			return result;
+		}
+
+		appendPath(text) {
+			if (this._urlText.endsWith("/") && text.startsWith("/")) {
+				this._urlText += text.substring(1,text.length);
+			}
+			else if (this._urlText.endsWith("/") || text.startsWith("/")) {
+				this._urlText += text;
+			}
+			else {
+				this._urlText += "/" + text;
+			}
+			return this;
+		}
+	}
+	
 })();
 
 paella.AntiXSS = {
@@ -2448,6 +2501,23 @@ class VideoElementBase extends paella.VideoRect {
 	// Video canvas functions
 	videoCanvas() {
 		return Promise.reject(new Error("VideoElementBase::videoCanvas(): Not implemented in child class."));
+	}
+
+	// Multi audio functions
+	supportsMultiaudio() {
+		return Promise.resolve(false);
+	}
+
+	getAudioTracks() {
+		return Promise.resolve([]);
+	}
+
+	setCurrentAudioTrack(trackId) {
+		return Promise.resolve(false);
+	}
+
+	getCurrentAudioTrack() {
+		return Promise.resolve(-1);
 	}
 
 	// Playback functions
@@ -8714,7 +8784,13 @@ paella.ControlsContainer = ControlsContainer;
 
 		constructor(src) {
 			super('img','lazyLoadThumbnailContainer',{});
-			this.domElement.src = src;
+			let url = new paella.URL(src);
+			if (!url.isAbsolute) {
+				url = (new paella.URL(paella.player.repoUrl))
+					.appendPath(paella.player.videoIdentifier)
+					.appendPath(src);
+			}
+			this.domElement.src = url.absoluteUrl;
 			this.domElement.alt = "";
 
 			this.container = LazyThumbnailContainer.GetIconElement();
@@ -11071,48 +11147,99 @@ paella.addPlugin(function() {
 		closeOnMouseOut() { return true; }
 			
 		checkEnabled(onSuccess) {
-			paella.player.videoContainer.getAudioTags()
-				.then((tags) => {
-					this._tags = tags;
-					onSuccess(tags.length>1);
+			this._mainPlayer = paella.player.videoContainer.streamProvider.mainVideoPlayer;
+			this._mainPlayer.supportsMultiaudio()
+				.then((supports)=> {
+					if (supports) {
+						this._legacyMode = false;
+						return this._mainPlayer.getAudioTracks();
+					}
+					else {
+						this._legacyMode = true;
+						return paella.player.videoContainer.getAudioTags();
+					}
+				})
+
+				.then((audioTracks) => {
+					if (this._legacyMode) {
+						this._tags = audioTracks;
+						return Promise.resolve();
+					}
+					else {
+						this._audioTracks = audioTracks;
+						return this._mainPlayer.getCurrentAudioTrack();
+					}
+				})
+
+				.then((defaultAudioTrack) => {
+					if (this._legacyMode) {
+						onSuccess(this._tags.length>1);
+					}
+					else {
+						this._defaultAudioTrack = defaultAudioTrack;
+						onSuccess(true);
+					}
+				})
+		}
+
+		getButtonType() { return paella.ButtonPlugin.type.menuButton; }
+
+		getMenuContent() {
+			let buttonItems = [];
+
+			if (this._legacyMode) {
+				this._tags.forEach((tag,index) => {
+					buttonItems.push({
+						id: index,
+						title: tag,
+						value: tag,
+						icon: "",
+						className: this.getButtonItemClass(tag),
+						default: tag == paella.player.videoContainer.audioTag
+					});
 				});
+			}
+			else {
+				this._audioTracks.forEach((track) => {
+					buttonItems.push({
+						id: track.id,
+						title: track.groupId + " " + track.name,
+						value: track.id,
+						icon: "",
+						className: this.getButtonItemClass(track.id),
+						default: track.id == this._defaultAudioTrack.id
+					});
+				});
+			}
+
+			return buttonItems;
 		}
 
-		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-		
-		buildContent(domElement) {
-			this._tags.forEach((tag) => {
-				domElement.appendChild(this.getItemButton(tag));
-			});
-		}
-
-		getItemButton(lang) {
-			var elem = document.createElement('div');
-			let currentTag = paella.player.videoContainer.audioTag;
-			let label = lang.replace(/[-\_]/g," ");
-			elem.className = this.getButtonItemClass(label,lang==currentTag);
-			elem.id = "audioTagSelectorItem_" + lang;
-			elem.innerText = label;
-			elem.data = lang;
-			$(elem).click(function(event) {
-				$('.videoAudioTrackItem').removeClass('selected');
-				$('.videoAudioTrackItem.' + this.data).addClass('selected');
-				paella.player.videoContainer.setAudioTag(this.data);
-			});
-
-			return elem;
+		menuItemSelected(itemData) {
+			if (this._legacyMode) {
+				paella.player.videoContainer.setAudioTag(itemData.value);
+			}
+			else {
+				this._mainPlayer.setCurrentAudioTrack(itemData.id);
+			}
+			paella.player.controls.hidePopUp(this.getName());
 		}
 		
 		setQualityLabel() {
-			var This = this;
-			paella.player.videoContainer.getCurrentQuality()
-				.then(function(q) {
-					This.setText(q.shortLabel());
-				});
+			if (this._legacyMode) {
+				var This = this;
+				paella.player.videoContainer.getCurrentQuality()
+					.then(function(q) {
+						This.setText(q.shortLabel());
+					});
+			}
+			else {
+
+			}
 		}
 
-		getButtonItemClass(tag,selected) {
-			return 'videoAudioTrackItem ' + tag  + ((selected) ? ' selected':'');
+		getButtonItemClass(tag) {
+			return 'videoAudioTrackItem ' + tag;
 		}
 	}
 });
@@ -14169,6 +14296,78 @@ paella.addPlugin(function() {
 			return canvasInstance.loadVideo(this,stream,(videoElem) => {
 				return this.setupHls(videoElem,stream.src);
 			});
+		}
+
+		supportsMultiaudio() {
+			return this._deferredAction(() => {
+				if (base.userAgent.system.iOS) {
+					return this.video.audioTracks.length>1;
+				}
+				else {
+					return this._hls.audioTracks.length>1;
+				}
+			});
+		}
+	
+		getAudioTracks() {
+			return this._deferredAction(() => {
+				if (base.userAgent.system.iOS) {
+					return this.video.audioTracks;
+				}
+				else {
+					return this._hls.audioTracks;
+				}
+			});
+		}
+
+		setCurrentAudioTrack(trackId) {
+			return this._deferredAction(() => {
+				if (base.userAgent.system.iOS) {
+					if (this.video.audioTracks.some((track) => track.id==trackId)) {
+						this.video.audioTrack = trackId;
+						return true;
+					}
+					else {
+
+						return false;
+					}
+				}
+				else {
+					if (this._hls.audioTracks.some((track) => track.id==trackId)) {
+						this._hls.audioTrack = trackId;
+						return true;
+					}
+					else {
+
+						return false;
+					}
+				}
+			});
+		}
+
+		getCurrentAudioTrack() {
+			return this._deferredAction(() => {
+				if (base.userAgent.system.iOS) {
+					let result = null;
+					this.video.audioTracks.some((t) => {
+						if (t.id==this.video.audioTrack) {
+							result = t;
+							return true;
+						}
+					});
+					return result;
+				}
+				else {
+					let result = null;
+					this._hls.audioTracks.some((t) => {
+						if (t.id==this._hls.audioTrack) {
+							result = t;
+							return true;
+						}
+					});
+					return result;
+				}
+			})
 		}
 	
 		getQualities() {
