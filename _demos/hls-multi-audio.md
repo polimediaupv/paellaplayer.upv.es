@@ -1,5 +1,5 @@
 ---
-videoid: hls-multiaudio
+videoid: hls-multiaudio-smil
 ---
 
 # Multi language audio with HLS
