@@ -63,19 +63,13 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 7436db9";
+paella.version = "6.5.0 - build: c88a32a";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
     paella.baseUrl = window.paella_debug_baseUrl;
   } else {
-    var scripts = document.getElementsByTagName('script');
-    var script = scripts[scripts.length - 1].src.split("/");
-    script.pop(); // Remove javascript file name
-
-    script.pop(); // Remove javascript/ folder name
-
-    paella.baseUrl = script.join("/") + '/';
+    paella.baseUrl = location.href.replace(/[^/]*$/, '');
   }
 })();
 
@@ -11468,7 +11462,7 @@ function paella_DeferredNotImplemented() {
       masterPreview = masterPreview && decodeURIComponent(masterPreview);
       var slavePreview = paella.utils.parameters.get('previewSlave');
       slavePreview = slavePreview && decodeURIComponent(slavePreview);
-      var title = paella.utils.parameters.get('preview') || "Untitled Video";
+      var title = paella.utils.parameters.get('title') || "Untitled Video";
       var data = {
         metadata: {
           title: title
@@ -11484,8 +11478,11 @@ function paella_DeferredNotImplemented() {
               }
             }]
           },
-          preview: masterPreview
-        }]
+          preview: masterPreview,
+          type: "video",
+          content: "presenter"
+        }],
+        frameList: []
       };
 
       if (slave) {
@@ -11500,7 +11497,9 @@ function paella_DeferredNotImplemented() {
               }
             }]
           },
-          preview: slavePreview
+          preview: slavePreview,
+          type: "video",
+          content: "presentation"
         });
       }
 
