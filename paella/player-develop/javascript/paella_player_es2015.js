@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: c3a8e73";
+paella.version = "6.5.0 - build: 22e3cf0";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -103,274 +103,235 @@ paella.events = {
 
 paella.events.setupExternalListener();
 
-/*  
-	Paella HTML 5 Multistream Player
-	Copyright (C) 2017  Universitat Politècnica de València Licensed under the
-	Educational Community License, Version 2.0 (the "License"); you may
-	not use this file except in compliance with the License. You may
-	obtain a copy of the License at
-
-	http://www.osedu.org/licenses/ECL-2.0
-
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an "AS IS"
-	BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-	or implied. See the License for the specific language governing
-	permissions and limitations under the License.
-*/
-
-
-// Paella Mouse Manager
-///////////////////////////////////////////////////////
 (() => {
-	class MouseManager {	
-		get targetObject() { return this._targetObject; }
-		set targetObject(t) { this._targetObject = t; }
+    paella.utils = paella.utils || {};
 
-		constructor() {
-			paella.events.bind('mouseup',(event) => this.up(event));
-			paella.events.bind('mousemove',(event) => this.move(event));
-			paella.events.bind('mouseover',(event) =>  this.over(event));
-		}
-	
-		down(targetObject,event) {
-			this.targetObject = targetObject;
-			if (this.targetObject && this.targetObject.down) {
-				this.targetObject.down(event,event.pageX,event.pageY);
-				event.cancelBubble = true;
-			}
-			return false;
-		}
-	
-		up(event) {
-			if (this.targetObject && this.targetObject.up) {
-				this.targetObject.up(event,event.pageX,event.pageY);
-				event.cancelBubble = true;
-			}
-			this.targetObject = null;
-			return false;
-		}
-	
-		out(event) {
-			if (this.targetObject && this.targetObject.out) {
-				this.targetObject.out(event,event.pageX,event.pageY);
-				event.cancelBubble = true;
-			}
-			return false;
-		}
-	
-		move(event) {
-			if (this.targetObject && this.targetObject.move) {
-				this.targetObject.move(event,event.pageX,event.pageY);
-				event.cancelBubble = true;
-			}
-			return false;
-		}
-	
-		over(event) {
-			if (this.targetObject && this.targetObject.over) {
-				this.targetObject.over(event,event.pageX,event.pageY);
-				event.cancelBubble = true;
-			}
-			return false;
-		}
-	}
+    // This class requires jquery
+    paella.utils.ajax = {
+        // onSuccess/onFail(data,type,returnCode,rawData)
+        send:function(type,params,onSuccess,onFail) {
+            this.assertParams(params);
 
-	paella.MouseManager = MouseManager;
+            var ajaxObj = jQuery.ajax({
+                url:params.url,
+                data:params.params,
+                type:type
+            });
+
+            if (typeof(onSuccess)=='function') {
+                ajaxObj.done(function(data,textStatus,jqXHR) {
+                    var contentType = jqXHR.getResponseHeader('content-type')
+                    onSuccess(data,contentType,jqXHR.status,jqXHR.responseText);
+                });
+            }
+
+            if (typeof(onFail)=='function') {
+                ajaxObj.fail(function(jqXHR,textStatus,error) {
+                    onFail(textStatus + ' : ' + error,'text/plain',jqXHR.status,jqXHR.responseText);
+                });
+            }
+        },
+
+        assertParams:function(params) {
+            if (!params.url) throw new Error("paella.utils.ajax.send: url parameter not found");
+            if (!params.params) params.params = {}
+        }
+    }
+
+    paella.utils.ajax["get"] = function(params,onSuccess,onFail) {
+        paella.utils.ajax.send('get',params,onSuccess,onFail);
+    }
+
+    paella.utils.ajax["post"] = function(params,onSuccess,onFail) {
+        paella.utils.ajax.send('post',params,onSuccess,onFail);
+    }
+
+    paella.utils.ajax["put"] = function(params,onSuccess,onFail) {
+        paella.utils.ajax.send('put',params,onSuccess,onFail);
+    }
+
+    paella.utils.ajax["delete"] = function(params,onSuccess,onFail) {
+        paella.utils.ajax.send('delete',params,onSuccess,onFail);
+    }
+
+    // TODO: AsyncLoader is deprecated and should be replaced by promises
+    class AsyncLoaderCallback {
+        constructor(name) {
+            this.name = name;
+            this.prevCb = null;
+            this.nextCb = null;
+            this.loader = null;
+        }
+    
+        load(onSuccess,onError) {
+            onSuccess();
+            // If error: onError()
+        }
+    }
+
+    paella.utils.AsyncLoaderCallback = AsyncLoaderCallback;
+    
+    class AjaxCallback extends paella.utils.AsyncLoaderCallback {
+        getParams() {
+            return this.params;
+        }
+    
+        willLoad(callback) {
+    
+        }
+    
+        didLoadSuccess(callback) {
+            return true;
+        }
+    
+        didLoadFail(callback) {
+            return false;
+        }
+    
+        constructor(params,type) {
+            super();
+
+            this.params = null;
+            this.type = 'get';
+            this.data = null;
+            this.mimeType = null;
+            this.statusCode = null;
+            this.rawData = null;
+        
+            
+            this.name = "ajaxCallback";
+            if (type) this.type = type;
+            if (typeof(params)=='string') this.params = {url:params}
+            else if (typeof(params)=='object') this.params = params;
+            else this.params = {}
+        }
+    
+        load(onSuccess,onError) {
+            var This = this;
+            if (typeof(this.willLoad)=='function') this.willLoad(this);
+            paella.utils.ajax.send(this.type,this.getParams(),
+                function(data,type,code,rawData) {
+                    var status = true;
+                    This.data = data;
+                    This.mimeType = type;
+                    This.statusCode = code;
+                    This.rawData = rawData;
+                    if (typeof(This.didLoadSuccess)=='function') status = This.didLoadSuccess(This);
+                    if (status) onSuccess();
+                    else onError();
+                },
+                function(data,type,code,rawData) {
+                    var status = false;
+                    This.data = data;
+                    This.mimeType = type;
+                    This.statusCode = code;
+                    This.rawData = rawData;
+                    if (typeof(This.didLoadFail)=='function') status = This.didLoadFail(This);
+                    if (status) onSuccess();
+                    else onError();
+                });
+        }
+    }
+
+    paella.utils.AjaxCallback = AjaxCallback;
+    
+    class JSONCallback extends paella.utils.AjaxCallback {
+        constructor(params,type) {
+            super(params,type);
+        }
+    
+        didLoadSuccess(callback) {
+            if (typeof(callback.data)=='object') return true;
+    
+            try {
+                callback.data = JSON.parse(callback.data);
+                return true;
+            }
+            catch (e) {
+                callback.data = {error:"Unexpected data format",data:callback.data}
+                return false;
+            }
+        }
+    }
+
+    paella.utils.JSONCallback = JSONCallback;
+    
+    class AsyncLoader {
+        
+        clearError() {
+            this.errorCallbacks = [];
+        }
+    
+        constructor() {
+            this.firstCb = null;
+            this.lastCb = null;
+            this.callbackArray = null;
+            this.generatedId = 0;
+            this.continueOnError = false;
+            this.errorCallbacks = null;
+            this.currentCb = null;
+            
+            this.callbackArray = {};
+            this.errorCallbacks = [];
+            this.generatedId = 0;
+        }
+    
+        addCallback(cb,name) {
+            if (!name) {
+                name = "callback_" + this.generatedId++;
+            }
+            cb.__cbName__ = name;
+            this.callbackArray[name] = cb;
+            if (!this.firstCb) {
+                this.firstCb = cb;
+                this.currentCb = cb;
+            }
+            cb.prevCb = this.lastCb;
+            if (this.lastCb) this.lastCb.nextCb = cb;
+            this.lastCb = cb;
+            cb.loader = this;
+            return cb;
+        }
+    
+        getCallback(name) {
+            return this.callbackArray[name];
+        }
+    
+        load(onSuccess,onError) {
+            console.warn("paella.utils.AsyncLoader is deprecated. Consider to replace it with JavaScript promises.");
+            
+            var This = this;
+            if (this.currentCb) {
+                this.currentCb.load(function() {
+                    This.onComplete(This.currentCb,This.currentCb.__cbName__,true);
+                    This.currentCb = This.currentCb.nextCb;
+                    This.load(onSuccess,onError);
+                },
+                function() {
+                    This.onComplete(This.currentCb,This.currentCb.__cbName__,false);
+                    if (This.continueOnError) {
+                        This.errorCallbacks.push(This.currentCb);
+                        This.currentCb = This.currentCb.nextCb;
+                        This.load(onSuccess,onError);
+                    }
+                    else if (typeof(onError)=='function') {
+                        onError();
+                    }
+                });
+            }
+            else if (typeof(onSuccess)=='function') {
+                onSuccess();
+            }
+        }
+    
+        onComplete(callback,cbName,status) {
+    
+        }
+    }
+
+    paella.utils.AsyncLoader = AsyncLoader;
+
 })();
-
-
-// paella.utils
-///////////////////////////////////////////////////////
-(function initSkinDeps() {
-	var link = document.createElement('link');
-	link.rel = 'stylesheet';
-	link.href = paella.baseUrl + 'resources/bootstrap/css/bootstrap.min.css';
-	link.type = 'text/css';
-	link.media = 'screen';
-	link.charset = 'utf-8';
-	document.head.appendChild(link);
-})();
-
-paella.utils = {	
-	mouseManager: new paella.MouseManager(),
-	
-	folders: {
-		get: function(folder) {
-			if (paella.player && paella.player.config && paella.player.config.folders && paella.player.config.folders[folder]) {
-				return paella.player.config.folders[folder];	
-			}
-			return undefined;			
-		},
-		
-		profiles: function() {
-			return paella.baseUrl + (paella.utils.folders.get("profiles") || "config/profiles");
-		},
-		
-		resources: function() {
-			return paella.baseUrl + (paella.utils.folders.get("resources") || "resources");
-		},
-		
-		skins: function() {
-			return paella.baseUrl + (paella.utils.folders.get("skins") || paella.utils.folders.get("resources") + "/style");
-		}
-	},
-	
-	styleSheet: {
-		removeById:function(id) {
-			var outStyleSheet = $(document.head).find('#' + id)[0];
-			if (outStyleSheet) {
-				document.head.removeChild(outStyleSheet);
-			}
-		},
-		
-		remove:function(fileName) {
-			var links = document.head.getElementsByTagName('link');
-			for (var i =0; i<links.length; ++i) {
-				if (links[i].href) {
-					document.head.removeChild(links[i]);
-					break;
-				}
-			}
-		},
-		
-		add:function(fileName,id) {
-			var link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.href = fileName;
-			link.type = 'text/css';
-			link.media = 'screen';
-			link.charset = 'utf-8';
-			if (id) link.id = id;
-			document.head.appendChild(link);
-		},
-		
-		swap:function(outFile,inFile) {
-			this.remove(outFile);
-			this.add(inFile);
-		}
-	},
-	
-	skin: {
-		set:function(skinName) {
-			var skinId = 'paellaSkin';
-			paella.utils.styleSheet.removeById(skinId);
-			paella.utils.styleSheet.add(paella.utils.folders.skins() + '/style_' + skinName + '.css');
-			base.cookies.set("skin",skinName);
-		},
-		
-		restore:function(defaultSkin) {
-			var storedSkin = base.cookies.get("skin");
-			if (storedSkin && storedSkin!="") {
-				this.set(storedSkin);
-			}
-			else {
-				this.set(defaultSkin);
-			}
-		}
-	},
-
-	timeParse:{
-		timeToSeconds:function(timeString) {
-			var hours = 0;
-			var minutes = 0;
-			var seconds =0;
-			if (/([0-9]+)h/i.test(timeString)) {
-				hours = parseInt(RegExp.$1) * 60 * 60;
-			}
-			if (/([0-9]+)m/i.test(timeString)) {
-				minutes = parseInt(RegExp.$1) * 60;
-			}
-			if (/([0-9]+)s/i.test(timeString)) {
-				seconds = parseInt(RegExp.$1);
-			}
-			return hours + minutes + seconds;
-		},
-	
-		secondsToTime:function(seconds) {
-			var hrs = ~~ (seconds / 3600);
-			if (hrs<10) hrs = '0' + hrs;
-			var mins = ~~ ((seconds % 3600) / 60);
-			if (mins<10) mins = '0' + mins;
-			var secs = Math.floor(seconds % 60);
-			if (secs<10) secs = '0' + secs;
-			return hrs + ':' + mins + ':' + secs;
-		},
-		secondsToText:function(secAgo) {
-			// Seconds
-			if (secAgo <= 1) {
-				return base.dictionary.translate("1 second ago");
-			}
-			if (secAgo < 60) {
-				return base.dictionary.translate("{0} seconds ago").replace(/\{0\}/g, secAgo);
-			}
-			// Minutes
-			var minAgo = Math.round(secAgo/60);
-			if (minAgo <= 1) {
-				return base.dictionary.translate("1 minute ago");
-			}
-			if (minAgo < 60) {
-				return base.dictionary.translate("{0} minutes ago").replace(/\{0\}/g, minAgo);
-			}
-			//Hours
-			var hourAgo = Math.round(secAgo/(60*60));
-			if (hourAgo <= 1) {
-				return base.dictionary.translate("1 hour ago");
-			}
-			if (hourAgo < 24) {
-				return base.dictionary.translate("{0} hours ago").replace(/\{0\}/g, hourAgo);
-			}
-			//Days
-			var daysAgo = Math.round(secAgo/(60*60*24));
-			if (daysAgo <= 1) {
-				return base.dictionary.translate("1 day ago");
-			}
-			if (daysAgo < 24) {
-				return base.dictionary.translate("{0} days ago").replace(/\{0\}/g, daysAgo);
-			}
-			//Months
-			var monthsAgo = Math.round(secAgo/(60*60*24*30));
-			if (monthsAgo <= 1) {
-				return base.dictionary.translate("1 month ago");
-			}
-			if (monthsAgo < 12) {
-				return base.dictionary.translate("{0} months ago").replace(/\{0\}/g, monthsAgo);
-			}
-			//Years
-			var yearsAgo = Math.round(secAgo/(60*60*24*365));
-			if (yearsAgo <= 1) {
-				return base.dictionary.translate("1 year ago");
-			}
-			return base.dictionary.translate("{0} years ago").replace(/\{0\}/g, yearsAgo);
-		},
-		matterhornTextDateToDate: function(mhdate) {
-			var d = new Date();
-			d.setFullYear(parseInt(mhdate.substring(0, 4), 10));
-			d.setMonth(parseInt(mhdate.substring(5, 7), 10) - 1);
-			d.setDate(parseInt(mhdate.substring(8, 10), 10));
-			d.setHours(parseInt(mhdate.substring(11, 13), 10));
-			d.setMinutes(parseInt(mhdate.substring(14, 16), 10));
-			d.setSeconds(parseInt(mhdate.substring(17, 19), 10));
-
-			return d;
-		}
-	},
-
-	objectFromString: function(str) {
-	  var arr = str.split(".");
-	
-	  var fn = (window || this);
-	  for (var i = 0, len = arr.length; i < len; i++) {
-		fn = fn[arr[i]];
-	  }
-	
-	  if (typeof fn !== "function") {
-		throw new Error("constructor not found");
-	  }
-	
-	  return fn;
-	}
-};
 
 (function() {
 	let g_delegateCallbacks = {};
@@ -501,7 +462,7 @@ paella.addDataDelegate(["default","trimming"], () => {
 	
 		read(context,params,onSuccess) {
 			var key = this.serializeKey(context,params);
-			var value = base.cookies.get(key);
+			var value = paella.utils.cookies.get(key);
 			try {
 				value = unescape(value);
 				value = JSON.parse(value);
@@ -518,7 +479,7 @@ paella.addDataDelegate(["default","trimming"], () => {
 				value = JSON.stringify(value);
 			}
 			value = escape(value);
-			base.cookies.set(key,value);
+			paella.utils.cookies.set(key,value);
 			if(typeof(onSuccess)=='function') {
 				onSuccess({},true);
 			}
@@ -529,7 +490,7 @@ paella.addDataDelegate(["default","trimming"], () => {
 			if (typeof(value)=='object') {
 				value = JSON.stringify(value);
 			}
-			base.cookies.set(key,'');
+			paella.utils.cookies.set(key,'');
 			if(typeof(onSuccess)=='function') {
 				onSuccess({},true);
 			}
@@ -541,38 +502,37 @@ paella.addDataDelegate(["default","trimming"], () => {
 
 // Will be initialized inmediately after loading config.json, in PaellaPlayer.onLoadConfig()
 paella.data = null;
+(function() {
 
+    paella.utils = paella.utils || {};
+        
+    class Dictionary {
+        constructor() {
+            this._dictionary = {};
+        }
 
-(() => {
-	// Include scripts in header
-	let g_requiredScripts = {};
-	
-	paella.require = function(path) {
-		if (!g_requiredScripts[path]) {
-			g_requiredScripts[path] = new Promise((resolve,reject) => {
-				let script = document.createElement("script");
-				script.onload = script.onreadystatechange = function() {
-					if (!this.readyState ||
-						this.readyState == "loaded" ||
-						this.readyState == "complete")
-					{
-						resolve();
-					}
-				}
-				if (path.split(".").pop()=='js') {
-					script.src = path;
-					script.async = false;
-					document.head.appendChild(script);
-				}
-				else {
-					reject(new Error("Unexpected file type"));
-				}
-			});
-		}
-		return g_requiredScripts[path];
-	};
+        addDictionary(dict) {
+            for (let key in dict) {
+                this._dictionary[key] = dict[key];
+            }
+        }
 
-	class MessageBox {
+        translate(key) {
+            return this._dictionary[key] || key;
+        }
+
+        currentLanguage() {
+            let lang = navigator.language || window.navigator.userLanguage;
+            return lang.substr(0, 2).toLowerCase();
+        }
+    }
+
+    paella.utils.dictionary = new Dictionary();
+
+})();
+
+(function() {
+    class MessageBox {
 		get modalContainerClassName() { return 'modalMessageContainer'; } 
 		get frameClassName() { return 'frameContainer'; }
 		get messageClassName() { return 'messageContainer'; }
@@ -803,6 +763,912 @@ paella.data = null;
 	
 	paella.MessageBox = MessageBox;
 	paella.messageBox = new paella.MessageBox();
+})();
+
+(function() {
+    paella.utils = paella.utils || {};
+    
+    paella.utils.cookies = {
+        set:function(name,value) {
+            document.cookie = name + "=" + value;
+        },
+    
+        get:function(name) {
+            var i,x,y,ARRcookies=document.cookie.split(";");
+            for (i=0;i<ARRcookies.length;i++) {
+                x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+                y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+                x=x.replace(/^\s+|\s+$/g,"");
+                if (x==name) {
+                    return unescape(y);
+                }
+            }
+        }
+    };
+    
+    paella.utils.hashParams = {
+        extractUrl:function() {
+            var urlOnly = window.location.href;
+            if (urlOnly.lastIndexOf('#')>=0) {
+                urlOnly = urlOnly.substr(0,urlOnly.lastIndexOf('#'));
+            }
+            return urlOnly;
+        },
+    
+        extractParams:function() {
+            var params = window.location.href;
+            if (params.lastIndexOf('#')>=0) {
+                params = params.substr(window.location.href.lastIndexOf('#'));
+            }
+            else {
+                params = "";
+            }
+            return params;
+        },
+    
+        clear:function() {
+            window.location.href = this.extractUrl() + '#';
+        },
+    
+        unset:function(key) {
+            var url = location.href;
+            var lastIndex = url.lastIndexOf('#');
+            var urlOnly = this.extractUrl();
+            if (lastIndex>=0 && lastIndex+1<url.length) {
+                var newParams = "";
+                var params = url.substr(url.lastIndexOf('#')+1);
+                params = params.split('&');
+                for (var i=0;i<params.length;++i) {
+                    var current = params[i];
+                    var keyValue = current.split('=');
+                    if ((keyValue.length>=2 && keyValue[0]!=key) || keyValue.length<2) {
+                        if (newParams=="") newParams += '#';
+                        else newParams += "&";
+                        newParams += current;
+                    }
+                }
+                if (newParams=="") newParams = "#";
+                location.href = urlOnly + newParams;
+            }
+        },
+    
+        set:function(key,value) {
+            if (key && value) {
+                this.unset(key);
+                var url = this.extractUrl();
+                var params = this.extractParams();
+                var result = url;
+                if (params.length==0) {
+                    result += '#' + key + '=' + value;
+                }
+                else if (params.length==1) {
+                    result +=  params + key + '=' + value;
+                }
+                else {
+                    result +=  params + "&" + key + '=' + value;
+                }
+                location.href = result;
+            }
+        },
+    
+        get:function(key) {
+            var url = location.href;
+            var index = url.indexOf("#");
+            if (index==-1) return "";
+            index = url.indexOf(key,index) + key.length;
+            if (url.charAt(index)=="=") {
+                var result = url.indexOf("&",index);
+                if (result==-1) {
+                    result = url.length;
+                }
+                return url.substring(index + 1, result);
+            }
+            return "";
+        }
+    }
+    
+    paella.utils.parameters = {
+        list:null,
+    
+        parse:function() {
+            if (!this.list) {
+                var url = window.location.href;
+                this.list = {};
+                
+                if (/(http|https|file)?:\/\/([a-z0-9.\-_\/\~:]*\?)([a-z0-9.\/\-_\%\=\&]*)\#*/i.test(url)) {
+                    var params = RegExp.$3;
+                    var paramArray = params.split('&');
+                    this.list = {};
+                    for (var i=0; i<paramArray.length;++i) {
+                        var keyValue = paramArray[i].split('=');
+                        var key = keyValue[0];
+                        var value = keyValue.length==2 ? keyValue[1]:'';
+                        this.list[key] = value;
+                    }
+                }
+            }
+        },
+    
+        get:function(parameter) {
+            if (this.list==null) {
+                this.parse();
+            }
+            return this.list[parameter];
+        },
+    
+        extractUrl:function() {
+            var urlOnly = paella.utils.hashParams.extractUrl();
+            if (urlOnly.lastIndexOf('?')>=0) {
+                urlOnly = urlOnly.substr(0,urlOnly.lastIndexOf('?'));
+            }
+            return urlOnly;
+        },
+    
+        extractParams:function() {
+            // Primero quitar los parámetros hash
+            var urlAndParams = paella.utils.hashParams.extractUrl();
+            var params = urlAndParams;
+            if (params.lastIndexOf('?')>=0) {
+                params = params.substr(window.location.href.lastIndexOf('?'));
+            }
+            else {
+                params = "";
+            }
+            return params;
+        },
+    
+        // Pasa los parámetros de la URL a hash. Esta acción recargará la página
+        toHash:function() {
+            var urlOnly = this.extractUrl();
+            var hashParameters = paella.utils.hashParams.extractParams();
+            var parameters = this.extractParams();
+            var newHashParams = "";
+            var result = urlOnly;
+            if (parameters.length==0 || parameters.length==1) {
+                result += hashParameters;
+            }
+            else {
+                parameters = parameters.substr(1);
+                parameters = parameters.split('&');
+                for (var i=0;i<parameters.length;++i) {
+                    keyValue = parameters[i].split('=');
+                    if (keyValue.length>=2 && paella.utils.hashParams.get(keyValue[0])=='') {
+                        if (hashParameters=="" && newHashParams=="") newHashParams += '#';
+                        else newHashParams += '&';
+                        newHashParams += keyValue[0] + '=' + keyValue[1];
+                    }
+                }
+                result += hashParameters + newHashParams;
+            }
+            if (location.href!=result) {
+                location.href = result;
+            }
+        }
+    }
+
+})();
+(() => {
+
+    paella.utils = paella.utils || {};
+
+    function parseOperatingSystem(userAgentString) {
+		this.system.MacOS = /Macintosh/.test(userAgentString);
+		this.system.Windows = /Windows/.test(userAgentString);
+		this.system.iPhone = /iPhone/.test(userAgentString);
+		this.system.iPodTouch = /iPod/.test(userAgentString);
+		this.system.iPad = /iPad/.test(userAgentString) || /FxiOS/.test(userAgentString);
+		this.system.iOS = this.system.iPhone || this.system.iPad || this.system.iPodTouch;
+		this.system.Android = /Android/.test(userAgentString);
+		this.system.Linux = (this.system.Android) ? false:/Linux/.test(userAgentString);
+
+		if (this.system.MacOS) {
+			this.system.OSName = "Mac OS X";
+			parseMacOSVersion.apply(this, [userAgentString]);
+		}
+		else if (this.system.Windows) {
+			this.system.OSName = "Windows";
+			parseWindowsVersion.apply(this, [userAgentString]);
+		}
+		else if (this.system.Linux) {
+			this.system.OSName = "Linux";
+			parseLinuxVersion.apply(this, [userAgentString]);
+		}
+		else if (this.system.iOS) {
+			this.system.OSName = "iOS";
+			parseIOSVersion.apply(this, [userAgentString]);
+		}
+		else if (this.system.Android) {
+			this.system.OSName = "Android";
+			parseAndroidVersion.apply(this, [userAgentString]);
+		}
+	}
+
+	function parseBrowser(userAgentString) {
+		// Safari: Version/X.X.X Safari/XXX
+		// Chrome: Chrome/XX.X.XX.XX Safari/XXX
+		// Opera: Opera/X.XX
+		// Firefox: Gecko/XXXXXX Firefox/XX.XX.XX
+		// Explorer: MSIE X.X
+		this.browser.Version = {};
+		this.browser.Safari = /Version\/([\d\.]+) Safari\//.test(userAgentString);
+		if (this.browser.Safari) {
+			this.browser.Name = "Safari";
+			this.browser.Vendor = "Apple";
+			this.browser.Version.versionString = RegExp.$1;
+		}
+
+		this.browser.Chrome = /Chrome\/([\d\.]+) Safari\//.test(userAgentString) ||
+							  /Chrome\/([\d\.]+) Electron\//.test(userAgentString);
+		if (this.browser.Chrome) {
+			this.browser.Name = "Chrome";
+			this.browser.Vendor = "Google";
+			this.browser.Version.versionString = RegExp.$1;
+        }
+        
+        // The attribute this.browser.Chrome will still be true, because it is the same browser after all
+        this.browser.EdgeChromium = /Chrome.*Edg\/([0-9\.]+)/.test(userAgentString);
+        if (this.browser.EdgeChromium) {
+            this.browser.Name = "Edge Chromium";
+            this.browser.Vendor = "Microsoft";
+            this.browser.Version.versionString = RegExp.$1;
+        }
+
+		this.browser.Opera = /Opera\/[\d\.]+/.test(userAgentString);
+		if (this.browser.Opera) {
+			this.browser.Name = "Opera";
+			this.browser.Vendor = "Opera Software";
+			var versionString = /Version\/([\d\.]+)/.test(userAgentString);
+			this.browser.Version.versionString = RegExp.$1;
+		}
+
+		this.browser.Firefox = /Gecko\/[\d\.]+ Firefox\/([\d\.]+)/.test(userAgentString);
+		if (this.browser.Firefox) {
+			this.browser.Name = "Firefox";
+			this.browser.Vendor = "Mozilla Foundation";
+			this.browser.Version.versionString = RegExp.$1;
+		}
+
+		let firefoxIOS = this.browser.Firefox || /FxiOS\/(\d+\.\d+)/.test(userAgentString);
+		if (firefoxIOS) {
+			this.browser.Firefox = true;
+			this.browser.Name = "Firefox";
+			this.browser.Vendor = "Mozilla Foundation";
+			this.browser.Version.versionString = RegExp.$1;
+		}
+
+		this.browser.Edge = /Edge\/(.*)/.test(userAgentString);
+		if (this.browser.Edge) {
+			var result = /Edge\/(.*)/.exec(userAgentString);
+			this.browser.Name = "Edge";
+			this.browser.Chrome = false;
+			this.browser.Vendor = "Microsoft";
+			this.browser.Version.versionString = result[1];
+		} 
+
+		this.browser.Explorer = /MSIE ([\d\.]+)/.test(userAgentString);
+		if (!this.browser.Explorer) {
+			var re = /\Mozilla\/5.0 \(([^)]+)\) like Gecko/
+			var matches = re.exec(userAgentString);
+			if (matches) {
+				re = /rv:(.*)/
+				var version = re.exec(matches[1]);
+				this.browser.Explorer = true;
+				this.browser.Name = "Internet Explorer";
+				this.browser.Vendor = "Microsoft";
+				if (version) {
+					this.browser.Version.versionString = version[1];
+				}
+				else {
+					this.browser.Version.versionString = "unknown";
+				}
+			}
+		}
+		else {
+			this.browser.Name = "Internet Explorer";
+			this.browser.Vendor = "Microsoft";
+			this.browser.Version.versionString = RegExp.$1;
+		}
+
+		if (this.system.iOS) {
+			this.browser.IsMobileVersion = true;
+			this.browser.MobileSafari = /Version\/([\d\.]+) Mobile/.test(userAgentString);
+			if (this.browser.MobileSafari) {
+				this.browser.Name = "Mobile Safari";
+				this.browser.Vendor = "Apple";
+				this.browser.Version.versionString = RegExp.$1;
+			}
+			this.browser.Android = false;
+		}
+		else if (this.system.Android) {
+			this.browser.IsMobileVersion = true;
+			this.browser.Android = /Version\/([\d\.]+) Mobile/.test(userAgentString);
+			if (this.browser.MobileSafari) {
+				this.browser.Name = "Android Browser";
+				this.browser.Vendor = "Google";
+				this.browser.Version.versionString = RegExp.$1;
+			}
+			else {
+				this.browser.Chrome = /Chrome\/([\d\.]+)/.test(userAgentString);
+				this.browser.Name = "Chrome";
+				this.browser.Vendor = "Google";
+				this.browser.Version.versionString = RegExp.$1;
+			}
+
+			this.browser.Safari = false;
+		}
+		else {
+			this.browser.IsMobileVersion = false;
+		}
+
+		parseBrowserVersion.apply(this, [userAgentString]);
+	}
+
+	function parseBrowserVersion(userAgentString) {
+		if (/([\d]+)\.([\d]+)\.*([\d]*)/.test(this.browser.Version.versionString)) {
+			this.browser.Version.major = Number(RegExp.$1);
+			this.browser.Version.minor = Number(RegExp.$2);
+			this.browser.Version.revision = (RegExp.$3) ? Number(RegExp.$3):0;
+		}
+	}
+
+	function parseMacOSVersion(userAgentString) {
+		var versionString = (/Mac OS X (\d+_\d+_*\d*)/.test(userAgentString)) ? RegExp.$1:'';
+		this.system.Version = {};
+		// Safari/Chrome
+		if (versionString!='') {
+			if (/(\d+)_(\d+)_*(\d*)/.test(versionString)) {
+				this.system.Version.major = Number(RegExp.$1);
+				this.system.Version.minor = Number(RegExp.$2);
+				this.system.Version.revision = (RegExp.$3) ? Number(RegExp.$3):0;
+			}
+		}
+		// Firefox/Opera
+		else {
+			versionString = (/Mac OS X (\d+\.\d+\.*\d*)/.test(userAgentString)) ? RegExp.$1:'Unknown';
+			if (/(\d+)\.(\d+)\.*(\d*)/.test(versionString)) {
+				this.system.Version.major = Number(RegExp.$1);
+				this.system.Version.minor = Number(RegExp.$2);
+				this.system.Version.revision = (RegExp.$3) ? Number(RegExp.$3):0;
+			}
+		}
+		if (!this.system.Version.major) {
+			this.system.Version.major = 0;
+			this.system.Version.minor = 0;
+			this.system.Version.revision = 0;
+		}
+		this.system.Version.stringValue = this.system.Version.major + '.' + this.system.Version.minor + '.' + this.system.Version.revision;
+		switch (this.system.Version.minor) {
+			case 0:
+				this.system.Version.name = "Cheetah";
+				break;
+			case 1:
+				this.system.Version.name = "Puma";
+				break;
+			case 2:
+				this.system.Version.name = "Jaguar";
+				break;
+			case 3:
+				this.system.Version.name = "Panther";
+				break;
+			case 4:
+				this.system.Version.name = "Tiger";
+				break;
+			case 5:
+				this.system.Version.name = "Leopard";
+				break;
+			case 6:
+				this.system.Version.name = "Snow Leopard";
+				break;
+			case 7:
+				this.system.Version.name = "Lion";
+				break;
+			case 8:
+				this.system.Version.name = "Mountain Lion";
+                break;
+            case 9:
+                this.system.Version.name = "Mavericks";
+                break;
+            case 10:
+                this.system.Version.name = "Yosemite";
+                break;
+            case 11:
+                this.system.Version.name = "El Capitan";
+                break;
+            case 12:
+                this.system.Version.name = "Sierra";
+                break;
+            case 13:
+                this.system.Version.name = "High Sierra";
+                break;
+            case 14:
+                this.system.Version.name = "Mojave";
+                break;
+            case 15:
+                this.system.Version.name = "Catalina";
+                break;
+		}
+	}
+
+	function parseWindowsVersion(userAgentString) {
+		this.system.Version = {};
+		if (/NT (\d+)\.(\d*)/.test(userAgentString)) {
+			this.system.Version.major = Number(RegExp.$1);
+			this.system.Version.minor = Number(RegExp.$2);
+			this.system.Version.revision = 0;	// Solo por compatibilidad
+			this.system.Version.stringValue = "NT " + this.system.Version.major + "." + this.system.Version.minor;
+			var major = this.system.Version.major;
+			var minor = this.system.Version.minor;
+			var name = 'undefined';
+			if (major==5) {
+				if (minor==0) this.system.Version.name = '2000';
+				else this.system.Version.name = 'XP';
+			}
+			else if (major==6) {
+				if (minor==0) this.system.Version.name = 'Vista';
+				else if (minor==1) this.system.Version.name = '7';
+                else if (minor==2) this.system.Version.name = '8';
+            }
+            else if (major==10) {
+                this.system.Version.name = "10";
+            }
+		}
+		else {
+			this.system.Version.major = 0;
+			this.system.Version.minor = 0;
+			this.system.Version.name = "Unknown";
+			this.system.Version.stringValue = "Unknown";
+		}
+	}
+
+	function parseLinuxVersion(userAgentString) {
+		// Muchos navegadores no proporcionan información sobre la distribución de linux... no se puede hacer mucho más que esto
+		this.system.Version = {};
+		this.system.Version.major = 0;
+		this.system.Version.minor = 0;
+		this.system.Version.revision = 0;
+		this.system.Version.name = "";
+		this.system.Version.stringValue = "Unknown distribution";
+	}
+
+	function parseIOSVersion(userAgentString) {
+		this.system.Version = {};
+
+		if (/iPhone OS (\d+)_(\d+)_*(\d*)/i.test(userAgentString) || /iPad; CPU OS (\d+)_(\d+)_*(\d*)/i.test(userAgentString)) {
+			this.system.Version.major = Number(RegExp.$1);
+			this.system.Version.minor = Number(RegExp.$2);
+			this.system.Version.revision = (RegExp.$3) ? Number(RegExp.$3):0;
+			this.system.Version.stringValue = this.system.Version.major + "." + this.system.Version.minor + '.' + this.system.Version.revision;
+			this.system.Version.name = "iOS";
+		}
+		else {
+			this.system.Version.major = 0;
+			this.system.Version.minor = 0;
+			this.system.Version.name = "Unknown";
+			this.system.Version.stringValue = "Unknown";
+		}
+	}
+
+	function parseAndroidVersion(userAgentString) {
+		this.system.Version = {};
+		if (/Android (\d+)\.(\d+)\.*(\d*)/.test(userAgentString)) {
+			this.system.Version.major = Number(RegExp.$1);
+			this.system.Version.minor = Number(RegExp.$2);
+			this.system.Version.revision = (RegExp.$3) ? Number(RegExp.$3):0;
+			this.system.Version.stringValue = this.system.Version.major + "." + this.system.Version.minor + '.' + this.system.Version.revision;
+		}
+		else {
+			this.system.Version.major = 0;
+			this.system.Version.minor = 0;
+			this.system.Version.revision = 0;
+		}
+		if (/Build\/([a-zA-Z]+)/.test(userAgentString)) {
+			this.system.Version.name = RegExp.$1;
+		}
+		else {
+			this.system.Version.name = "Unknown version";
+		}
+		this.system.Version.stringValue = this.system.Version.major + "." + this.system.Version.minor + '.' + this.system.Version.revision;
+	}
+
+	function getInfoString() {
+		return navigator.userAgent;
+    }
+    
+    class UserAgent {
+		constructor(userAgentString = null) {
+            if (!userAgentString) {
+                userAgentString = navigator.userAgent;
+            }
+			this._system = {};
+			this._browser = {};
+
+            parseOperatingSystem.apply(this,[userAgentString]);
+            parseBrowser.apply(this, [userAgentString]);
+		}
+
+		get system() { return this._system; }
+
+		get browser() { return this._browser; }
+
+        getInfoString() {
+            return navigator.userAgent;
+        }
+
+        get infoString() { navigator.userAgent; }
+	}
+
+    paella.UserAgent = UserAgent;
+
+    paella.utils.userAgent = new paella.UserAgent();
+    
+})();
+
+/*  
+	Paella HTML 5 Multistream Player
+	Copyright (C) 2017  Universitat Politècnica de València Licensed under the
+	Educational Community License, Version 2.0 (the "License"); you may
+	not use this file except in compliance with the License. You may
+	obtain a copy of the License at
+
+	http://www.osedu.org/licenses/ECL-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an "AS IS"
+	BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+	or implied. See the License for the specific language governing
+	permissions and limitations under the License.
+*/
+
+
+// Paella Mouse Manager
+///////////////////////////////////////////////////////
+(() => {
+	class MouseManager {	
+		get targetObject() { return this._targetObject; }
+		set targetObject(t) { this._targetObject = t; }
+
+		constructor() {
+			paella.events.bind('mouseup',(event) => this.up(event));
+			paella.events.bind('mousemove',(event) => this.move(event));
+			paella.events.bind('mouseover',(event) =>  this.over(event));
+		}
+	
+		down(targetObject,event) {
+			this.targetObject = targetObject;
+			if (this.targetObject && this.targetObject.down) {
+				this.targetObject.down(event,event.pageX,event.pageY);
+				event.cancelBubble = true;
+			}
+			return false;
+		}
+	
+		up(event) {
+			if (this.targetObject && this.targetObject.up) {
+				this.targetObject.up(event,event.pageX,event.pageY);
+				event.cancelBubble = true;
+			}
+			this.targetObject = null;
+			return false;
+		}
+	
+		out(event) {
+			if (this.targetObject && this.targetObject.out) {
+				this.targetObject.out(event,event.pageX,event.pageY);
+				event.cancelBubble = true;
+			}
+			return false;
+		}
+	
+		move(event) {
+			if (this.targetObject && this.targetObject.move) {
+				this.targetObject.move(event,event.pageX,event.pageY);
+				event.cancelBubble = true;
+			}
+			return false;
+		}
+	
+		over(event) {
+			if (this.targetObject && this.targetObject.over) {
+				this.targetObject.over(event,event.pageX,event.pageY);
+				event.cancelBubble = true;
+			}
+			return false;
+		}
+	}
+
+	paella.MouseManager = MouseManager;
+})();
+
+
+// paella.utils
+///////////////////////////////////////////////////////
+(function initSkinDeps() {
+	var link = document.createElement('link');
+	link.rel = 'stylesheet';
+	link.href = paella.baseUrl + 'resources/bootstrap/css/bootstrap.min.css';
+	link.type = 'text/css';
+	link.media = 'screen';
+	link.charset = 'utf-8';
+	document.head.appendChild(link);
+})();
+
+paella.utils = paella.utils || {};
+
+paella.utils.mouseManager = new paella.MouseManager();
+
+paella.utils.folders = {
+	get: function(folder) {
+		if (paella.player && paella.player.config && paella.player.config.folders && paella.player.config.folders[folder]) {
+			return paella.player.config.folders[folder];	
+		}
+		return undefined;			
+	},
+	
+	profiles: function() {
+		return paella.baseUrl + (paella.utils.folders.get("profiles") || "config/profiles");
+	},
+	
+	resources: function() {
+		return paella.baseUrl + (paella.utils.folders.get("resources") || "resources");
+	},
+	
+	skins: function() {
+		return paella.baseUrl + (paella.utils.folders.get("skins") || paella.utils.folders.get("resources") + "/style");
+	}
+}
+	
+paella.utils.styleSheet = {
+	removeById:function(id) {
+		var outStyleSheet = $(document.head).find('#' + id)[0];
+		if (outStyleSheet) {
+			document.head.removeChild(outStyleSheet);
+		}
+	},
+	
+	remove:function(fileName) {
+		var links = document.head.getElementsByTagName('link');
+		for (var i =0; i<links.length; ++i) {
+			if (links[i].href) {
+				document.head.removeChild(links[i]);
+				break;
+			}
+		}
+	},
+	
+	add:function(fileName,id) {
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = fileName;
+		link.type = 'text/css';
+		link.media = 'screen';
+		link.charset = 'utf-8';
+		if (id) link.id = id;
+		document.head.appendChild(link);
+	},
+	
+	swap:function(outFile,inFile) {
+		this.remove(outFile);
+		this.add(inFile);
+	}
+};
+	
+paella.utils.skin = {
+	set:function(skinName) {
+		var skinId = 'paellaSkin';
+		paella.utils.styleSheet.removeById(skinId);
+		paella.utils.styleSheet.add(paella.utils.folders.skins() + '/style_' + skinName + '.css');
+		paella.utils.cookies.set("skin",skinName);
+	},
+	
+	restore:function(defaultSkin) {
+		var storedSkin = paella.utils.cookies.get("skin");
+		if (storedSkin && storedSkin!="") {
+			this.set(storedSkin);
+		}
+		else {
+			this.set(defaultSkin);
+		}
+	}
+};
+
+paella.utils.timeParse = {
+	timeToSeconds:function(timeString) {
+		var hours = 0;
+		var minutes = 0;
+		var seconds =0;
+		if (/([0-9]+)h/i.test(timeString)) {
+			hours = parseInt(RegExp.$1) * 60 * 60;
+		}
+		if (/([0-9]+)m/i.test(timeString)) {
+			minutes = parseInt(RegExp.$1) * 60;
+		}
+		if (/([0-9]+)s/i.test(timeString)) {
+			seconds = parseInt(RegExp.$1);
+		}
+		return hours + minutes + seconds;
+	},
+
+	secondsToTime:function(seconds) {
+		var hrs = ~~ (seconds / 3600);
+		if (hrs<10) hrs = '0' + hrs;
+		var mins = ~~ ((seconds % 3600) / 60);
+		if (mins<10) mins = '0' + mins;
+		var secs = Math.floor(seconds % 60);
+		if (secs<10) secs = '0' + secs;
+		return hrs + ':' + mins + ':' + secs;
+	},
+	secondsToText:function(secAgo) {
+		// Seconds
+		if (secAgo <= 1) {
+			return paella.utils.dictionary.translate("1 second ago");
+		}
+		if (secAgo < 60) {
+			return paella.utils.dictionary.translate("{0} seconds ago").replace(/\{0\}/g, secAgo);
+		}
+		// Minutes
+		var minAgo = Math.round(secAgo/60);
+		if (minAgo <= 1) {
+			return paella.utils.dictionary.translate("1 minute ago");
+		}
+		if (minAgo < 60) {
+			return paella.utils.dictionary.translate("{0} minutes ago").replace(/\{0\}/g, minAgo);
+		}
+		//Hours
+		var hourAgo = Math.round(secAgo/(60*60));
+		if (hourAgo <= 1) {
+			return paella.utils.dictionary.translate("1 hour ago");
+		}
+		if (hourAgo < 24) {
+			return paella.utils.dictionary.translate("{0} hours ago").replace(/\{0\}/g, hourAgo);
+		}
+		//Days
+		var daysAgo = Math.round(secAgo/(60*60*24));
+		if (daysAgo <= 1) {
+			return paella.utils.dictionary.translate("1 day ago");
+		}
+		if (daysAgo < 24) {
+			return paella.utils.dictionary.translate("{0} days ago").replace(/\{0\}/g, daysAgo);
+		}
+		//Months
+		var monthsAgo = Math.round(secAgo/(60*60*24*30));
+		if (monthsAgo <= 1) {
+			return paella.utils.dictionary.translate("1 month ago");
+		}
+		if (monthsAgo < 12) {
+			return paella.utils.dictionary.translate("{0} months ago").replace(/\{0\}/g, monthsAgo);
+		}
+		//Years
+		var yearsAgo = Math.round(secAgo/(60*60*24*365));
+		if (yearsAgo <= 1) {
+			return paella.utils.dictionary.translate("1 year ago");
+		}
+		return paella.utils.dictionary.translate("{0} years ago").replace(/\{0\}/g, yearsAgo);
+	},
+	matterhornTextDateToDate: function(mhdate) {
+		var d = new Date();
+		d.setFullYear(parseInt(mhdate.substring(0, 4), 10));
+		d.setMonth(parseInt(mhdate.substring(5, 7), 10) - 1);
+		d.setDate(parseInt(mhdate.substring(8, 10), 10));
+		d.setHours(parseInt(mhdate.substring(11, 13), 10));
+		d.setMinutes(parseInt(mhdate.substring(14, 16), 10));
+		d.setSeconds(parseInt(mhdate.substring(17, 19), 10));
+
+		return d;
+	}
+};
+
+paella.utils.objectFromString = (str) => {
+	var arr = str.split(".");
+
+	var fn = (window || this);
+	for (var i = 0, len = arr.length; i < len; i++) {
+		fn = fn[arr[i]];
+	}
+
+	if (typeof fn !== "function") {
+		throw new Error("constructor not found");
+	}
+
+	return fn;
+}
+
+paella.utils.uuid = function() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+		let r = Math.random() * 16 | 0;
+		let v = (c == 'x' ? r : r) & 0x3 | 0x8;
+		return v.toString(16);
+	});
+};
+
+(() => {
+
+	class TimerManager {
+		constructor() {
+			this.timerArray = [];
+			this.lastId = 0;
+		}
+	
+		setupTimer(timer,time) {
+			this.lastId++;
+			timer.timerId = this.lastId;
+			timer.timeout = time;
+			this.timerArray[this.lastId] = timer;
+			timer.jsTimerId = setTimeout(
+				`g_timerManager.executeTimerCallback(${ this.lastId })`	
+			, time);
+		}
+	
+		executeTimerCallback(timerId) {
+			var timer = this.timerArray[timerId];
+			if (timer && timer.callback) {
+				timer.callback(timer,timer.params);
+			}
+			if (timer.repeat) {
+				timer.jsTimerId = setTimeout(
+					`g_timerManager.executeTimerCallback(${ timer.timerId })`
+				, timer.timeout);
+			}
+		}
+	}
+
+	window.g_timerManager = new TimerManager();
+
+	class Timer {
+		static sleep(milliseconds) {
+			let start = new Date().getTime();
+			for (let i = 0; i<1e7; ++i) {
+				if ((new Date().getTime() - start) > milliseconds) {
+					break;
+				}
+			}
+		}
+
+		constructor(callback,time,params) {
+			this.callback = callback;
+			this.params = params;
+			this._repeat = false;
+			g_timerManager.setupTimer(this,time);
+		}
+
+		get repeat() { return this._repeat; }
+		set repeat(r) { this._repeat = r; } 
+
+		cancel() {
+			clearTimeout(this.jsTimerId);
+		}
+	}
+
+	paella.utils.Timer = Timer;
+})();
+
+(() => {
+	// Include scripts in header
+	let g_requiredScripts = {};
+	
+	paella.require = function(path) {
+		if (!g_requiredScripts[path]) {
+			g_requiredScripts[path] = new Promise((resolve,reject) => {
+				let script = document.createElement("script");
+				script.onload = script.onreadystatechange = function() {
+					if (!this.readyState ||
+						this.readyState == "loaded" ||
+						this.readyState == "complete")
+					{
+						resolve();
+					}
+				}
+				if (path.split(".").pop()=='js') {
+					script.src = path;
+					script.async = false;
+					document.head.appendChild(script);
+				}
+				else {
+					reject(new Error("Unexpected file type"));
+				}
+			});
+		}
+		return g_requiredScripts[path];
+	};
 
 	paella.tabIndex = new (class TabIndexManager {
 		constructor() {
@@ -913,6 +1779,82 @@ paella.data = null;
 		}
 	}
 	
+	class Log {
+        constructor() {
+			this._currentLevel = 0;
+            var logLevelParam = paella.utils.parameters.get("logLevel");
+            logLevelParam = logLevelParam ? logLevelParam:paella.utils.hashParams.get("logLevel");
+            logLevelParam = logLevelParam.toLowerCase();
+            switch (logLevelParam) {
+                case "error":
+                    this.setLevel(paella.log.kLevelError);
+                    break;
+                case "warning":
+                    this.setLevel(paella.log.kLevelWarning);
+                    break;
+                case "debug":
+                    this.setLevel(paella.log.kLevelDebug);
+                    break;
+                case "log":
+                    this.setLevel(paella.log.kLevelLog);
+                    break;
+            }
+        }
+    
+        logMessage(level,message) {
+            var prefix = "";
+            if (typeof(level)=="string") {
+                message = level;
+            }
+            else if (level>=paella.log.kLevelError && level<=paella.log.kLevelLog) {
+                switch (level) {
+                    case paella.log.kLevelError:
+                        prefix = "ERROR: ";
+                        break;
+                    case paella.log.kLevelWarning:
+                        prefix = "WARNING: ";
+                        break;
+                    case paella.log.kLevelDebug:
+                        prefix = "DEBUG: ";
+                        break;
+                    case paella.log.kLevelLog:
+                        prefix = "LOG: ";
+                        break;
+                }
+            }
+    
+            if (this._currentLevel>=level && console.log) {
+                console.log(prefix + message);
+            }
+        }
+    
+        error(message) {
+            this.logMessage(paella.log.kLevelError, message);
+        }
+    
+        warning(message) {
+            this.logMessage(paella.log.kLevelWarning, message);
+        }
+    
+        debug(message) {
+            this.logMessage(paella.log.kLevelDebug, message);
+        }
+    
+        log(message) {
+            this.logMessage(paella.log.kLevelLog, message);
+        }
+    
+        setLevel(level) {
+            this._currentLevel = level;
+        }
+	}
+    
+    Log.kLevelError    = 1;
+    Log.kLevelWarning  = 2;
+    Log.kLevelDebug    = 3;
+    Log.kLevelLog      = 4;
+    
+    paella.log = new Log();	
 })();
 
 paella.AntiXSS = {
@@ -1371,7 +2313,7 @@ function paella_DeferredNotImplemented () {
                 return false;
             }
             
-            animate = base.userAgent.browser.Explorer ? false:animate;
+            animate = paella.utils.userAgent.browser.Explorer ? false:animate;
             if (this.currentProfile) {
                 this.currentProfile.onDeactivate();
             }
@@ -1901,7 +2843,7 @@ paella.Profiles = {
 				profileData = data[defaultProfile];
 			} else {
 				// Unable to find or map defaultProfile in profiles.json
-				base.log.debug("Error loading the default profile. Check your Paella Player configuration");
+				paella.log.debug("Error loading the default profile. Check your Paella Player configuration");
 				return false;
 			}
 			onSuccessFunction(profileData);
@@ -1913,7 +2855,7 @@ paella.Profiles = {
 		if (this.profileList == null) {
 			var params = { url: paella.utils.folders.profiles() + "/profiles.json" };
 	
-			base.ajax.get(params,function(data,mimetype,code) {
+			paella.utils.ajax.get(params,function(data,mimetype,code) {
 					if (typeof(data)=="string") {
 						data = JSON.parse(data);
 					}
@@ -1921,7 +2863,7 @@ paella.Profiles = {
 					onSuccessFunction(thisClass.profileList);
 				},
 				function(data,mimetype,code) {
-					base.log.debug("Error loading video profiles. Check your Paella Player configuration");
+					paella.log.debug("Error loading video profiles. Check your Paella Player configuration");
 				}
 			);
 		}
@@ -2266,7 +3208,7 @@ class VideoRect extends paella.DomNode {
 
 			let altScrollMessageContainer = document.createElement('div');
 			altScrollMessageContainer.className = "alt-scroll-message-container";
-			altScrollMessageContainer.innerHTML = "<p>" + paella.dictionary.translate("Use Alt+Scroll to zoom the video") + "</p>";
+			altScrollMessageContainer.innerHTML = "<p>" + paella.utils.dictionary.translate("Use Alt+Scroll to zoom the video") + "</p>";
 			eventCapture.appendChild(altScrollMessageContainer);
 			$(altScrollMessageContainer).css({ opacity: 0.0 });
 			let altScrollMessageTimer = null;
@@ -2475,7 +3417,7 @@ class VideoElementBase extends paella.VideoRect {
 	}
 
 	setPosterFrame(url) {
-		base.log.debug("TODO: implement setPosterFrame() function");
+		paella.log.debug("TODO: implement setPosterFrame() function");
 	}
 
 	setAutoplay(autoplay) {
@@ -2522,52 +3464,52 @@ class VideoElementBase extends paella.VideoRect {
 	}
 	
 	play() {
-		base.log.debug("TODO: implement play() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement play() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	pause() {
-		base.log.debug("TODO: implement pause() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement pause() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	isPaused() {
-		base.log.debug("TODO: implement isPaused() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement isPaused() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	duration() {
-		base.log.debug("TODO: implement duration() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement duration() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	setCurrentTime(time) {
-		base.log.debug("TODO: implement setCurrentTime() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement setCurrentTime() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	currentTime() {
-		base.log.debug("TODO: implement currentTime() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement currentTime() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	setVolume(volume) {
-		base.log.debug("TODO: implement setVolume() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement setVolume() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	volume() {
-		base.log.debug("TODO: implement volume() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement volume() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	setPlaybackRate(rate) {
-		base.log.debug("TODO: implement setPlaybackRate() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement setPlaybackRate() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
 	playbackRate() {
-		base.log.debug("TODO: implement playbackRate() function in your VideoElementBase subclass");
+		paella.log.debug("TODO: implement playbackRate() function in your VideoElementBase subclass");
 		return paella_DeferredNotImplemented();
 	}
 
@@ -3180,7 +4122,7 @@ class Html5VideoFactory {
 	isStreamCompatible(streamData) {
 		try {
 			if (paella.videoFactories.Html5VideoFactory.s_instances>0 && 
-				base.userAgent.system.iOS &&
+				paella.utils.userAgent.system.iOS &&
 				(paella.utils.userAgent.system.Version.major<=10 && paella.utils.userAgent.system.Version.minor<3))
 			{
 				return false;
@@ -3382,7 +4324,7 @@ class ImageVideo extends paella.VideoElementBase {
 	play() {
 		let This = this;
 		return this._deferredAction(() => {
-			This._playTimer = new base.Timer(function() {
+			This._playTimer = new paella.utils.Timer(function() {
 				This._currentTime += 0.25 * This._playbackRate;
 				This._loadCurrentFrame();
 			}, 250);
@@ -3871,7 +4813,7 @@ class VideoContainerBase extends paella.DomNode {
 	}
 
 	startTimeupdate() {
-		this.timeupdateEventTimer = new Timer((timer) => {
+		this.timeupdateEventTimer = new paella.utils.Timer((timer) => {
 			this.triggerTimeupdate();
 		}, this.timeupdateInterval);
 		this.timeupdateEventTimer.repeat = true;
@@ -4117,30 +5059,30 @@ class VideoContainerBase extends paella.DomNode {
 	}
 
 	setCurrentTime(time) {
-		base.log.debug("VideoContainerBase.setCurrentTime(" +  time + ")");
+		paella.log.debug("VideoContainerBase.setCurrentTime(" +  time + ")");
 	}
 
 	currentTime() {
-		base.log.debug("VideoContainerBase.currentTime()");
+		paella.log.debug("VideoContainerBase.currentTime()");
 		return 0;
 	}
 
 	duration() {
-		base.log.debug("VideoContainerBase.duration()");
+		paella.log.debug("VideoContainerBase.duration()");
 		return 0;
 	}
 
 	paused() {
-		base.log.debug("VideoContainerBase.paused()");
+		paella.log.debug("VideoContainerBase.paused()");
 		return true;
 	}
 
 	setupVideo(onSuccess) {
-		base.log.debug("VideoContainerBase.setupVide()");
+		paella.log.debug("VideoContainerBase.setupVide()");
 	}
 
 	isReady() {
-		base.log.debug("VideoContainerBase.isReady()");
+		paella.log.debug("VideoContainerBase.isReady()");
 		return true;
 	}
 
@@ -4238,7 +5180,7 @@ class StreamProvider {
 		this._audioPlayers = [];
 		this._players = [];
 
-		this._autoplay = base.parameters.get('autoplay')=='true' || this.isLiveStreaming;
+		this._autoplay = paella.utils.parameters.get('autoplay')=='true' || this.isLiveStreaming;
 		this._startTime = 0;
 
 		this._bufferedData = [];
@@ -4527,7 +5469,7 @@ class VideoContainer extends paella.VideoContainerBase {
 		this.setVideoQualityStrategy(paella.VideoQualityStrategy.Factory());
 
 		this._audioTag = paella.player.config.player.defaultAudioTag ||
-						 paella.dictionary.currentLanguage();
+						 paella.utils.dictionary.currentLanguage();
 		this._audioPlayer = null;
 
 		// Initial volume level
@@ -4836,8 +5778,8 @@ class VideoContainer extends paella.VideoContainerBase {
 	}
 
 	setStreamData(videoData) {
-		var urlParamTime = base.parameters.get("time");
-		var hashParamTime = base.hashParams.get("time");
+		var urlParamTime = paella.utils.parameters.get("time");
+		var hashParamTime = paella.utils.hashParams.get("time");
 		var timeString = hashParamTime ? hashParamTime:urlParamTime ? urlParamTime:"0s";
 		var startTime = paella.utils.timeParse.timeToSeconds(timeString);
 		if (startTime) {
@@ -4923,8 +5865,8 @@ class VideoContainer extends paella.VideoContainerBase {
 
 					this._ready = true;
 					paella.events.trigger(paella.events.videoReady);
-					let profileToUse = base.parameters.get('profile') ||
-										base.cookies.get('profile') ||
+					let profileToUse = paella.utils.parameters.get('profile') ||
+										paella.utils.cookies.get('profile') ||
 										paella.profiles.getDefaultProfile();
 
 					if (paella.profiles.setProfile(profileToUse, false)) {
@@ -5073,7 +6015,7 @@ class PluginManager {
 			this.loadPlugins("paella.DeferredLoadPlugin");
 		});
 		
-		var timer = new base.Timer(() => {
+		var timer = new paella.utils.Timer(() => {
 			if (paella.player && paella.player.controls && this.doResize) paella.player.controls.onresize();
 		}, 1000);
 		timer.repeat = true;
@@ -5123,7 +6065,7 @@ class PluginManager {
 				if (plugin.isLoaded()) return;
 				if (eval("plugin instanceof " + pluginBaseClass)) {
 					if (config.enabled) {
-						base.log.debug("Load plugin (" + pluginBaseClass + "): " + plugin.getName());
+						paella.log.debug("Load plugin (" + pluginBaseClass + "): " + plugin.getName());
 						plugin.config = config;							
 						plugin.load(This);
 					}				
@@ -5552,19 +6494,19 @@ class ButtonPlugin extends paella.UIPlugin {
 	}
 
 	willShowContent() {
-		base.log.debug(this.getName() + " willDisplayContent");
+		paella.log.debug(this.getName() + " willDisplayContent");
 	}
 
 	didShowContent() {
-		base.log.debug(this.getName() + " didDisplayContent");
+		paella.log.debug(this.getName() + " didDisplayContent");
 	}
 
 	willHideContent() {
-		base.log.debug(this.getName() + " willHideContent");
+		paella.log.debug(this.getName() + " willHideContent");
 	}
 
 	didHideContent() {
-		base.log.debug(this.getName() + " didHideContent");
+		paella.log.debug(this.getName() + " didHideContent");
 	}
 
 	getButtonType() {
@@ -5656,7 +6598,7 @@ class ButtonPlugin extends paella.UIPlugin {
 	static BuildPluginButton(plugin,id) {
 		plugin.subclass = plugin.getSubclass();
 		var elem = document.createElement('div');
-		let ariaLabel = plugin.getAriaLabel() || base.dictionary.translate(plugin.config.ariaLabel) || "";
+		let ariaLabel = plugin.getAriaLabel() || paella.utils.dictionary.translate(plugin.config.ariaLabel) || "";
 		if (ariaLabel!="") {
 			elem = document.createElement('button');
 		}
@@ -6360,10 +7302,10 @@ class CaptionParserManager {
 			ext = [ext]; 
 		}
 		if (ext.length == 0) {
-			base.log.debug("No extension provided by the plugin " + plugin.getName());
+			paella.log.debug("No extension provided by the plugin " + plugin.getName());
 		}
 		else {
-			base.log.debug("New captionParser added: " + plugin.getName());		
+			paella.log.debug("New captionParser added: " + plugin.getName());		
 			ext.forEach(function(f){
 				self._formats[f] = plugin;
 			});
@@ -6378,7 +7320,7 @@ class CaptionParserManager {
 
 let captionParserManager = new CaptionParserManager();
 
-class SearchCallback extends base.AsyncLoaderCallback {
+class SearchCallback extends paella.utils.AsyncLoaderCallback {
 	constructor(caption, text) {
 		super();
 		this.name = "captionSearchCallback";
@@ -6457,7 +7399,7 @@ paella.captions = {
 	
 	search: function(text, next) {
 		var self = this;
-		var asyncLoader = new base.AsyncLoader();
+		var asyncLoader = new paella.utils.AsyncLoader();
 		
 		this.getAvailableLangs().forEach(function(l) {			
 			asyncLoader.addCallback(new SearchCallback(self.getCaptions(l.id), text));
@@ -6515,14 +7457,14 @@ class Caption {
 		.then(function(dataRaw){
 			var parser = captionParserManager._formats[self._format];			
 			if (parser == undefined) {
-				base.log.debug("Error adding captions: Format not supported!");
+				paella.log.debug("Error adding captions: Format not supported!");
 				paella.player.videoContainer.duration(true)
 				.then((duration)=>{
 					self._captions = [{
 						id: 0,
 		            	begin: 0,
 		            	end: duration,
-		            	content: base.dictionary.translate("Error! Captions format not supported.")
+		            	content: paella.utils.dictionary.translate("Error! Captions format not supported.")
 					}];
 					if (next) { next(true); }
 				});
@@ -6548,7 +7490,7 @@ class Caption {
 			}
 		})
 		.fail(function(error){
-			base.log.debug("Error loading captions: " + self._url);
+			paella.log.debug("Error loading captions: " + self._url);
 				if (next) { next(true); }
 		});
 	}
@@ -6663,7 +7605,7 @@ var searchServiceManager = {
 };
 
 
-class SearchCallback extends base.AsyncLoaderCallback {
+class SearchCallback extends paella.utils.AsyncLoaderCallback {
 	constructor(plugin, text) {
 		super();
 		this.name = "searchCallback";
@@ -6688,7 +7630,7 @@ class SearchCallback extends base.AsyncLoaderCallback {
 paella.searchService = {
 	
 	search: function(text, next) {
-		let asyncLoader = new base.AsyncLoader();
+		let asyncLoader = new paella.utils.AsyncLoader();
 		
 		paella.userTracking.log("paella:searchService:search", text);
 		
@@ -6782,7 +7724,7 @@ paella.userTracking.log = function(event, params) {
 	if (evsentsToLog[event] != undefined) {
 		evsentsToLog[event].cancel();
 	}
-	evsentsToLog[event] = new base.Timer(function(timer) {
+	evsentsToLog[event] = new paella.utils.Timer(function(timer) {
 		userTrackingManager._plugins.forEach(function(p) {
 			p.log(event, params);
 		});
@@ -7133,7 +8075,7 @@ class PlaybackBar extends paella.DomNode {
 		$(playbackFull.domElement).bind('mousedown',function(event) {
 			paella.utils.mouseManager.down(thisClass,event); event.stopPropagation();
 		});
-		if (!base.userAgent.browser.IsMobileVersion) {
+		if (!paella.utils.userAgent.browser.IsMobileVersion) {
 			$(this.domElement).bind('mousemove',function(event) {
 				thisClass.movePassive(event); paella.utils.mouseManager.move(event);
 			});
@@ -7604,7 +8546,7 @@ class PlaybackControl extends paella.DomNode {
 
 	onresize() {
 		var windowSize = $(this.domElement).width();
-		base.log.debug("resize playback bar (width=" + windowSize + ")");
+		paella.log.debug("resize playback bar (width=" + windowSize + ")");
 
 		for (var i=0;i<this.buttonPlugins.length;++i) {
 			var plugin = this.buttonPlugins[i];
@@ -7748,7 +8690,7 @@ class ControlsContainer extends paella.DomNode {
 
 		paella.events.trigger(paella.events.controlBarWillHide);
 		if (this._doHide) {
-			if (!base.userAgent.browser.IsMobileVersion && !base.userAgent.browser.Explorer) {			
+			if (!paella.utils.userAgent.browser.IsMobileVersion && !paella.utils.userAgent.browser.Explorer) {			
 				$(this.domElement).animate({opacity:0.0},{duration:300, complete: hideIfNotCanceled});
 			}
 			else {
@@ -7853,7 +8795,7 @@ class ControlsContainer extends paella.DomNode {
 		this.showControls();
 		this.clearAutohideTimer();
 		var thisClass = this;
-		this.autohideTimer = new base.Timer(function(timer) {
+		this.autohideTimer = new paella.utils.Timer(function(timer) {
 			thisClass.autohideTimeout();
 		},this.hideControlsTimeMillis);
 	}
@@ -7907,7 +8849,7 @@ paella.ControlsContainer = ControlsContainer;
 			this.loader.domElement.className = "icon-spinner";
 	
 			paella.events.bind(paella.events.loadComplete,(event,params) => { this.loadComplete(params); });
-			this.timer = new base.Timer((timer) => {
+			this.timer = new paella.utils.Timer((timer) => {
 				//thisClass.loaderPosition -= 128;
 				
 				//thisClass.loader.domElement.style.backgroundPosition = thisClass.loaderPosition + 'px';
@@ -8109,24 +9051,25 @@ paella.ControlsContainer = ControlsContainer;
 		
 		checkCompatibility() {
 			let message = "";
-			if (base.parameters.get('ignoreBrowserCheck')) {
+			if (paella.utils.parameters.get('ignoreBrowserCheck')) {
 				return true;
 			}
-			if (base.userAgent.browser.IsMobileVersion) return true;
-			let isCompatible =	base.userAgent.browser.Chrome ||
-								base.userAgent.browser.Safari ||
-								base.userAgent.browser.Firefox ||
-								base.userAgent.browser.Opera ||
-								base.userAgent.browser.Edge ||
-								(base.userAgent.browser.Explorer && base.userAgent.browser.Version.major>=9);
+			if (paella.utils.userAgent.browser.IsMobileVersion) return true;
+			let isCompatible =	paella.utils.userAgent.browser.Chrome ||
+								paella.utils.userAgent.browser.EdgeChromium ||
+								paella.utils.userAgent.browser.Safari ||
+								paella.utils.userAgent.browser.Firefox ||
+								paella.utils.userAgent.browser.Opera ||
+								paella.utils.userAgent.browser.Edge ||
+								(paella.utils.userAgent.browser.Explorer && paella.utils.userAgent.browser.Version.major>=9);
 			if (isCompatible) {
 				return true;
 			}
 			else {
-				var errorMessage = base.dictionary.translate("It seems that your browser is not HTML 5 compatible");
+				var errorMessage = paella.utils.dictionary.translate("It seems that your browser is not HTML 5 compatible");
 				paella.events.trigger(paella.events.error,{error:errorMessage});
 				message = errorMessage + '<div style="display:block;width:470px;height:140px;margin-left:auto;margin-right:auto;font-family:Verdana,sans-sherif;font-size:12px;"><a href="http://www.google.es/chrome" style="color:#004488;float:left;margin-right:20px;"><img src="'+paella.utils.folders.resources()+'images/chrome.png" style="width:80px;height:80px" alt="Google Chrome"></img><p>Google Chrome</p></a><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home" style="color:#004488;float:left;margin-right:20px;"><img src="'+paella.utils.folders.resources()+'images/explorer.png" style="width:80px;height:80px" alt="Internet Explorer 9"></img><p>Internet Explorer 9</p></a><a href="http://www.apple.com/safari/" style="float:left;margin-right:20px;color:#004488"><img src="'+paella.utils.folders.resources()+'images/safari.png" style="width:80px;height:80px" alt="Safari"></img><p>Safari 5</p></a><a href="http://www.mozilla.org/firefox/" style="float:left;color:#004488"><img src="'+paella.utils.folders.resources()+'images/firefox.png" style="width:80px;height:80px" alt="Firefox"></img><p>Firefox 12</p></a></div>';
-				message += '<div style="margin-top:30px;"><a id="ignoreBrowserCheckLink" href="#" onclick="window.location = window.location + \'&ignoreBrowserCheck=true\'">' + base.dictionary.translate("Continue anyway") + '</a></div>';
+				message += '<div style="margin-top:30px;"><a id="ignoreBrowserCheckLink" href="#" onclick="window.location = window.location + \'&ignoreBrowserCheck=true\'">' + paella.utils.dictionary.translate("Continue anyway") + '</a></div>';
 				paella.messageBox.showError(message,{height:'40%'});
 			}
 			return false;
@@ -8140,28 +9083,28 @@ paella.ControlsContainer = ControlsContainer;
 			this.controls = null;
 			this.accessControl = null;
 	
-			if (base.parameters.get('log') != undefined) {
+			if (paella.utils.parameters.get('log') != undefined) {
 				var log = 0;
-				switch(base.parameters.get('log')) {
+				switch(paella.utils.parameters.get('log')) {
 					case "error":
-						log = base.Log.kLevelError;
+						log = paella.log.kLevelError;
 						break;					
 					case "warn":
-						log = base.Log.kLevelWarning;
+						log = paella.log.kLevelWarning;
 						break;					
 					case "debug":
-						log = base.Log.kLevelDebug;
+						log = paella.log.kLevelDebug;
 						break;					
 					case "log":
 					case "true":
-						log = base.Log.kLevelLog;
+						log = paella.log.kLevelLog;
 						break;
 				}
-				base.log.setLevel(log);
+				paella.log.setLevel(log);
 			}		
 				
 			if (!this.checkCompatibility()) {
-				base.log.debug('It seems that your browser is not HTML 5 compatible');
+				paella.log.debug('It seems that your browser is not HTML 5 compatible');
 			}
 			else {
 				paella.player = this;
@@ -8243,7 +9186,7 @@ paella.ControlsContainer = ControlsContainer;
 
 			if (!this.initParams.getId) {
 				this.initParams.getId = function() {
-					return base.parameters.get('id') || "noid";
+					return paella.utils.parameters.get('id') || "noid";
 				} 
 			}
 		}
@@ -8254,8 +9197,8 @@ paella.ControlsContainer = ControlsContainer;
 	
 		loadDictionary() {
 			return new Promise((resolve) => {
-				base.ajax.get({ url:this.initParams.dictionaryUrl + "_" + base.dictionary.currentLanguage() + '.json' }, function(data,type,returnCode) {
-					base.dictionary.addDictionary(data);
+				paella.utils.ajax.get({ url:this.initParams.dictionaryUrl + "_" + paella.utils.dictionary.currentLanguage() + '.json' }, function(data,type,returnCode) {
+					paella.utils.dictionary.addDictionary(data);
 					resolve(data);
 				},
 				function(data,type,returnCode) {
@@ -8266,7 +9209,7 @@ paella.ControlsContainer = ControlsContainer;
 	
 		loadConfig() {
 			let loadAccessControl = (data) => {
-				var AccessControlClass = Class.fromString(data.player.accessControlClass || "paella.AccessControl");
+				var AccessControlClass = paella.utils.objectFromString(data.player.accessControlClass || "paella.AccessControl");
 				this.initParams.accessControl = new AccessControlClass();
 			};
 	
@@ -8293,7 +9236,7 @@ paella.ControlsContainer = ControlsContainer;
 					var configUrl = this.initParams.configUrl;
 					var params = {};
 					params.url = configUrl;
-					base.ajax.get(params,(data,type,returnCode) => {
+					paella.utils.ajax.get(params,(data,type,returnCode) => {
 							try {
 								data = JSON.parse(data);
 							}
@@ -8302,7 +9245,7 @@ paella.ControlsContainer = ControlsContainer;
 							resolve(data);
 						},
 						function(data,type,returnCode) {
-							paella.messageBox.showError(base.dictionary.translate("Error! Config file not found. Please configure paella!"));
+							paella.messageBox.showError(paella.utils.dictionary.translate("Error! Config file not found. Please configure paella!"));
 							//onSuccess({});
 						});
 				});
@@ -8356,7 +9299,7 @@ paella.ControlsContainer = ControlsContainer;
 			if ((fs.webkitRequestFullScreen) || (fs.mozRequestFullScreen) || (fs.msRequestFullscreen) || (fs.requestFullScreen)) {
 				return true;
 			}
-			if (base.userAgent.browser.IsMobileVersion && paella.player.videoContainer.isMonostream) {
+			if (paella.utils.userAgent.browser.IsMobileVersion && paella.player.videoContainer.isMonostream) {
 				return true;
 			}		
 			return false;
@@ -8410,7 +9353,7 @@ paella.ControlsContainer = ControlsContainer;
 
 		goFullScreen() {
 			if (!this.isFullScreen()) {
-				if (base.userAgent.system.iOS &&
+				if (paella.utils.userAgent.system.iOS &&
 					(paella.utils.userAgent.browser.Version.major<12 ||
 					 !paella.utils.userAgent.system.iPad))
 				{
@@ -8455,7 +9398,7 @@ paella.ControlsContainer = ControlsContainer;
 			if (paella.profiles.setProfile(profileName,animate)) {
 				let profileData = paella.player.getProfile(profileName);
 				if (profileData && !paella.player.videoContainer.isMonostream) {
-					base.cookies.set('lastProfile', profileName);
+					paella.utils.cookies.set('lastProfile', profileName);
 				}
 				paella.events.trigger(paella.events.setProfile,{profileName:profileName});
 			}
@@ -8520,11 +9463,11 @@ paella.ControlsContainer = ControlsContainer;
 					var videoQualityStrategy = new paella.BestFitVideoQualityStrategy();
 					try {
 						var StrategyClass = this.config.player.videoQualityStrategy;
-						var ClassObject = Class.fromString(StrategyClass);
+						var ClassObject = paella.utils.classFromString(StrategyClass);
 						videoQualityStrategy = new ClassObject();
 					}
 					catch(e) {
-						base.log.warning("Error selecting video quality strategy: strategy not found");
+						paella.log.warning("Error selecting video quality strategy: strategy not found");
 					}
 					this.videoContainer.setVideoQualityStrategy(videoQualityStrategy);
 					
@@ -8555,21 +9498,21 @@ paella.ControlsContainer = ControlsContainer;
 					}
 					else if (userData.isAnonymous) {
 						var redirectUrl = paella.initDelegate.initParams.accessControl.getAuthenticationUrl("player/?id=" + paella.player.videoIdentifier);
-						var message = '<div>' + base.dictionary.translate("You are not authorized to view this resource") + '</div>';
+						var message = '<div>' + paella.utils.dictionary.translate("You are not authorized to view this resource") + '</div>';
 						if (redirectUrl) {
-							message += '<div class="login-link"><a href="' + redirectUrl + '">' + base.dictionary.translate("Login") + '</a></div>';
+							message += '<div class="login-link"><a href="' + redirectUrl + '">' + paella.utils.dictionary.translate("Login") + '</a></div>';
 						}
 						thisClass.unloadAll(message);
 					}
 					else {
-						let errorMessage = base.dictionary.translate("You are not authorized to view this resource");
+						let errorMessage = paella.utils.dictionary.translate("You are not authorized to view this resource");
 						thisClass.unloadAll(errorMessage);
 						paella.events.trigger(paella.events.error,{error:errorMessage});
 					}
 				})
 	
 				.catch((error) => {
-					let errorMessage = base.dictionary.translate(error);
+					let errorMessage = paella.utils.dictionary.translate(error);
 					thisClass.unloadAll(errorMessage);
 					paella.events.trigger(paella.events.error,{error:errorMessage});
 				});
@@ -8631,7 +9574,7 @@ paella.ControlsContainer = ControlsContainer;
 						.catch((error) => {
 							console.error(error);
 							let msg = error.message || "Could not load the video";
-							paella.messageBox.showError(base.dictionary.translate(msg));
+							paella.messageBox.showError(paella.utils.dictionary.translate(msg));
 						});
 				});
 			}
@@ -8954,7 +9897,7 @@ class DefaultVideoLoader extends paella.VideoLoader {
 		}
 		else if (url) {
 			var This = this;
-			base.ajax.get({ url:this.getDataUrl() },
+			paella.utils.ajax.get({ url:this.getDataUrl() },
 				function(data,type,err) {
 					if (typeof(data)=="string") {
 						try {
@@ -8968,16 +9911,16 @@ class DefaultVideoLoader extends paella.VideoLoader {
 				function(data,type,err) {
 					switch (err) {
 					case 401:
-						paella.messageBox.showError(base.dictionary.translate("You are not logged in"));
+						paella.messageBox.showError(paella.utils.dictionary.translate("You are not logged in"));
 						break;
 					case 403:
-						paella.messageBox.showError(base.dictionary.translate("You are not authorized to view this resource"));
+						paella.messageBox.showError(paella.utils.dictionary.translate("You are not authorized to view this resource"));
 						break;
 					case 404:
-						paella.messageBox.showError(base.dictionary.translate("The specified video identifier does not exist"));
+						paella.messageBox.showError(paella.utils.dictionary.translate("The specified video identifier does not exist"));
 						break;
 					default:
-						paella.messageBox.showError(base.dictionary.translate("Could not load the video"));
+						paella.messageBox.showError(paella.utils.dictionary.translate("Could not load the video"));
 					}
 				});
 		}
@@ -9434,192 +10377,11 @@ paella.lazyLoad = function(playerContainer, params, forceLazyLoad = true) {
 	paella.extendedAdapter = new paella.ExtendedAdapter();
 })();
 
-/*  
-	Paella HTML 5 Multistream Player
-	Copyright (C) 2017  Universitat Politècnica de València Licensed under the
-	Educational Community License, Version 2.0 (the "License"); you may
-	not use this file except in compliance with the License. You may
-	obtain a copy of the License at
 
-	http://www.osedu.org/licenses/ECL-2.0
+try {
+    module.export = paella;
+} catch(e) {}
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an "AS IS"
-	BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-	or implied. See the License for the specific language governing
-	permissions and limitations under the License.
-*/
-
-/*
-Class ("paella.editor.EmbedPlayer", base.AsyncLoaderCallback,{
-	editar:null,
-
-	initialize:function() {
-		this.editor = paella.editor.instance;
-	},
-
-	load:function(onSuccess,onError) {
-		var barHeight = this.editor.bottomBar.getHeight() + 20;
-		var rightBarWidth = this.editor.rightBar.getWidth() + 20;
-		$(paella.player.mainContainer).css({
-			'position':'fixed',
-			"width":"",
-			"bottom":barHeight + "px",
-			"right":rightBarWidth + "px",
-			"left":"20px",
-			"top":"20px"
-		});
-		paella.player.mainContainer.className = "paellaMainContainerEditorMode";
-		new Timer(function(timer) {
-			paella.player.controls.disable();
-			paella.player.onresize();
-			if (onSuccess) {
-				onSuccess();
-			}
-		},500);
-	},
-
-	restorePlayer:function() {
-		$('body')[0].appendChild(paella.player.mainContainer);
-		paella.player.controls.enable();
-		paella.player.mainContainer.className = "";
-		$(paella.player.mainContainer).css({
-			'position':'',
-			"width":"",
-			"bottom":"",
-			"left":"",
-			"right":"",
-			"top":""
-		});
-		paella.player.onresize();
-	},
-
-	onresize:function() {
-		var barHeight = this.editor.bottomBar.getHeight() + 20;
-		var rightBarWidth = this.editor.rightBar.getWidth() + 20;
-		$(paella.player.mainContainer).css({
-			'position':'fixed',
-			"width":"",
-			"bottom":barHeight + "px",
-			"right":rightBarWidth + "px",
-			"left":"20px",
-			"top":"20px"
-		});
-
-	}
-});
-
-*/
-/*  
-	Paella HTML 5 Multistream Player
-	Copyright (C) 2017  Universitat Politècnica de València Licensed under the
-	Educational Community License, Version 2.0 (the "License"); you may
-	not use this file except in compliance with the License. You may
-	obtain a copy of the License at
-
-	http://www.osedu.org/licenses/ECL-2.0
-
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an "AS IS"
-	BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-	or implied. See the License for the specific language governing
-	permissions and limitations under the License.
-*/
-
-///////////////////////////////////////////////////////
-// Deprecated functions/objects
-//
-//    Will be removed in next paella version.
-///////////////////////////////////////////////////////
-
-
-function DeprecatedClass(name, replacedBy, p) {
-	Class (name, p, {
-		initialize: function() {
-			base.log.warning(name +  " is deprecated, use " + replacedBy + " instead.");
-			this.parent.apply(this, arguments);
-		}
-	});
-}
-
-function DeprecatedFunc(name, replacedBy, func) {
-	function ret(){
-		base.log.warning(name +  " is deprecated, use " + replacedBy + " instead.");
-		func.apply(this, arguments);
-	}
-	
-	return ret;
-}
-
-// Pella Dictionary
-///////////////////////////////////////////////////////
-DeprecatedClass("paella.Dictionary", "base.Dictionary", base.Dictionary);
-paella.dictionary = base.dictionary;
-
-// Paella AsyncLoader
-///////////////////////////////////////////////////////
-DeprecatedClass("paella.AsyncLoaderCallback", "base.AsyncLoaderCallback", base.AsyncLoaderCallback);
-DeprecatedClass("paella.AjaxCallback", "base.AjaxCallback", base.AjaxCallback);
-DeprecatedClass("paella.JSONCallback", "base.JSONCallback", base.JSONCallback);
-DeprecatedClass("paella.DictionaryCallback", "base.DictionaryCallback", base.DictionaryCallback);
-DeprecatedClass("paella.AsyncLoader", "base.AsyncLoader", base.AsyncLoader);
-
-// Paella Timer
-///////////////////////////////////////////////////////
-DeprecatedClass("paella.Timer", "base.Timer", base.Timer);
-DeprecatedClass("paella.utils.Timer", "base.Timer", base.Timer);
-
-
-// Paella Ajax
-///////////////////////////////////////////////////////
-paella.ajax = {};
-paella.ajax['send'] = DeprecatedFunc("paella.ajax.send", "base.ajax.send", base.ajax.send);
-paella.ajax['get'] = DeprecatedFunc("paella.ajax.get", "base.ajax.get", base.ajax.get);
-paella.ajax['put'] = DeprecatedFunc("paella.ajax.put", "base.ajax.put", base.ajax.put);
-paella.ajax['post'] = DeprecatedFunc("paella.ajax.post", "base.ajax.post", base.ajax.post);
-paella.ajax['delete'] = DeprecatedFunc("paella.ajax.delete", "base.ajax.delete", base.ajax.send);
-
-
-
-// Paella UI
-///////////////////////////////////////////////////////
-paella.ui = {};
-
-paella.ui.Container = function(params) {
-	var elem = document.createElement('div');
-	if (params.id) elem.id = params.id;
-	if (params.className) elem.className = params.className;
-	if (params.style) $(elem).css(params.style);
-	return elem;
-};
-
-
-
-
-// paella.utils
-///////////////////////////////////////////////////////
-paella.utils.ajax = base.ajax;
-paella.utils.cookies = base.cookies;
-paella.utils.parameters = base.parameters;
-paella.utils.require = base.require;
-paella.utils.importStylesheet = base.importStylesheet;
-paella.utils.language = base.dictionary.currentLanguage;
-paella.utils.uuid = base.uuid;
-paella.utils.userAgent = base.userAgent;
-
-
-
-
-// paella.debug
-///////////////////////////////////////////////////////
-paella.debug = {
-	log:function(msg) {
-		base.log.warning("paella.debug.log is deprecated, use base.debug.[error/warning/debug/log] instead.");
-		base.log.log(msg);
-	}
-};
-
-paella.debugReady = true;
 paella.addPlugin(function() {
 	class FlexSkipPlugin extends paella.ButtonPlugin {
 		getAlignment() { return 'left'; }
@@ -9628,7 +10390,7 @@ paella.addPlugin(function() {
 		getSubclass() { return 'flexSkip_Rewind_10'; }
 		getIconClass() { return 'icon-back-10-s'; }
 		formatMessage() { return 'Rewind 10 seconds'; }
-		getDefaultToolTip() { return base.dictionary.translate(this.formatMessage()); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate(this.formatMessage()); }
 	
 		checkEnabled(onSuccess) {
 			onSuccess(!paella.player.isLiveStream());
@@ -10717,105 +11479,6 @@ paella.addProfile(() => {
 });
 
 
-/*
-paella.plugins.TrimmingTrackPlugin = Class.create(paella.editor.MainTrackPlugin,{
-	trimmingTrack:null,
-	trimmingData:{s:0,e:0},
-
-	getTrackItems:function() {
-		if (this.trimmingTrack==null) {
-			this.trimmingTrack = {id:1,s:0,e:0};
-			this.trimmingTrack.s = paella.player.videoContainer.trimStart();
-			this.trimmingTrack.e = paella.player.videoContainer.trimEnd();
-			this.trimmingData.s = this.trimmingTrack.s;
-			this.trimmingData.e = this.trimmingTrack.e;
-		}		
-		var tracks = [];
-		tracks.push(this.trimmingTrack);
-		return tracks;
-	},
-		
-	getName:function() { return "es.upv.paella.editor.trimmingTrackPlugin"; },
-
-	getTools:function() {
-		if(this.config.enableResetButton) {
-			return [
-				{name:'reset', label:base.dictionary.translate('Reset'), hint:base.dictionary.translate('Resets the trimming bar to the default length of the video.')}
-			];
-		}
-	},
-
-	onToolSelected:function(toolName) {
-		if(this.config.enableResetButton) {
-		    if(toolName=='reset') {
-			this.trimmingTrack = {id:1,s:0,e:0};
-			this.trimmingTrack.s = 0;
-			this.trimmingTrack.e = paella.player.videoContainer.duration(true);
-			return true;
-			}
-		}
-	},
-
-	getTrackName:function() {
-		return base.dictionary.translate("Trimming");
-	},
-	
-	getColor:function() {
-		return 'rgb(0, 51, 107)';
-	},
-	
-	//checkEnabled:function(isEnabled) {
-	//	isEnabled(paella.plugins.trimmingLoaderPlugin.config.enabled);
-		//isEnabled(paella.player.config.trimming && paella.player.config.trimming.enabled);
-		//},
-	
-	onSave:function(onDone) {
-		paella.player.videoContainer.enableTrimming();
-		paella.player.videoContainer.setTrimmingStart(this.trimmingTrack.s);
-		paella.player.videoContainer.setTrimmingEnd(this.trimmingTrack.e);
-
-		this.trimmingData.s = this.trimmingTrack.s;
-		this.trimmingData.e = this.trimmingTrack.e;
-		
-		paella.data.write('trimming',{id:paella.initDelegate.getId()},{start:this.trimmingTrack.s,end:this.trimmingTrack.e},function(data,status) {
-			onDone(status);
-		});
-	},
-	
-	onDiscard:function(onDone) {
-		this.trimmingTrack.s = this.trimmingData.s;
-		this.trimmingTrack.e = this.trimmingData.e;
-		onDone(true);
-	},
-	
-	allowDrag:function() {
-		return false;
-	},
-	
-	onTrackChanged:function(id,start,end) {
-		//Checks if the trimming is valid (start >= 0 and end <= duration_of_the_video)
-		playerEnd = paella.player.videoContainer.duration(true);
-		start = (start < 0)? 0 : start;
-		end = (end > playerEnd)? playerEnd : end;
-		this.trimmingTrack.s = start;
-		this.trimmingTrack.e = end;
-		this.parent(id,start,end);
-	},
-
-	contextHelpString:function() {
-		// TODO: Implement this using the standard base.dictionary class
-		if (base.dictionary.currentLanguage()=="es") {
-			return "Utiliza la herramienta de recorte para definir el instante inicial y el instante final de la clase. Para cambiar la duración solo hay que arrastrar el inicio o el final de la pista \"Recorte\", en la linea de tiempo.";
-		}
-		else {
-			return "Use this tool to define the start and finish time.";
-		}
-	}
-});
-
-paella.plugins.trimmingTrackPlugin = new paella.plugins.TrimmingTrackPlugin();
-
-*/
 paella.addPlugin(function() {
 
 
@@ -10853,8 +11516,8 @@ paella.addPlugin(function() {
 				}
 				else {
 					// Check for optional trim 'start' and 'end', in seconds, in location args
-					var startTime =  base.parameters.get('start');
-					var endTime = base.parameters.get('end');
+					var startTime =  paella.utils.parameters.get('start');
+					var endTime = paella.utils.parameters.get('end');
 					if (startTime && endTime) {
 						paella.player.videoContainer.setTrimming(startTime, endTime).then(function() {
 							return paella.player.videoContainer.enableTrimming();
@@ -10884,7 +11547,7 @@ paella.addPlugin(function() {
 				onSuccess(window.WebKitPlaybackTargetAvailabilityEvent);
 			}
 		}
-		getDefaultToolTip() { return base.dictionary.translate("Emit to AirPlay."); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Emit to AirPlay."); }
 	
 		setup() {
 			let video = paella.player.videoContainer.masterVideo().video;
@@ -11143,7 +11806,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-headphone'; }
 		getIndex() { return 2040; }
 		getName() { return "es.upv.paella.audioSelector"; }
-		getDefaultToolTip() { return base.dictionary.translate("Set audio stream"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Set audio stream"); }
 
 		closeOnMouseOut() { return true; }
 			
@@ -11250,7 +11913,7 @@ paella.addPlugin(function() {
 		getIndex() {return 10; }
 		getAlignment() { return 'right'; }
 		getSubclass() { return "blackBoardButton2"; }
-		getDefaultToolTip() { return base.dictionary.translate("BlackBoard"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("BlackBoard"); }
 	
 		checkEnabled(onSuccess) {
 			this._blackBoardProfile = "s_p_blackboard2";
@@ -11662,7 +12325,7 @@ paella.addPlugin(() => {
 					height: 40
 				};
 				this.currentText = text;
-				this.messageContainer = paella.player.videoContainer.overlayContainer.addText(paella.dictionary.translate(text), rect);
+				this.messageContainer = paella.player.videoContainer.overlayContainer.addText(paella.utils.dictionary.translate(text), rect);
 				this.messageContainer.className = 'textBreak';
 				this.currentText = text;
 			}
@@ -11727,7 +12390,7 @@ paella.addPlugin(function() {
 				var l_lang = ll.attr("xml:lang");
 				if ((l_lang == undefined) || (l_lang == "")){
 					if ((g_lang == undefined) || (g_lang == "")) {
-						base.log.debug("No xml:lang found! Using '" + lang + "' lang instead.");
+						paella.log.debug("No xml:lang found! Using '" + lang + "' lang instead.");
 						l_lang = lang;
 					}
 					else {
@@ -11782,7 +12445,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-captions'; }
 		getName() { return "es.upv.paella.captionsPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-		getDefaultToolTip() { return base.dictionary.translate("Subtitles"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Subtitles"); }
 		getIndex() { return 509; }
 		closeOnMouseOut() { return false; }
 	
@@ -11957,7 +12620,7 @@ paella.addPlugin(function() {
 	
 		action() {
 			var self = this;
-			self._browserLang = base.dictionary.currentLanguage();
+			self._browserLang = paella.utils.dictionary.currentLanguage();
 			self._autoScroll = true;
 	
 			switch(self._open){
@@ -12001,7 +12664,7 @@ paella.addPlugin(function() {
 				thisClass._input.type = "text";
 				thisClass._input.id ="captionsBarInput";
 				thisClass._input.name = "captionsString";
-				thisClass._input.placeholder = base.dictionary.translate("Search captions");
+				thisClass._input.placeholder = paella.utils.dictionary.translate("Search captions");
 				thisClass._bar.appendChild(thisClass._input);
 	
 				//INPUT jQuery
@@ -12015,7 +12678,7 @@ paella.addPlugin(function() {
 					if(thisClass._searchTimer != null){
 						thisClass._searchTimer.cancel();
 					}
-					thisClass._searchTimer = new base.Timer(function(timer) {
+					thisClass._searchTimer = new paella.utils.Timer(function(timer) {
 						thisClass.doSearch(text);
 					}, thisClass._searchTimerTime);			
 				});
@@ -12028,7 +12691,7 @@ paella.addPlugin(function() {
 			thisClass._select.className = "captionsSelector";
 			
 			var defOption = document.createElement("option"); // NO ONE SELECT
-			defOption.text = base.dictionary.translate("None");
+			defOption.text = paella.utils.dictionary.translate("None");
 			defOption.value = "";
 			thisClass._select.add(defOption);
 	
@@ -12832,7 +13495,7 @@ paella.addPlugin(function() {
 					return false;
 				}
 				if (paella.videoFactories.Html5VideoFactory.s_instances>0 && 
-					base.userAgent.system.iOS)
+					paella.utils.userAgent.system.iOS)
 				{
 					return false;
 				}
@@ -12877,10 +13540,10 @@ paella.addPlugin(function() {
 	
 		getSubclass() { return "showCommentsTabBar"; }
 		getName() { return "es.upv.paella.commentsPlugin"; }
-		getTabName() { return base.dictionary.translate("Comments"); }
+		getTabName() { return paella.utils.dictionary.translate("Comments"); }
 		checkEnabled(onSuccess) { onSuccess(true); }
 		getIndex() { return 40; }
-		getDefaultToolTip() { return base.dictionary.translate("Comments"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Comments"); }
 						
 		action(tab) {
 			this.loadContent();
@@ -12957,7 +13620,7 @@ paella.addPlugin(function() {
 					thisClass.addComment();
 				}
 			};
-			btnAddComment.innerText = base.dictionary.translate("Publish");
+			btnAddComment.innerText = paella.utils.dictionary.translate("Publish");
 			
 			this.publishCommentButtons.appendChild(btnAddComment);
 			
@@ -13148,7 +13811,7 @@ paella.addPlugin(function() {
 				//var btnRplyComment = document.createElement('button');
 				var btnRplyComment = document.createElement('div');
 				btnRplyComment.className = "reply_button";
-				btnRplyComment.innerText = base.dictionary.translate("Reply");
+				btnRplyComment.innerText = paella.utils.dictionary.translate("Reply");
 				
 				btnRplyComment.id = rootID+"_comment_reply_button";
 				btnRplyComment.onclick = function(){
@@ -13270,7 +13933,7 @@ paella.addPlugin(function() {
 					thisClass.addReply(annotationID,textArea.id);
 				}
 			};
-			btnAddComment.innerText = base.dictionary.translate("Reply");
+			btnAddComment.innerText = paella.utils.dictionary.translate("Reply");
 			
 			this.publishCommentButtons.appendChild(btnAddComment);
 			
@@ -13333,7 +13996,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-folder'; }
 		getIndex() { return 2030; }
 		getName() { return "es.upv.paella.extendedTabAdapterPlugin"; }
-		getDefaultToolTip() { return base.dictionary.translate("Extended Tab Adapter"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Extended Tab Adapter"); }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		
 		buildContent(domElement) {
@@ -13360,7 +14023,7 @@ paella.addPlugin(function() {
 		getSubclass() { return "footPrints"; }
 		getIconClass() { return 'icon-stats'; }
 		getIndex() { return 590; }
-		getDefaultToolTip() { return base.dictionary.translate("Show statistics"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Show statistics"); }
 		getName() { return "es.upv.paella.footprintsPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.timeLineButton; }
 	
@@ -13441,7 +14104,7 @@ paella.addPlugin(function() {
 		willShowContent() {
 			var thisClass = this;
 			this.loadFootprints();
-			this.footPrintsTimer = new base.Timer(function(timer) {
+			this.footPrintsTimer = new paella.utils.Timer(function(timer) {
 				thisClass.loadFootprints();
 			},5000);
 			this.footPrintsTimer.repeat = true;
@@ -13575,7 +14238,7 @@ paella.addPlugin(function() {
 		getIndex() { return 510; }
 		getName() { return "es.upv.paella.frameControlPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.timeLineButton; }
-		getDefaultToolTip() { return base.dictionary.translate("Navigate by slides"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Navigate by slides"); }
 
 		checkEnabled(onSuccess) {
 			this._img = null;
@@ -13620,7 +14283,7 @@ paella.addPlugin(function() {
 							}
 
 							if(this.hiResFrame) thisClass.removeHiResFrame();
-							if (!base.userAgent.browser.IsMobileVersion) {
+							if (!paella.utils.userAgent.browser.IsMobileVersion) {
 								thisClass.buttons[selectedItem].frameControl.onMouseOver(null,thisClass.buttons[selectedItem].frameData);
 							}
 							
@@ -13645,7 +14308,7 @@ paella.addPlugin(function() {
 							}
 
 							if(this.hiResFrame)thisClass.removeHiResFrame();
-							if (!base.userAgent.browser.IsMobileVersion) {
+							if (!paella.utils.userAgent.browser.IsMobileVersion) {
 								thisClass.buttons[selectedItem].frameControl.onMouseOver(null,thisClass.buttons[selectedItem].frameData);
 							}
 							
@@ -13845,7 +14508,7 @@ paella.addPlugin(function() {
 				var image = frameData.thumb ? frameData.thumb:frameData.url;
 				var labelTime = paella.utils.timeParse.secondsToTime(frameData.time);
 				frame.innerHTML = '<img src="' + image + '" alt="" class="frameControlImage" title="'+labelTime+'" aria-label="'+labelTime+'"></img>';
-				if (!base.userAgent.browser.IsMobileVersion) {
+				if (!paella.utils.userAgent.browser.IsMobileVersion) {
 					$(frame).mouseover(function(event) {
 						this.frameControl.onMouseOver(event,this.frameData);
 					});
@@ -13941,7 +14604,7 @@ paella.addPlugin(function() {
 			var enabled = paella.player.checkFullScreenCapability();
 			onSuccess(enabled);
 		}
-		getDefaultToolTip() { return base.dictionary.translate("Go Fullscreen"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Go Fullscreen"); }
 		
 		setup() {
 			this._reload = this.config.reloadOnFullscreen ? this.config.reloadOnFullscreen.enabled:false;
@@ -13953,7 +14616,7 @@ paella.addPlugin(function() {
 			if (paella.player.isFullScreen()) {
 				paella.player.exitFullScreen();
 			}
-			else if ((!paella.player.checkFullScreenCapability() || base.userAgent.browser.Explorer) && window.location !== window.parent.location) {
+			else if ((!paella.player.checkFullScreenCapability() || paella.utils.userAgent.browser.Explorer) && window.location !== window.parent.location) {
 				// Iframe and no fullscreen support
 				var url = window.location.href;
 	
@@ -13998,13 +14661,13 @@ paella.addPlugin(function() {
 		}
 	
 		onEnterFullscreen() {
-			this.setToolTip(base.dictionary.translate("Exit Fullscreen"));
+			this.setToolTip(paella.utils.dictionary.translate("Exit Fullscreen"));
 			this.button.className = this.getButtonItemClass(true);
 			this.changeIconClass('icon-windowed');
 		}
 		
 		onExitFullscreen() {
-			this.setToolTip(base.dictionary.translate("Go Fullscreen"));
+			this.setToolTip(paella.utils.dictionary.translate("Go Fullscreen"));
 			this.button.className = this.getButtonItemClass(false);
 			this.changeIconClass('icon-fullscreen');
 			setTimeout(() => {
@@ -14027,7 +14690,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-help'; }
 		getName() { return "es.upv.paella.helpPlugin"; }
 
-		getDefaultToolTip() { return base.dictionary.translate("Show help") + ' (' + base.dictionary.translate("Paella version:") + ' ' + paella.version + ')'; }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Show help") + ' (' + paella.utils.dictionary.translate("Paella version:") + ' ' + paella.version + ')'; }
 
 
 		checkEnabled(onSuccess) { 
@@ -14036,7 +14699,7 @@ paella.addPlugin(function() {
 		}
 
 		action(button) {
-			var mylang = base.dictionary.currentLanguage();
+			var mylang = paella.utils.dictionary.currentLanguage();
 			
 			var availableLangs = (this.config && this.config.langs) || [];
 			var idx = availableLangs.indexOf(mylang);
@@ -14044,7 +14707,7 @@ paella.addPlugin(function() {
 							
 			//paella.messageBox.showFrame("http://paellaplayer.upv.es/?page=usage");
 			let url = "resources/style/help/help_" + availableLangs[idx] + ".html";
-			if (base.userAgent.browser.IsMobileVersion) {
+			if (paella.utils.userAgent.browser.IsMobileVersion) {
 				window.open(url);
 			}
 			else {
@@ -14271,7 +14934,7 @@ paella.addPlugin(function() {
 		}
 
 		webGlDidLoad() {
-			if (base.userAgent.system.iOS) {
+			if (paella.utils.userAgent.system.iOS) {
 				return super.webGlDidLoad();
 			}
 			// Register a new video loader in the webgl engine, to enable the
@@ -14287,7 +14950,7 @@ paella.addPlugin(function() {
 		}
 
 		loadVideoStream(canvasInstance,stream) {
-			if (base.userAgent.system.iOS) {
+			if (paella.utils.userAgent.system.iOS) {
 				return super.loadVideoStream(canvasInstance,stream);
 			}
 
@@ -14298,7 +14961,7 @@ paella.addPlugin(function() {
 
 		supportsMultiaudio() {
 			return this._deferredAction(() => {
-				if (base.userAgent.system.iOS) {
+				if (paella.utils.userAgent.system.iOS) {
 					return this.video.audioTracks.length>1;
 				}
 				else {
@@ -14309,7 +14972,7 @@ paella.addPlugin(function() {
 	
 		getAudioTracks() {
 			return this._deferredAction(() => {
-				if (base.userAgent.system.iOS) {
+				if (paella.utils.userAgent.system.iOS) {
 					let result = [];
 					Array.from(this.video.audioTracks).forEach((t) => {
 						result.push({
@@ -14329,7 +14992,7 @@ paella.addPlugin(function() {
 
 		setCurrentAudioTrack(trackId) {
 			return this._deferredAction(() => {
-				if (base.userAgent.system.iOS) {
+				if (paella.utils.userAgent.system.iOS) {
 					let found = false;
 					Array.from(this.video.audioTracks).forEach((track) => {
 						if (track.id==trackId) {
@@ -14357,7 +15020,7 @@ paella.addPlugin(function() {
 
 		getCurrentAudioTrack() {
 			return this._deferredAction(() => {
-				if (base.userAgent.system.iOS) {
+				if (paella.utils.userAgent.system.iOS) {
 					let result = null;
 					Array.from(this.video.audioTracks).some((t) => {
 						if (t.enabled) {
@@ -14381,8 +15044,8 @@ paella.addPlugin(function() {
 		}
 	
 		getQualities() {
-			if (base.userAgent.system.iOS)// ||
-		//		base.userAgent.browser.Safari)
+			if (paella.utils.userAgent.system.iOS)// ||
+		//		paella.utils.userAgent.browser.Safari)
 			{
 				return new Promise((resolve,reject) => {
 					resolve([
@@ -14426,7 +15089,7 @@ paella.addPlugin(function() {
 		}
 
 		disable(isMainAudioPlayer) {
-			if (base.userAgent.system.iOS) {
+			if (paella.utils.userAgent.system.iOS) {
 				return;
 			}
 			
@@ -14454,8 +15117,8 @@ paella.addPlugin(function() {
 		}
 		
 		setQuality(index) {
-			if (base.userAgent.system.iOS)// ||
-				//base.userAgent.browser.Safari)
+			if (paella.utils.userAgent.system.iOS)// ||
+				//paella.utils.userAgent.browser.Safari)
 			{
 				return Promise.resolve();
 			}
@@ -14488,8 +15151,8 @@ paella.addPlugin(function() {
 		}
 		
 		getCurrentQuality() {
-			if (base.userAgent.system.iOS)// ||
-				//base.userAgent.browser.Safari)
+			if (paella.utils.userAgent.system.iOS)// ||
+				//paella.utils.userAgent.browser.Safari)
 			{
 				return Promise.resolve(0);
 			}
@@ -14525,9 +15188,9 @@ paella.addPlugin(function() {
 			}
 			try {
 				let cfg = this.config;
-				if ((base.userAgent.system.iOS &&
+				if ((paella.utils.userAgent.system.iOS &&
 					paella.videoFactories.HLSVideoFactory.s_instances>=cfg.iOSMaxStreams) ||
-					(base.userAgent.system.Android &&
+					(paella.utils.userAgent.system.Android &&
 					paella.videoFactories.HLSVideoFactory.s_instances>=cfg.androidMaxStreams))
 			//	In some old mobile devices, playing a high number of HLS streams may cause that the browser tab crash
 				{
@@ -14690,7 +15353,7 @@ paella.addPlugin(function() {
         getIndex() {return 10;}
         getSubclass() { return "liveIndicator"; }
         getAlignment() { return 'right'; }
-        getDefaultToolTip() { return base.dictionary.translate("This video is a live stream"); }
+        getDefaultToolTip() { return paella.utils.dictionary.translate("This video is a live stream"); }
         getName() { return "es.upv.paella.liveStreamingIndicatorPlugin"; }
 
         checkEnabled(onSuccess) {
@@ -14700,7 +15363,7 @@ paella.addPlugin(function() {
         setup() {}
 
         action(button) {
-            paella.messageBox.showMessage(base.dictionary.translate("Live streaming mode: This is a live video, so, some capabilities of the player are disabled"));
+            paella.messageBox.showMessage(paella.utils.dictionary.translate("Live streaming mode: This is a live video, so, some capabilities of the player are disabled"));
         }
     }
 });
@@ -14921,7 +15584,7 @@ paella.MpegDashVideo = MpegDashVideo;
 class MpegDashVideoFactory extends paella.VideoFactory {
 	isStreamCompatible(streamData) {
 		try {
-			if (base.userAgent.system.iOS) {
+			if (paella.utils.userAgent.system.iOS) {
 				return false;
 			}
 			for (var key in streamData.sources) {
@@ -14951,7 +15614,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-screen'; }
 		getIndex() { return 2030; }
 		getName() { return "es.upv.paella.multipleQualitiesPlugin"; }
-		getDefaultToolTip() { return base.dictionary.translate("Change video quality"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Change video quality"); }
 		
 		closeOnMouseOut() { return true; }
 		
@@ -15035,7 +15698,7 @@ paella.addPlugin(function() {
                 onSuccess(false);
             }
         }
-        getDefaultToolTip() { return base.dictionary.translate("Set picture-in-picture mode."); }
+        getDefaultToolTip() { return paella.utils.dictionary.translate("Set picture-in-picture mode."); }
 
         setup() {
 
@@ -15063,7 +15726,7 @@ paella.addPlugin(function() {
     }
 });
 
-//paella.plugins.PlayPauseButtonPlugin = Class.create(paella.ButtonPlugin, {
+
 paella.addPlugin(function() {
 	return class PlayPauseButtonPlugin extends paella.ButtonPlugin {
 		constructor() {
@@ -15079,7 +15742,7 @@ paella.addPlugin(function() {
 		getSubclass() { return this.playSubclass; }
 		getIconClass() { return this.playIconClass; }
 		getName() { return "es.upv.paella.playPauseButtonPlugin"; }
-		getDefaultToolTip() { return base.dictionary.translate("Play"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Play"); }
 		getIndex() { return 110; }
 	
 		checkEnabled(onSuccess) {
@@ -15094,19 +15757,19 @@ paella.addPlugin(function() {
 			paella.events.bind(paella.events.play,(event) => {
 				this.changeIconClass(this.pauseIconClass);
 				this.changeSubclass(this.pauseSubclass);
-				this.setToolTip(paella.dictionary.translate("Pause"));
+				this.setToolTip(paella.utils.dictionary.translate("Pause"));
 			});
 
 			paella.events.bind(paella.events.pause,(event) => {
 				this.changeIconClass(this.playIconClass);
 				this.changeSubclass(this.playSubclass);
-				this.setToolTip(paella.dictionary.translate("Play"));
+				this.setToolTip(paella.utils.dictionary.translate("Play"));
 			});
 
 			paella.events.bind(paella.events.ended,(event) => {
 				this.changeIconClass(this.replayIconClass);
 				this.changeSubclass(this.playSubclass);
-				this.setToolTip(paella.dictionary.translate("Play"));
+				this.setToolTip(paella.utils.dictionary.translate("Play"));
 			});
 		}
 	
@@ -15144,8 +15807,8 @@ paella.addPlugin(function() {
                 this.showOnEnd = !Array.isArray(data) ||  data.length == 0;
 			});
 			
-			onSuccess(!paella.player.isLiveStream() || base.userAgent.system.Android 
-				|| base.userAgent.system.iOS || !paella.player.videoContainer.supportAutoplay());
+			onSuccess(!paella.player.isLiveStream() || paella.utils.userAgent.system.Android 
+				|| paella.utils.userAgent.system.iOS || !paella.player.videoContainer.supportAutoplay());
 		}
 	
 		getIndex() { return 1010; }
@@ -15240,7 +15903,7 @@ paella.addPlugin(function() {
 		getIndex() { return 140; }
 		getName() { return "es.upv.paella.playbackRatePlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.menuButton; }
-		getDefaultToolTip() { return base.dictionary.translate("Set playback rate"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Set playback rate"); }
 
 		checkEnabled(onSuccess) {
 			this.buttonItems = null;
@@ -15302,7 +15965,7 @@ paella.addPlugin(function() {
 		getIndex() { return 540; }
 		getName() { return "es.upv.paella.ratePlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-		getDefaultToolTip() { return base.dictionary.translate("Rate this video"); }		
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Rate this video"); }		
 		checkEnabled(onSuccess) {
 			this.buttonItems = null;
 			this.buttons =  [];
@@ -15337,20 +16000,20 @@ paella.addPlugin(function() {
 		closeOnMouseOut() { return true; }
 
 		updateHeader() {
-			let score = base.dictionary.translate("Not rated");
+			let score = paella.utils.dictionary.translate("Not rated");
 			if (this.count>0) {
 				score = '<i class="glyphicon glyphicon-star"></i>';
-				score += ` ${ this.score } ${ this.count } ${ base.dictionary.translate('votes') }`;
+				score += ` ${ this.score } ${ this.count } ${ paella.utils.dictionary.translate('votes') }`;
 			}
 
 			this.scoreContainer.header.innerHTML = `
 			<div>
-				<h4>${ base.dictionary.translate('Video score') }:</h4>
+				<h4>${ paella.utils.dictionary.translate('Video score') }:</h4>
 				<h5>
 					${ score }
 				</h5>
 				</h4>
-				<h4>${ base.dictionary.translate('Vote:') }</h4>
+				<h4>${ paella.utils.dictionary.translate('Vote:') }</h4>
 			</div>
 			`;
 		}
@@ -15367,7 +16030,7 @@ paella.addPlugin(function() {
 				}
 			}
 			else {
-				this.scoreContainer.rateButtons.innerHTML = `<h5>${ base.dictionary.translate('Login to vote')}</h5>`;
+				this.scoreContainer.rateButtons.innerHTML = `<h5>${ paella.utils.dictionary.translate('Login to vote')}</h5>`;
 			}
 			this.updateVote();
 		}
@@ -15570,15 +16233,15 @@ class RTMPVideo extends paella.VideoElementBase {
 			if (eventName=="progress") {
 				try { This.flashVideo.setVolume(This._volume); }
 				catch(e) {}
-				base.log.debug("Flash video event: " + eventName + ", progress: " + This.flashVideo.currentProgress());
+				paella.log.debug("Flash video event: " + eventName + ", progress: " + This.flashVideo.currentProgress());
 			}
 			else if (eventName=="ended") {
-				base.log.debug("Flash video event: " + eventName);
+				paella.log.debug("Flash video event: " + eventName);
 				paella.events.trigger(paella.events.pause);
 				paella.player.controls.showControls();
 			}
 			else {
-				base.log.debug("Flash video event: " + eventName);
+				paella.log.debug("Flash video event: " + eventName);
 			}
 		};
 
@@ -15634,13 +16297,13 @@ class RTMPVideo extends paella.VideoElementBase {
 					var message = document.createElement('div');
 
 					var header = document.createElement('h3');
-					header.innerText = base.dictionary.translate("Flash player problem");
+					header.innerText = paella.utils.dictionary.translate("Flash player problem");
 					var text = document.createElement('div');
-					text.innerHTML = base.dictionary.translate("A problem occurred trying to load flash player.") + "<br>" +
-						base.dictionary.translate("Please go to {0} and install it.")
+					text.innerHTML = paella.utils.dictionary.translate("A problem occurred trying to load flash player.") + "<br>" +
+						paella.utils.dictionary.translate("Please go to {0} and install it.")
 							.replace("{0}", "<a style='color: #800000; text-decoration: underline;' href='http://www.adobe.com/go/getflash'>http://www.adobe.com/go/getflash</a>") + '<br>' +
 
-						base.dictionary.translate("If the problem presist, contact us.");
+						paella.utils.dictionary.translate("If the problem presist, contact us.");
 
 					var link = document.createElement('a');
 					link.setAttribute("href", "http://www.adobe.com/go/getflash");
@@ -15658,12 +16321,12 @@ class RTMPVideo extends paella.VideoElementBase {
 			var message = document.createElement('div');
 
 			var header = document.createElement('h3');
-			header.innerText = base.dictionary.translate("Flash player needed");
+			header.innerText = paella.utils.dictionary.translate("Flash player needed");
 
 			var text = document.createElement('div');
 
-			text.innerHTML = base.dictionary.translate("You need at least Flash player 9 installed.") + "<br>" +
-				base.dictionary.translate("Please go to {0} and install it.")
+			text.innerHTML = paella.utils.dictionary.translate("You need at least Flash player 9 installed.") + "<br>" +
+				paella.utils.dictionary.translate("Please go to {0} and install it.")
 					.replace("{0}", "<a style='color: #800000; text-decoration: underline;' href='http://www.adobe.com/go/getflash'>http://www.adobe.com/go/getflash</a>");
 
 			var link = document.createElement('a');
@@ -15773,7 +16436,7 @@ class RTMPVideo extends paella.VideoElementBase {
 				if (this._autoplay) {
 					parameters.autoplay = this._autoplay;
 				}
-				if (base.parameters.get('debug')=="true") {
+				if (paella.utils.parameters.get('debug')=="true") {
 					parameters.debugMode = true;
 				}
 
@@ -15943,7 +16606,7 @@ paella.RTMPVideo = RTMPVideo;
 class RTMPVideoFactory extends paella.VideoFactory {
 	isStreamCompatible(streamData) {
 		try {
-			if (base.userAgent.system.iOS || base.userAgent.system.Android) {
+			if (paella.utils.userAgent.system.iOS || paella.utils.userAgent.system.Android) {
 				return false;
 			}
 			for (var key in streamData.sources) {
@@ -15982,7 +16645,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-binoculars'; }
 		getName() { return "es.upv.paella.searchPlugin"; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }	
-		getDefaultToolTip() { return base.dictionary.translate("Search"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Search"); }
 		getIndex() {return 510;}
 		
 		closeOnMouseOut() { return true; }
@@ -16083,14 +16746,14 @@ paella.addPlugin(function() {
 			parent.appendChild(loadingResults);
 			var sBodyText = document.createElement('p');
 			sBodyText.className = 'sBodyText';
-			sBodyText.innerText = base.dictionary.translate("Searching") + "...";
+			sBodyText.innerText = paella.utils.dictionary.translate("Searching") + "...";
 			parent.appendChild(sBodyText);
 		}
 
 		createNotResultsFound(parent){
 			var noResults = document.createElement('div');
 			noResults.className = "noResults";
-			noResults.innerText = base.dictionary.translate("Sorry! No results found.");
+			noResults.innerText = paella.utils.dictionary.translate("Sorry! No results found.");
 			parent.appendChild(noResults);
 		}
 
@@ -16211,7 +16874,7 @@ paella.addPlugin(function() {
 				input.type = "text";
 				input.id ="searchBarInput";
 				input.name = "searchString";
-				input.placeholder = base.dictionary.translate("Search");
+				input.placeholder = paella.utils.dictionary.translate("Search");
 				searchBar.appendChild(input);
 
 				$(input).change(function(){
@@ -16231,7 +16894,7 @@ paella.addPlugin(function() {
 							thisClass._searchTimer.cancel();
 						}
 						if(text!=""){
-							thisClass._searchTimer = new base.Timer(function(timer) {
+							thisClass._searchTimer = new paella.utils.Timer(function(timer) {
 								thisClass.doSearch(text, searchBody);
 							}, thisClass._searchTimerTime);
 						}
@@ -16267,7 +16930,7 @@ paella.addPlugin(function() {
 		getIndex() { return 560; }
 		getName() { return 'es.upv.paella.sharePlugin'; }
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-		getDefaultToolTip() { return base.dictionary.translate('Share this video'); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate('Share this video'); }
 		
 		checkEnabled(onSuccess) { onSuccess(true); }
 		closeOnMouseOut() { return false; }
@@ -16283,12 +16946,12 @@ paella.addPlugin(function() {
 				<div>
 					<div class="form-group">
 						<label class="control-label">
-							<input id="share-video-responsive" type="checkbox" value="3" name="mailId[]" > ${ base.dictionary.translate('Responsive design') }
+							<input id="share-video-responsive" type="checkbox" value="3" name="mailId[]" > ${ paella.utils.dictionary.translate('Responsive design') }
 						</label>
 					</div>
 
 					<div id="share-video-block-size" class="form-group">
-						<label class="control-label"> ${ base.dictionary.translate('Video resolution') } </label>
+						<label class="control-label"> ${ paella.utils.dictionary.translate('Video resolution') } </label>
 						
 						<div class="row">
 							<div class="col-sm-6">
@@ -16299,7 +16962,7 @@ paella.addPlugin(function() {
 									<option value="1920x1080">1080p (Full HD)</option>
 									<option value="2560x1440">1440p (2.5K)</option>
 									<option value="3840x2160">2160p (4K UHD)</option>
-									<option value="custom">${ base.dictionary.translate('Custom size') }</option>
+									<option value="custom">${ paella.utils.dictionary.translate('Custom size') }</option>
 								</select>
 							</div>
 							<div class="col-sm-3">
@@ -16312,7 +16975,7 @@ paella.addPlugin(function() {
 					</div>	
 
 					<div id="share-video-block-resp" class="form-group" style="display:none;">
-						<label class="control-label"> ${ base.dictionary.translate('Video resolution') } </label>
+						<label class="control-label"> ${ paella.utils.dictionary.translate('Video resolution') } </label>
 						
 						<select id="share-video-size-resp" class="form-control input-sm">
 							<option value="25">25%</option>
@@ -16325,7 +16988,7 @@ paella.addPlugin(function() {
 					</div>						
 					
 					<div class="form-group">
-						<label class="control-label">${ base.dictionary.translate('Embed code') }</label>
+						<label class="control-label">${ paella.utils.dictionary.translate('Embed code') }</label>
 						
 						<div id="share-video-embed" class="alert alert-share">
 						</div>
@@ -16377,7 +17040,7 @@ paella.addPlugin(function() {
 			social.innerHTML = `
 				<div>
 					<div class="form-group">
-						<label class="control-label">${ base.dictionary.translate('Share on social networks') }</label>
+						<label class="control-label">${ paella.utils.dictionary.translate('Share on social networks') }</label>
 						<div class="row" style="margin:0;">	
 							<span id="share-btn-facebook" class="share-button button-icon icon-facebook" ></span>
 							<span id="share-btn-twitter" class="share-button button-icon icon-twitter" ></span>
@@ -16465,13 +17128,13 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-pencil'; }
 		getAlignment() { return 'right'; }
 		getIndex() {return 10;}
-		getDefaultToolTip() { return base.dictionary.translate("Enter editor mode"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Enter editor mode"); }
 
 		checkEnabled(onSuccess) {			
 			if (this.config.editorUrl) {
 				paella.initDelegate.initParams.accessControl.canWrite()
 				.then((canWrite)=>{
-					var enabled = (canWrite); // && !base.userAgent.browser.IsMobileVersion && !paella.player.isLiveStream());					
+					var enabled = (canWrite); // && !paella.utils.userAgent.browser.IsMobileVersion && !paella.player.isLiveStream());					
 					onSuccess(enabled);
 				});	
 			}
@@ -16495,7 +17158,7 @@ paella.addPlugin(function() {
 		getIconClass() { return 'icon-paintbrush'; }
 		getIndex() { return 2030; }
 		getName() { return "es.upv.paella.themeChooserPlugin"; }	
-		getDefaultToolTip() { return base.dictionary.translate("Change theme"); }	
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Change theme"); }	
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		
 		checkEnabled(onSuccess) { 
@@ -16767,7 +17430,7 @@ paella.addDataDelegate("cameraTrack",() => {
             closeOnMouseOut() { return true; }
             getIndex() { return 2030; }
             getName() { return "es.upv.paella.videoZoomTrack4kPlugin"; }
-            getDefaultToolTip() { return base.dictionary.translate("Set video zoom"); }
+            getDefaultToolTip() { return paella.utils.dictionary.translate("Set video zoom"); }
             getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 
             checkEnabled(onSuccess) {
@@ -16904,7 +17567,7 @@ Class ("paella.captions.translectures.Caption", paella.captions.Caption, {
 
 		var messageBoxTitle = document.createElement('div');
 		messageBoxTitle.className = "title";
-		messageBoxTitle.innerText = base.dictionary.translate("You are trying to modify the transcriptions, but you are not Logged in!");		
+		messageBoxTitle.innerText = paella.utils.dictionary.translate("You are trying to modify the transcriptions, but you are not Logged in!");		
 		messageBoxElem.appendChild(messageBoxTitle);
 
 		var messageBoxAuthContainer = document.createElement('div');
@@ -16928,7 +17591,7 @@ Class ("paella.captions.translectures.Caption", paella.captions.Caption, {
 		messageBoxAuthLink.appendChild(messageBoxAuthLinkImg);
 
 		var messageBoxAuthLinkText = document.createElement('p');
-		messageBoxAuthLinkText.innerText = base.dictionary.translate("Continue editing the transcriptions anonymously");
+		messageBoxAuthLinkText.innerText = paella.utils.dictionary.translate("Continue editing the transcriptions anonymously");
 		messageBoxAuthLink.appendChild(messageBoxAuthLinkText);
 
 		$(messageBoxAuthLink).click(function() {
@@ -16952,7 +17615,7 @@ Class ("paella.captions.translectures.Caption", paella.captions.Caption, {
 		messageBoxAuthLink.appendChild(messageBoxAuthLinkImg);
 
 		messageBoxAuthLinkText = document.createElement('p');
-		messageBoxAuthLinkText.innerText = base.dictionary.translate("Log in and edit the transcriptions");
+		messageBoxAuthLinkText.innerText = paella.utils.dictionary.translate("Log in and edit the transcriptions");
 		messageBoxAuthLink.appendChild(messageBoxAuthLinkText);
 
 
@@ -16978,12 +17641,12 @@ Class ("paella.plugins.translectures.CaptionsPlugIn", paella.EventDrivenPlugin, 
 		var video_id = paella.player.videoIdentifier;
 				
 		if ((this.config.tLServer == undefined) || (this.config.tLdb == undefined)){
-			base.log.warning(this.getName() + " plugin not configured!");
+			paella.log.warning(this.getName() + " plugin not configured!");
 			onSuccess(false);
 		}
 		else {
 			var langs_url = (this.config.tLServer + "/langs?db=${tLdb}&id=${videoId}").replace(/\$\{videoId\}/ig, video_id).replace(/\$\{tLdb\}/ig, this.config.tLdb);
-			base.ajax.get({url: langs_url},
+			paella.utils.ajax.get({url: langs_url},
 				function(data, contentType, returnCode, dataRaw) {					
 					if (data.scode == 0) {
 						data.langs.forEach(function(l){
@@ -17003,10 +17666,10 @@ Class ("paella.plugins.translectures.CaptionsPlugIn", paella.EventDrivenPlugin, 
 							var l_txt = l.value;
 				            switch(l.type){
 						    	case 0:
-						    		l_txt += " (" + paella.dictionary.translate("Auto") + ")";
+						    		l_txt += " (" + paella.utils.dictionary.translate("Auto") + ")";
 						    		break;
 						    	case 1:
-						    		l_txt += " (" + paella.dictionary.translate("Under review") + ")";
+						    		l_txt += " (" + paella.utils.dictionary.translate("Under review") + ")";
 						    		break;
 						    }
 														
@@ -17016,12 +17679,12 @@ Class ("paella.plugins.translectures.CaptionsPlugIn", paella.EventDrivenPlugin, 
 						onSuccess(false);
 					}
 					else {
-						base.log.debug("Error getting available captions from translectures: " + langs_url);
+						paella.log.debug("Error getting available captions from translectures: " + langs_url);
 						onSuccess(false);
 					}
 				},						
 				function(data, contentType, returnCode) {
-					base.log.debug("Error getting available captions from translectures: " + langs_url);
+					paella.log.debug("Error getting available captions from translectures: " + langs_url);
 					onSuccess(false);
 				}
 			);			
@@ -17045,7 +17708,7 @@ paella.addPlugin(function() {
 			var enabled = true;
 			if (this._url == undefined){
 				enabled = false;
-				base.log.debug("No ElasticSearch URL found in config file. Disabling ElasticSearch PlugIn");
+				paella.log.debug("No ElasticSearch URL found in config file. Disabling ElasticSearch PlugIn");
 			}
 			
 			onSuccess(enabled);
@@ -17088,7 +17751,7 @@ paella.addPlugin(function() {
 			var trackingID = this.config.trackingID;
 			var domain = this.config.domain || "auto";
 			if (trackingID){
-				base.log.debug("Google Analitycs Enabled");
+				paella.log.debug("Google Analitycs Enabled");
 				/* jshint ignore:start */
 					(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 					(i[r].q=i[r].q||[]).push(arguments);},i[r].l=1*new Date();a=s.createElement(o),
@@ -17100,7 +17763,7 @@ paella.addPlugin(function() {
 				onSuccess(true);
 			}		
 			else {
-				base.log.debug("No Google Tracking ID found in config file. Disabling Google Analitycs PlugIn");
+				paella.log.debug("No Google Tracking ID found in config file. Disabling Google Analitycs PlugIn");
 				onSuccess(false);
 			}				
 		}
@@ -17653,7 +18316,7 @@ paella.addPlugin(function() {
         }
 
         action(button) {
-            //paella.messageBox.showMessage(base.dictionary.translate("Live streaming mode: This is a live video, so, some capabilities of the player are disabled"));
+            //paella.messageBox.showMessage(paella.utils.dictionary.translate("Live streaming mode: This is a live video, so, some capabilities of the player are disabled"));
         }
 
         getName() {
@@ -17670,7 +18333,7 @@ paella.addPlugin(function() {
         getIconClass() { return 'icon-screen'; }
         getIndex() { return 2030; }
         getName() { return "es.upv.paella.videoZoomToolbarPlugin"; }
-        getDefaultToolTip() { return base.dictionary.translate("Set video zoom"); }
+        getDefaultToolTip() { return paella.utils.dictionary.translate("Set video zoom"); }
         getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 
         checkEnabled(onSuccess) {
@@ -17718,7 +18381,7 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.viewModePlugin"; }
 		//getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getButtonType() { return paella.ButtonPlugin.type.menuButton; }
-		getDefaultToolTip() { return base.dictionary.translate("Change video layout"); }		
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Change video layout"); }		
 		checkEnabled(onSuccess) {
 			this.buttonItems =null;
 			this.buttons = [];
@@ -17826,7 +18489,7 @@ paella.addPlugin(function() {
 		getSubclass() { return 'volumeRangeButton'; }
 		getIconClass() { return 'icon-volume-high'; }
 		getName() { return "es.upv.paella.volumeRangePlugin"; }
-		getDefaultToolTip() { return base.dictionary.translate("Volume"); }
+		getDefaultToolTip() { return paella.utils.dictionary.translate("Volume"); }
 		getIndex() {return 9999;}
 
 		checkEnabled(onSuccess) {
@@ -17834,7 +18497,7 @@ paella.addPlugin(function() {
 			this._inputMaster = null;
 			this._control_NotMyselfEvent = true;
 			this._storedValue = false;
-			var enabled = !base.userAgent.browser.IsMobileVersion;
+			var enabled = !paella.utils.userAgent.browser.IsMobileVersion;
 			onSuccess(enabled);
 		}
 
@@ -18217,7 +18880,7 @@ class YoutubeVideo extends paella.VideoElementBase {
 		return new Promise((resolve,reject) => {
 			This._playing = true;
 			This.video.playVideo();
-			new base.Timer((timer) => {
+			new paella.utils.Timer((timer) => {
 				var q = this.video.getAvailableQualityLevels();
 				if (q.length) {
 					timer.repeat = false;
@@ -18400,7 +19063,7 @@ paella.addPlugin(function() {
       if (server && site_id){
         if (server.substr(-1) != '/') server += '/';
         require([server + "piwik.js"], function(matomo) {
-          base.log.debug("Matomo Analytics Enabled");
+          paella.log.debug("Matomo Analytics Enabled");
           paella.userTracking.matomotracker = Piwik.getAsyncTracker( server + "piwik.php", site_id );
           paella.userTracking.matomotracker.client_id = thisClass.config.client_id;
           if (heartbeat && heartbeat > 0) paella.userTracking.matomotracker.enableHeartBeatTimer(heartbeat);
@@ -18413,7 +19076,7 @@ paella.addPlugin(function() {
         });
         onSuccess(true);
       }	else {
-        base.log.debug("No Matomo Site ID found in config file. Disabling Matomo Analytics PlugIn");
+        paella.log.debug("No Matomo Site ID found in config file. Disabling Matomo Analytics PlugIn");
         onSuccess(false);
       }
     }
@@ -18463,7 +19126,7 @@ paella.addPlugin(function() {
 
     log(event, params) {
       if (paella.userTracking.matomotracker === undefined) {
-        base.log.debug("Matomo Tracker is missing");
+        paella.log.debug("Matomo Tracker is missing");
         return;
       }
       if ((this.config.category === undefined) || (this.config.category ===true)) {
@@ -18558,20 +19221,20 @@ paella.addPlugin(function() {
                 tracked;
            
             function trackX5gon() {
-                base.log.debug("X5GON: trackX5gon permission check [trackingPermission " + trackingPermission + "] [tracked " + tracked + "]");
+                paella.log.debug("X5GON: trackX5gon permission check [trackingPermission " + trackingPermission + "] [tracked " + tracked + "]");
                 if (isTrackingPermission() && !tracked) {
                     if (!token) {
-                        base.log.debug("X5GON: token missing! Disabling X5gon PlugIn");
+                        paella.log.debug("X5GON: token missing! Disabling X5gon PlugIn");
                         onSuccess(false);
                         }
                     else {
                         // load x5gon lib from remote server
-                        base.log.debug("X5GON: trackX5gon loading x5gon-snippet, token: " + token);
+                        paella.log.debug("X5GON: trackX5gon loading x5gon-snippet, token: " + token);
                         require(["https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"], function (x5gon) {
-                            base.log.debug("X5GON: external x5gon snippet loaded");
+                            paella.log.debug("X5GON: external x5gon snippet loaded");
                             if (typeof x5gonActivityTracker !== 'undefined') {
                                 x5gonActivityTracker(token, testingEnvironment);
-                                base.log.debug("X5GON: send data to X5gon servers");
+                                paella.log.debug("X5GON: send data to X5gon servers");
                                 tracked = true;
                             }                                             
                         });
@@ -18585,7 +19248,7 @@ paella.addPlugin(function() {
             function initCookieNotification() {
                 // load cookieconsent lib from remote server
                 require([urlCookieconsentJS], function (cookieconsent) {
-                    base.log.debug("X5GON: external cookie consent lib loaded");
+                    paella.log.debug("X5GON: external cookie consent lib loaded");
                     window.cookieconsent.initialise({
                         "palette": {
                             "popup": {
@@ -18645,7 +19308,7 @@ paella.addPlugin(function() {
             }
 
             function initTranslate(language, funcSuccess, funcError) {
-                base.log.debug('X5GON: selecting language ' + language.slice(0,2));
+                paella.log.debug('X5GON: selecting language ' + language.slice(0,2));
                 var jsonstr = window.location.origin + '/player/localization/paella_' + language.slice(0,2) + '.json';
                 $.ajax({
                     url: jsonstr,
@@ -18683,24 +19346,24 @@ paella.addPlugin(function() {
 
             function checkDoNotTrackStatus() {
                 if (window.navigator.doNotTrack == 1 || window.navigator.msDoNotTrack == 1) {
-                    base.log.debug("X5GON: Browser DoNotTrack: true");
+                    paella.log.debug("X5GON: Browser DoNotTrack: true");
                     return true;
                 }
-                base.log.debug("X5GON: Browser DoNotTrack: false");
+                paella.log.debug("X5GON: Browser DoNotTrack: false");
                 return false;
             }
 
             function setTrackingPermission(permissionStatus) {
                 trackingPermission = permissionStatus;
-                base.log.debug("X5GON: trackingPermissions: " + permissionStatus);
+                paella.log.debug("X5GON: trackingPermissions: " + permissionStatus);
                 trackX5gon();
             };
 
             initTranslate(navigator.language, function () {
-                base.log.debug('X5GON: Successfully translated.');
+                paella.log.debug('X5GON: Successfully translated.');
                 initCookieNotification();
             }, function () {
-                base.log.debug('X5gon: Error translating.');
+                paella.log.debug('X5gon: Error translating.');
                 initCookieNotification();
             });
 
