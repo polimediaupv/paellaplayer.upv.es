@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: a26876e";
+paella.version = "6.5.0 - build: 5ad1f0c";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -1947,21 +1947,29 @@ paella.utils.uuid = function () {
   paella.require = function (path) {
     if (!g_requiredScripts[path]) {
       g_requiredScripts[path] = new Promise(function (resolve, reject) {
-        var script = document.createElement("script");
+        paella.utils.ajax.get({
+          url: path
+        }, function (data) {
+          try {
+            var _module = {
+              exports: null
+            };
+            var exports = null;
+            eval(data);
 
-        script.onload = script.onreadystatechange = function () {
-          if (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") {
-            resolve();
+            if (_module && _module.exports) {
+              resolve(_module.exports);
+            } else {
+              var geval = eval;
+              geval(data);
+              resolve();
+            }
+          } catch (err) {
+            reject(err);
           }
-        };
-
-        if (path.split(".").pop() == 'js') {
-          script.src = path;
-          script.async = false;
-          document.head.appendChild(script);
-        } else {
-          reject(new Error("Unexpected file type"));
-        }
+        }, function (err) {
+          reject(err);
+        });
       });
     }
 
@@ -13264,16 +13272,11 @@ paella.addPlugin(function () {
       key: "_loadDeps",
       value: function _loadDeps() {
         return new Promise(function (resolve, reject) {
-          if (!window.$paella_mpd) {
-            require(['resources/deps/xapiwrapper.min.js'], function () {
-              require(['resources/deps/random_name_generator.js'], function () {
-                window.$paella_bg2e = true;
-                resolve(window.$paella_bg2e);
-              });
-            });
-          } else {
-            defer.resolve(window.$paella_mpd);
-          }
+          paella.require('resources/deps/xapiwrapper.min.js').then(function () {
+            return paella.require('resources/deps/random_name_generator.js');
+          }).then(function () {
+            resolve();
+          });
         });
       }
     }, {
@@ -18768,7 +18771,7 @@ paella.addPlugin(function () {
       value: function _loadDeps() {
         return new Promise(function (resolve, reject) {
           if (!window.$paella_hls) {
-            require([paella.baseUrl + 'javascript/hls.min.js'], function (hls) {
+            paella.require(paella.baseUrl + 'javascript/hls.min.js').then(function (hls) {
               window.$paella_hls = hls;
               resolve(window.$paella_hls);
             });
@@ -19519,7 +19522,7 @@ paella.addPlugin(function () {
       value: function _loadDeps() {
         return new Promise(function (resolve, reject) {
           if (!window.$paella_mpd) {
-            require([paella.baseUrl + 'resources/deps/dash.all.js'], function () {
+            paella.require(paella.baseUrl + 'resources/deps/dash.all.js').then(function () {
               window.$paella_mpd = true;
               resolve(window.$paella_mpd);
             });
@@ -24342,7 +24345,7 @@ paella.addPlugin(function () {
         if (server && site_id) {
           if (server.substr(-1) != '/') server += '/';
 
-          require([server + "piwik.js"], function (matomo) {
+          paella.require(server + "piwik.js").then(function (matomo) {
             paella.log.debug("Matomo Analytics Enabled");
             paella.userTracking.matomotracker = Piwik.getAsyncTracker(server + "piwik.php", site_id);
             paella.userTracking.matomotracker.client_id = thisClass.config.client_id;
@@ -24532,7 +24535,7 @@ paella.addPlugin(function () {
               // load x5gon lib from remote server
               paella.log.debug("X5GON: trackX5gon loading x5gon-snippet, token: " + token);
 
-              require(["https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"], function (x5gon) {
+              paella.require("https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js").then(function (x5gon) {
                 paella.log.debug("X5GON: external x5gon snippet loaded");
 
                 if (typeof x5gonActivityTracker !== 'undefined') {
@@ -24551,7 +24554,7 @@ paella.addPlugin(function () {
 
         function initCookieNotification() {
           // load cookieconsent lib from remote server
-          require([urlCookieconsentJS], function (cookieconsent) {
+          paella.require(urlCookieconsentJS).then(function (cookieconsent) {
             paella.log.debug("X5GON: external cookie consent lib loaded");
             window.cookieconsent.initialise({
               "palette": {

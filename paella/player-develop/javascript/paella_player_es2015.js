@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: a26876e";
+paella.version = "6.5.0 - build: 5ad1f0c";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -1648,23 +1648,29 @@ paella.utils.uuid = function() {
 	paella.require = function(path) {
 		if (!g_requiredScripts[path]) {
 			g_requiredScripts[path] = new Promise((resolve,reject) => {
-				let script = document.createElement("script");
-				script.onload = script.onreadystatechange = function() {
-					if (!this.readyState ||
-						this.readyState == "loaded" ||
-						this.readyState == "complete")
-					{
-						resolve();
+				paella.utils.ajax.get({url: path}, (data) => {
+					try {
+						let module = {
+							exports: null
+						};
+						let exports = null;
+						eval(data);
+						if (module && module.exports) {
+							resolve(module.exports);
+						}
+						else {
+							let geval = eval;
+							geval(data);
+							resolve();
+						}
 					}
-				}
-				if (path.split(".").pop()=='js') {
-					script.src = path;
-					script.async = false;
-					document.head.appendChild(script);
-				}
-				else {
-					reject(new Error("Unexpected file type"));
-				}
+					catch(err) {
+						reject(err);
+					}
+				},
+				(err) => {
+					reject(err);
+				});
 			});
 		}
 		return g_requiredScripts[path];
@@ -10621,17 +10627,13 @@ paella.addPlugin(function() {
 
     _loadDeps() {
       return new Promise((resolve,reject) => {
-        if (!window.$paella_mpd) {
-          require(['resources/deps/xapiwrapper.min.js'],function() {
-            require(['resources/deps/random_name_generator.js'],function() {
-              window.$paella_bg2e = true;
-              resolve(window.$paella_bg2e);
-            });
+        paella.require('resources/deps/xapiwrapper.min.js')
+          .then(() => {
+            return paella.require('resources/deps/random_name_generator.js')
+          })
+          .then(() => {
+            resolve();
           });
-        }
-        else {
-          defer.resolve(window.$paella_mpd);
-        }
       });
     }
 
@@ -14807,10 +14809,11 @@ paella.addPlugin(function() {
 		_loadDeps() {
 			return new Promise((resolve,reject) => {
 				if (!window.$paella_hls) {
-					require([paella.baseUrl +'javascript/hls.min.js'],function(hls) {
-						window.$paella_hls = hls;
-						resolve(window.$paella_hls);
-					});
+					paella.require(paella.baseUrl +'javascript/hls.min.js')
+						.then((hls) => {
+							window.$paella_hls = hls;
+							resolve(window.$paella_hls);
+						});
 				}
 				else {
 					resolve(window.$paella_hls);
@@ -15381,10 +15384,11 @@ class MpegDashVideo extends paella.Html5Video {
 	_loadDeps() {
 		return new Promise((resolve,reject) => {
 			if (!window.$paella_mpd) {
-				require([paella.baseUrl +'resources/deps/dash.all.js'],function() {
-					window.$paella_mpd = true;
-					resolve(window.$paella_mpd);
-				});
+				paella.require(paella.baseUrl +'resources/deps/dash.all.js')
+					.then(() => {
+						window.$paella_mpd = true;
+						resolve(window.$paella_mpd);
+					});
 			}
 			else {
 				resolve(window.$paella_mpd);
@@ -19062,18 +19066,19 @@ paella.addPlugin(function() {
 
       if (server && site_id){
         if (server.substr(-1) != '/') server += '/';
-        require([server + "piwik.js"], function(matomo) {
-          paella.log.debug("Matomo Analytics Enabled");
-          paella.userTracking.matomotracker = Piwik.getAsyncTracker( server + "piwik.php", site_id );
-          paella.userTracking.matomotracker.client_id = thisClass.config.client_id;
-          if (heartbeat && heartbeat > 0) paella.userTracking.matomotracker.enableHeartBeatTimer(heartbeat);
-          if (Piwik && Piwik.MediaAnalytics) {
-            paella.events.bind(paella.events.videoReady, () => {
-              Piwik.MediaAnalytics.scanForMedia();
-            });
-          }
-          thisClass.registerVisit();
-        });
+        paella.require(server + "piwik.js")
+          .then((matomo) => {
+            paella.log.debug("Matomo Analytics Enabled");
+            paella.userTracking.matomotracker = Piwik.getAsyncTracker( server + "piwik.php", site_id );
+            paella.userTracking.matomotracker.client_id = thisClass.config.client_id;
+            if (heartbeat && heartbeat > 0) paella.userTracking.matomotracker.enableHeartBeatTimer(heartbeat);
+            if (Piwik && Piwik.MediaAnalytics) {
+              paella.events.bind(paella.events.videoReady, () => {
+                Piwik.MediaAnalytics.scanForMedia();
+              });
+            }
+            thisClass.registerVisit();
+          });
         onSuccess(true);
       }	else {
         paella.log.debug("No Matomo Site ID found in config file. Disabling Matomo Analytics PlugIn");
@@ -19230,14 +19235,15 @@ paella.addPlugin(function() {
                     else {
                         // load x5gon lib from remote server
                         paella.log.debug("X5GON: trackX5gon loading x5gon-snippet, token: " + token);
-                        require(["https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"], function (x5gon) {
-                            paella.log.debug("X5GON: external x5gon snippet loaded");
-                            if (typeof x5gonActivityTracker !== 'undefined') {
-                                x5gonActivityTracker(token, testingEnvironment);
-                                paella.log.debug("X5GON: send data to X5gon servers");
-                                tracked = true;
-                            }                                             
-                        });
+                        paella.require("https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js")
+                            .then((x5gon) => {
+                                paella.log.debug("X5GON: external x5gon snippet loaded");
+                                if (typeof x5gonActivityTracker !== 'undefined') {
+                                    x5gonActivityTracker(token, testingEnvironment);
+                                    paella.log.debug("X5GON: send data to X5gon servers");
+                                    tracked = true;
+                                }                                             
+                            });
                     }
                     onSuccess(true);
                 } else {
@@ -19247,64 +19253,65 @@ paella.addPlugin(function() {
 
             function initCookieNotification() {
                 // load cookieconsent lib from remote server
-                require([urlCookieconsentJS], function (cookieconsent) {
-                    paella.log.debug("X5GON: external cookie consent lib loaded");
-                    window.cookieconsent.initialise({
-                        "palette": {
-                            "popup": {
-                                "background": "#1d8a8a"
+                paella.require(urlCookieconsentJS)
+                    .then((cookieconsent) => {
+                        paella.log.debug("X5GON: external cookie consent lib loaded");
+                        window.cookieconsent.initialise({
+                            "palette": {
+                                "popup": {
+                                    "background": "#1d8a8a"
+                                },
+                                "button": {
+                                    "background": "#62ffaa"
+                                }
                             },
-                            "button": {
-                                "background": "#62ffaa"
+                            "type": "opt-in",
+                            "position": "top",
+                            "content": {
+                                "message": translate('x5_message', "On this site the X5gon service can be included, to provide personalized Open Educational Ressources."),
+                                "allow": translate('x5_accept', "Accept"),
+                                "deny": translate('x5_deny', "Deny"),
+                                "link": translate('x5_more_info', "More information"),
+                                "policy": translate('x5_policy', "Cookie Policy"),
+                                // link to the X5GON platform privacy policy - describing what are we collecting
+                                // through the platform
+                                "href": "https://platform.x5gon.org/privacy-policy"
+                            },
+                            onInitialise: function (status) {
+                                var type = this.options.type;
+                                var didConsent = this.hasConsented();
+                                // enable cookies - send user data to the platform
+                                // only if the user enabled cookies
+                                if (type == 'opt-in' && didConsent) {
+                                    setTrackingPermission(true);
+                                } else {
+                                    setTrackingPermission(false);
+                                }
+                            },
+                            onStatusChange: function (status, chosenBefore) {
+                                var type = this.options.type;
+                                var didConsent = this.hasConsented();
+                                // enable cookies - send user data to the platform
+                                // only if the user enabled cookies
+                                if (type == 'opt-in' && didConsent) {
+                                    setTrackingPermission(true);
+                                } else {
+                                    setTrackingPermission(false);
+                                }
+                            },
+                            onRevokeChoice: function () {
+                                var type = this.options.type;
+                                var didConsent = this.hasConsented();
+                                // disable cookies - set what to do when
+                                // the user revokes cookie usage
+                                if (type == 'opt-in' && didConsent) {
+                                    setTrackingPermission(true);
+                                } else {
+                                    setTrackingPermission(false);
+                                }
                             }
-                        },
-                        "type": "opt-in",
-                        "position": "top",
-                        "content": {
-                            "message": translate('x5_message', "On this site the X5gon service can be included, to provide personalized Open Educational Ressources."),
-                            "allow": translate('x5_accept', "Accept"),
-                            "deny": translate('x5_deny', "Deny"),
-                            "link": translate('x5_more_info', "More information"),
-                            "policy": translate('x5_policy', "Cookie Policy"),
-                            // link to the X5GON platform privacy policy - describing what are we collecting
-                            // through the platform
-                            "href": "https://platform.x5gon.org/privacy-policy"
-                        },
-                        onInitialise: function (status) {
-                            var type = this.options.type;
-                            var didConsent = this.hasConsented();
-                            // enable cookies - send user data to the platform
-                            // only if the user enabled cookies
-                            if (type == 'opt-in' && didConsent) {
-                                setTrackingPermission(true);
-                            } else {
-                                setTrackingPermission(false);
-                            }
-                        },
-                        onStatusChange: function (status, chosenBefore) {
-                            var type = this.options.type;
-                            var didConsent = this.hasConsented();
-                            // enable cookies - send user data to the platform
-                            // only if the user enabled cookies
-                            if (type == 'opt-in' && didConsent) {
-                                setTrackingPermission(true);
-                            } else {
-                                setTrackingPermission(false);
-                            }
-                        },
-                        onRevokeChoice: function () {
-                            var type = this.options.type;
-                            var didConsent = this.hasConsented();
-                            // disable cookies - set what to do when
-                            // the user revokes cookie usage
-                            if (type == 'opt-in' && didConsent) {
-                                setTrackingPermission(true);
-                            } else {
-                                setTrackingPermission(false);
-                            }
-                        }
-                    })
-                })
+                        });
+                    });
             }
 
             function initTranslate(language, funcSuccess, funcError) {
