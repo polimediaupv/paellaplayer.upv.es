@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 1cee1cd";
+paella.version = "6.5.0 - build: 26bc634";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -15750,7 +15750,8 @@ paella.addPlugin(function () {
       value: function parse(content, lang, next) {
         var captions = [];
         var self = this;
-        var xml = $(content);
+        var xmlDoc = $.parseXML(content);
+        var xml = $(xmlDoc);
         var g_lang = xml.attr("xml:lang");
         var lls = xml.find("div");
 
