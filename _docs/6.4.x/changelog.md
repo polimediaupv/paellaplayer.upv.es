@@ -5,6 +5,11 @@
 CHANGELOG
 =========
 
+* Paella 6.4.3
+
+  * DFXP caption parse fix for jQuery 3.5.0 upgrade
+  * jQuery 3.5.1 upgrade
+
 * Paella 6.4.2
 
   * Fixed a bug in HLS videos that occurs when the connection is slow.
