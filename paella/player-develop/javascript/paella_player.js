@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 073c64b";
+paella.version = "6.5.0 - build: 89a8b67";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -11496,13 +11496,17 @@ function paella_DeferredNotImplemented() {
             configUrl: paella.baseUrl + 'config/config.json',
             dictionaryUrl: paella.baseUrl + 'localization/paella',
             accessControl: null,
-            videoLoader: null // Other parameters set externally:
+            videoLoader: null,
+            disableUserInterface: function disableUserInterface() {
+              return /true/i.test(paella.utils.parameters.get("disable-ui"));
+            } // Other parameters set externally:
             //	config: json containing the configuration file
             //	loadConfig: function(defaultConfigUrl). Returns a promise with the config.json data
             //	url: attribute. Contains the repository base URL
             //	videoUrl: function. Returns the base URL of the video (example: baseUrl + videoID)
             //	dataUrl: function. Returns the full URL to get the data.json file
             //	loadVideo: Function. Returns a promise with the data.json file content
+            //  disableUserInterface: Function. Returns true if the user interface should be disabled (only shows the video container)
 
           };
         }
@@ -12035,15 +12039,19 @@ function paella_DeferredNotImplemented() {
 
         return new Promise(function (resolve, reject) {
           _this129.videoContainer.play().then(function () {
-            if (!_this129.controls) {
-              _this129.showPlaybackBar();
+            if (paella.initDelegate.initParams.disableUserInterface()) {
+              resolve();
+            } else if (!_this129.controls) {
+              if (!_this129.controls) {
+                _this129.showPlaybackBar();
 
-              paella.events.trigger(paella.events.controlBarLoaded);
+                paella.events.trigger(paella.events.controlBarLoaded);
 
-              _this129.controls.onresize();
+                _this129.controls.onresize();
+              }
+
+              resolve();
             }
-
-            resolve();
           })["catch"](function (err) {
             reject(err);
           });
