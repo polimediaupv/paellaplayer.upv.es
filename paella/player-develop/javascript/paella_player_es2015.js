@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 89a8b67";
+paella.version = "6.5.0 - build: 83d1915";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -9666,29 +9666,39 @@ paella.ControlsContainer = ControlsContainer;
 		}
 	
 		play() {
-			if (this.lazyLoadContainer) {
+			if (!this.videoContainer) {
+				// play() is called from lazyLoadContainer
+				this.lazyLoadContainer.destroyElements();
+				this.lazyLoadContainer = null;
+				this._onPlayClosure && this._onPlayClosure();
+			}
+			else if (this.lazyLoadContainer) {
+				// play() has been called by a user interaction
 				document.body.removeChild(this.lazyLoadContainer.domElement);
 				this.lazyLoadContainer = null;
 			}
-			return new Promise((resolve,reject) => {
-				this.videoContainer.play()
-					.then(() => {
-						if (paella.initDelegate.initParams.disableUserInterface()) {
-							resolve();
-						}
-						else if (!this.controls) {
-							if (!this.controls) {
-								this.showPlaybackBar();
-								paella.events.trigger(paella.events.controlBarLoaded);
-								this.controls.onresize();
+
+			if (this.videoContainer) {
+				return new Promise((resolve,reject) => {
+					this.videoContainer.play()
+						.then(() => {
+							if (paella.initDelegate.initParams.disableUserInterface()) {
+								resolve();
 							}
-							resolve();
-						}
-					})
-					.catch((err) => {
-						reject(err);
-					});
-			});
+							else if (!this.controls) {
+								if (!this.controls) {
+									this.showPlaybackBar();
+									paella.events.trigger(paella.events.controlBarLoaded);
+									this.controls.onresize();
+								}
+								resolve();
+							}
+						})
+						.catch((err) => {
+							reject(err);
+						});
+				});
+			}
 		}
 	
 		pause() {

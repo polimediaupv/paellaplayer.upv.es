@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 89a8b67";
+paella.version = "6.5.0 - build: 83d1915";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -12032,30 +12032,38 @@ function paella_DeferredNotImplemented() {
       value: function play() {
         var _this129 = this;
 
-        if (this.lazyLoadContainer) {
+        if (!this.videoContainer) {
+          // play() is called from lazyLoadContainer
+          this.lazyLoadContainer.destroyElements();
+          this.lazyLoadContainer = null;
+          this._onPlayClosure && this._onPlayClosure();
+        } else if (this.lazyLoadContainer) {
+          // play() has been called by a user interaction
           document.body.removeChild(this.lazyLoadContainer.domElement);
           this.lazyLoadContainer = null;
         }
 
-        return new Promise(function (resolve, reject) {
-          _this129.videoContainer.play().then(function () {
-            if (paella.initDelegate.initParams.disableUserInterface()) {
-              resolve();
-            } else if (!_this129.controls) {
-              if (!_this129.controls) {
-                _this129.showPlaybackBar();
+        if (this.videoContainer) {
+          return new Promise(function (resolve, reject) {
+            _this129.videoContainer.play().then(function () {
+              if (paella.initDelegate.initParams.disableUserInterface()) {
+                resolve();
+              } else if (!_this129.controls) {
+                if (!_this129.controls) {
+                  _this129.showPlaybackBar();
 
-                paella.events.trigger(paella.events.controlBarLoaded);
+                  paella.events.trigger(paella.events.controlBarLoaded);
 
-                _this129.controls.onresize();
+                  _this129.controls.onresize();
+                }
+
+                resolve();
               }
-
-              resolve();
-            }
-          })["catch"](function (err) {
-            reject(err);
+            })["catch"](function (err) {
+              reject(err);
+            });
           });
-        });
+        }
       }
     }, {
       key: "pause",
