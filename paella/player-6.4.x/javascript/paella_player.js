@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.3 - build: 6566b23";
+paella.version = "6.4.3 - build: cd941b3";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19427,7 +19427,7 @@ paella.addPlugin(function () {
       key: "pause",
       value: function pause() {
         this.isPlaying = false;
-        this.showIcon = true;
+        this.showIcon = this.config.showOnPause;
         this.checkStatus();
       }
     }, {

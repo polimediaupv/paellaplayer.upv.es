@@ -290,7 +290,8 @@
         "enabled": true
       },
       "es.upv.paella.playButtonOnScreenPlugin": {
-        "enabled": true
+        "enabled": true,
+        "showOnPause": true
       },
       "es.upv.paella.translecture.captionsPlugin": {
         "enabled": true
