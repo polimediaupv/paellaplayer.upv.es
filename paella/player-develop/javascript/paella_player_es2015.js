@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 61bbe69";
+paella.version = "6.5.0 - build: bd70b3e";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -11539,9 +11539,10 @@ paella.addPlugin(function() {
 					var startTime =  paella.utils.parameters.get('start');
 					var endTime = paella.utils.parameters.get('end');
 					if (startTime && endTime) {
-						paella.player.videoContainer.setTrimming(startTime, endTime).then(function() {
-							return paella.player.videoContainer.enableTrimming();
-						});
+						paella.player.videoContainer.enableTrimming();
+						paella.player.videoContainer.setTrimming(startTime, endTime)
+							.then(() => {})
+
 					}
 				}
 			});
@@ -15845,11 +15846,19 @@ paella.addPlugin(function() {
 		}
 	
 		getEvents() {
-			return [paella.events.endVideo,paella.events.play,paella.events.pause,paella.events.showEditor,paella.events.hideEditor];
+			return [
+				paella.events.ended,
+				paella.events.endVideo,
+				paella.events.play,
+				paella.events.pause,
+				paella.events.showEditor,
+				paella.events.hideEditor
+			];
 		}
 	
 		onEvent(eventType,params) {
 			switch (eventType) {
+				case paella.events.ended:
 				case paella.events.endVideo:
 					this.endVideo();
 					break;
@@ -15874,9 +15883,16 @@ paella.addPlugin(function() {
 		}
 	
 		endVideo() {
-			this.isPlaying = false;
-			this.showIcon = this.showOnEnd;
-			this.checkStatus();
+			paella.player.videoContainer.ended()
+			.then(ended => {
+				if (ended) {
+					this.isPlaying = false;
+					this.showIcon = this.showOnEnd;
+					this.checkStatus();
+				} else {
+					base.log.debug(`BTN ON SCREEN: The player is no longer in ended state.`);
+				}
+			});
 		}
 	
 		play() {
