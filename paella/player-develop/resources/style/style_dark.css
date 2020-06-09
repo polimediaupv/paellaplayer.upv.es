@@ -3719,6 +3719,9 @@ input[type=range]:focus::-ms-fill-upper {
   width: 100%;
   text-align: center;
 }
+.buttonPlugin.showEditorButton {
+  pointer-events: all;
+}
 .buttonPluginPopUp.videoZoomToolbar {
   width: 50px;
   text-align: center;
@@ -3733,9 +3736,6 @@ input[type=range]:focus::-ms-fill-upper {
 }
 .autoTrackingActivated {
   color: red !important;
-}
-.buttonPlugin.showEditorButton {
-  pointer-events: all;
 }
 html {
   margin: 0px;
