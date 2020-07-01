@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 988ef33";
+paella.version = "6.5.0 - build: 3aab877";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -12645,7 +12645,9 @@ function paella_DeferredNotImplemented() {
     var auth = params && params.auth || {}; // Check autoplay. If autoplay is enabled, this function must call paella.load()
 
     paella.Html5Video.IsAutoplaySupported().then(function (supported) {
-      if (supported || forceLazyLoad) {
+      var disableUI = /true/i.test(paella.utils.parameters.get("disable-ui"));
+
+      if ((supported || forceLazyLoad) && !disableUI) {
         // Build custom init data using url parameters
         var data = getManifestFromParameters(params);
 

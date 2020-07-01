@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 988ef33";
+paella.version = "6.5.0 - build: 3aab877";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -10185,7 +10185,8 @@ paella.lazyLoad = function(playerContainer, params, forceLazyLoad = true) {
 	// Check autoplay. If autoplay is enabled, this function must call paella.load()
 	paella.Html5Video.IsAutoplaySupported()
 		.then((supported) => {
-			if (supported || forceLazyLoad) {
+			let disableUI = /true/i.test(paella.utils.parameters.get("disable-ui"));
+			if ((supported || forceLazyLoad) && !disableUI) {
 				// Build custom init data using url parameters
 				let data = getManifestFromParameters(params);
 				if (data) {
