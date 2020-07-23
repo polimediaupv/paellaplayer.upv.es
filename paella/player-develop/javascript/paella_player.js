@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 6473121";
+paella.version = "6.5.0 - build: 423c617";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -8425,16 +8425,13 @@ function paella_DeferredNotImplemented() {
           self.plugin.action(self);
         }
 
-        if (plugin.getButtonType() == paella.ButtonPlugin.type.actionButton) {
-          $(elem).click(function (event) {
-            onAction(this);
-          });
-          $(elem).keypress(function (event) {
-            onAction(this);
-            event.preventDefault();
-          });
-        }
-
+        $(elem).click(function (event) {
+          onAction(this);
+        });
+        $(elem).keypress(function (event) {
+          onAction(this);
+          event.preventDefault();
+        });
         $(elem).focus(function (event) {
           plugin.expand();
         });
