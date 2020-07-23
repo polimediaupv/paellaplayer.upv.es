@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 423c617";
+paella.version = "6.5.0 - build: d0e7504";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -6277,7 +6277,9 @@ class PopUpContainer extends paella.DomNode {
 
 	hideContainer(identifier, button, swapFocus = false) {
 		var container = this.containers[identifier];
-		hideContainer.apply(this,[identifier,container,swapFocus]);
+		if (container) {
+			hideContainer.apply(this,[identifier,container,swapFocus]);
+		}
 	}
 
 	showContainer(identifier, button, swapFocus = false) {
@@ -8534,6 +8536,26 @@ class PlaybackControl extends paella.DomNode {
 	showPopUp(identifier,button,swapFocus=false) {
 		this.popUpPluginContainer.showContainer(identifier,button,swapFocus);
 		this.timeLinePluginContainer.showContainer(identifier,button,swapFocus);
+		this.hideCrossTimelinePopupButtons(identifier,this.popUpPluginContainer,this.timeLinePluginContainer,button,swapFocus);
+	}
+
+	// Hide popUpPluginContainer when a timeLinePluginContainer popup opens, and visa versa
+	hideCrossTimelinePopupButtons(identifier, popupContainer, timelineContainer, button, swapFocus=true) {
+		var containerToHide = null;
+		if (popupContainer.containers[identifier]
+			&& timelineContainer.containers[timelineContainer.currentContainerId]) {
+			containerToHide = timelineContainer;
+		} else if (timelineContainer.containers[identifier]
+			&& popupContainer.containers[popupContainer.currentContainerId]) {
+			containerToHide = popupContainer;
+		}
+		if (containerToHide) {
+			var hideId = containerToHide.currentContainerId;
+			var hidePugin = paella.pluginManager.getPlugin(hideId);
+			if (hidePugin) {
+				containerToHide.hideContainer(hideId,hidePugin.button,swapFocus);
+			}
+		}
 	}
 
 	hidePopUp(identifier,button,swapFocus=true) {
