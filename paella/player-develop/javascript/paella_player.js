@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: ae5a208";
+paella.version = "6.5.0 - build: 47fa559";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -1594,7 +1594,9 @@ paella.data = null;
         this.targetObject = targetObject;
 
         if (this.targetObject && this.targetObject.down) {
-          this.targetObject.down(event, event.pageX, event.pageY);
+          var pageX = event.pageX || (event.changedTouches.length > 0 ? event.changedTouches[0].pageX : 0);
+          var pageY = event.pageY || (event.changedTouches.length > 0 ? event.changedTouches[0].pageY : 0);
+          this.targetObject.down(event, pageX, pageY);
           event.cancelBubble = true;
         }
 
@@ -1604,7 +1606,9 @@ paella.data = null;
       key: "up",
       value: function up(event) {
         if (this.targetObject && this.targetObject.up) {
-          this.targetObject.up(event, event.pageX, event.pageY);
+          var pageX = event.pageX || (event.changedTouches.length > 0 ? event.changedTouches[0].pageX : 0);
+          var pageY = event.pageY || (event.changedTouches.length > 0 ? event.changedTouches[0].pageY : 0);
+          this.targetObject.up(event, pageX, pageY);
           event.cancelBubble = true;
         }
 
@@ -1615,7 +1619,9 @@ paella.data = null;
       key: "out",
       value: function out(event) {
         if (this.targetObject && this.targetObject.out) {
-          this.targetObject.out(event, event.pageX, event.pageY);
+          var pageX = event.pageX || (event.changedTouches.length > 0 ? event.changedTouches[0].pageX : 0);
+          var pageY = event.pageY || (event.changedTouches.length > 0 ? event.changedTouches[0].pageY : 0);
+          this.targetObject.out(event, pageX, pageY);
           event.cancelBubble = true;
         }
 
@@ -1625,7 +1631,9 @@ paella.data = null;
       key: "move",
       value: function move(event) {
         if (this.targetObject && this.targetObject.move) {
-          this.targetObject.move(event, event.pageX, event.pageY);
+          var pageX = event.pageX || (event.changedTouches.length > 0 ? event.changedTouches[0].pageX : 0);
+          var pageY = event.pageY || (event.changedTouches.length > 0 ? event.changedTouches[0].pageY : 0);
+          this.targetObject.move(event, pageX, pageY);
           event.cancelBubble = true;
         }
 
@@ -1635,7 +1643,9 @@ paella.data = null;
       key: "over",
       value: function over(event) {
         if (this.targetObject && this.targetObject.over) {
-          this.targetObject.over(event, event.pageX, event.pageY);
+          var pageX = event.pageX || (event.changedTouches.length > 0 ? event.changedTouches[0].pageX : 0);
+          var pageY = event.pageY || (event.changedTouches.length > 0 ? event.changedTouches[0].pageY : 0);
+          this.targetObject.over(event, pageX, pageY);
           event.cancelBubble = true;
         }
 
