@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: c2e38b9";
+paella.version = "6.5.0 - build: a218ac5";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -9403,6 +9403,12 @@ function paella_DeferredNotImplemented() {
 
           if (parser == undefined) {
             paella.log.debug("Error adding captions: Format not supported!");
+
+            if (!paella.player.videoContainer) {
+              paella.log.debug("Video container is not ready, delaying parse until next reload");
+              return;
+            }
+
             paella.player.videoContainer.duration(true).then(function (duration) {
               self._captions = [{
                 id: 0,

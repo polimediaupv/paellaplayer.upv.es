@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: c2e38b9";
+paella.version = "6.5.0 - build: a218ac5";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -7471,9 +7471,13 @@ class Caption {
 			dataType: "text"
 		})
 		.then(function(dataRaw){
-			var parser = captionParserManager._formats[self._format];			
+			var parser = captionParserManager._formats[self._format];
 			if (parser == undefined) {
 				paella.log.debug("Error adding captions: Format not supported!");
+				if (!paella.player.videoContainer) {
+					paella.log.debug("Video container is not ready, delaying parse until next reload");
+					return;
+				}
 				paella.player.videoContainer.duration(true)
 				.then((duration)=>{
 					self._captions = [{
@@ -7587,6 +7591,7 @@ paella.CaptionParserPlugIn = CaptionParserPlugIn;
 
 
 }());
+
 /*  
 	Paella HTML 5 Multistream Player
 	Copyright (C) 2017  Universitat Politècnica de València Licensed under the
