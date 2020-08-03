@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 52af052";
+paella.version = "6.5.0 - build: 2082fc4";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6934,7 +6934,7 @@ function paella_DeferredNotImplemented() {
 
       _this81._volume = paella.utils.cookies.get("volume") ? Number(paella.utils.cookies.get("volume")) : 1;
 
-      if (/true/.test(paella.utils.parameters.get("muted")) || /1/.test(paella.utils.parameters.get("muted"))) {
+      if (paella.player.startMuted) {
         _this81._volume = 0;
       }
 
@@ -11498,6 +11498,11 @@ function paella_DeferredNotImplemented() {
       key: "videoId",
       get: function get() {
         return paella.initDelegate.getId();
+      }
+    }, {
+      key: "startMuted",
+      get: function get() {
+        return /true/.test(paella.utils.parameters.get("muted"));
       }
     }, {
       key: "auth",
