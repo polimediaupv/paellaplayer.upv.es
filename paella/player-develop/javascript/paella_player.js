@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 13ed8f1";
+paella.version = "6.5.0 - build: 52af052";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -6933,6 +6933,11 @@ function paella_DeferredNotImplemented() {
       _this81._audioPlayer = null; // Initial volume level
 
       _this81._volume = paella.utils.cookies.get("volume") ? Number(paella.utils.cookies.get("volume")) : 1;
+
+      if (/true/.test(paella.utils.parameters.get("muted")) || /1/.test(paella.utils.parameters.get("muted"))) {
+        _this81._volume = 0;
+      }
+
       _this81._muted = false;
       return _this81;
     } // Playback and status functions
