@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.3 - build: cd941b3";
+paella.version = "6.4.3 - build: d1c5687";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -5333,7 +5333,9 @@ class PopUpContainer extends paella.DomNode {
 
 	hideContainer(identifier, button, swapFocus = false) {
 		var container = this.containers[identifier];
-		hideContainer.apply(this,[identifier,container,swapFocus]);
+		if (container) {
+			hideContainer.apply(this,[identifier,container,swapFocus]);
+		}
 	}
 
 	showContainer(identifier, button, swapFocus = false) {
