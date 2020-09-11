@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 7a6a6bf";
+paella.version = "6.5.0 - build: 1921c8b";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
