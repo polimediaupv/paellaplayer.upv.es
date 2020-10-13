@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.3 - build: d1c5687";
+paella.version = "6.4.3 - build: 8064b5a";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -4775,7 +4775,7 @@ function paella_DeferredNotImplemented() {
       value: function setVisible(visible, animate) {
         var _this63 = this;
 
-        if (_typeof(visible == "string")) {
+        if (typeof visible == "string") {
           visible = /true/i.test(visible) ? true : false;
         }
 
