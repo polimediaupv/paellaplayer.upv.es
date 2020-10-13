@@ -2891,12 +2891,6 @@ textarea {
   margin-top: 5px;
   margin-right: 5px;
 }
-.buttonPlugin.showMultipleQualitiesPlugin {
-  text-align: center;
-  font-size: 0.8em;
-  line-height: 20px;
-  min-width: 36px;
-}
 .buttonPlugin.playButton {
   background-position: -500% -100%;
 }
@@ -2963,6 +2957,12 @@ textarea {
 }
 .rateButtons .starButton:first-of-type {
   margin-left: 19px;
+}
+.buttonPlugin.showMultipleQualitiesPlugin {
+  text-align: center;
+  font-size: 0.8em;
+  line-height: 20px;
+  min-width: 36px;
 }
 .buttonPlugin.searchButton {
   background-size: 2000% 1000%;
