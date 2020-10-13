@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 1449a3f";
+paella.version = "6.5.0 - build: 1486ffa";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -18912,6 +18912,7 @@ paella.addPlugin(function () {
           debug: false,
           defaultAudioCodec: undefined,
           initialLiveManifestSize: 1,
+          initialQualityLevel: 1,
           maxBufferLength: 30,
           maxMaxBufferLength: 600,
           maxBufferSize: 60 * 1000 * 1000,
