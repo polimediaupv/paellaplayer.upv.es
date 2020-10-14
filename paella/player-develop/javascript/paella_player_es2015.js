@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 1486ffa";
+paella.version = "6.5.0 - build: a3f551a";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -4656,7 +4656,7 @@ class VideoWrapper extends paella.DomNode {
 	}
 
 	setVisible(visible,animate) {
-		if (typeof(visible=="string")) {
+		if (typeof(visible)=="string") {
 			visible = /true/i.test(visible) ? true : false;
 		}
 		if (visible && animate) {
