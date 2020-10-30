@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.3.3 - build: 2375af5";
+paella.version = "6.3.4 - build: 0291845";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -5926,7 +5926,7 @@ paella.EventDrivenPlugin = EventDrivenPlugin;
                             sourceElem.src = stream.src;
                             sourceElem.type = stream.type;
                             video.load();
-                            video.playbackRate = video._playbackRate || 1;
+                            video.playbackRate = videoPlugin._playbackRate || 1;
                             cbResolve();
                         })
                     };
@@ -11177,7 +11177,8 @@ paella.addPlugin(function() {
 		parse(content, lang, next) {
 			var captions = [];
 			var self = this;
-			var xml = $(content);
+			var xmlDoc = $.parseXML(content);
+			var xml = $(xmlDoc);
 			var g_lang = xml.attr("xml:lang");
 			
 			var lls = xml.find("div");
@@ -11233,6 +11234,7 @@ paella.addPlugin(function() {
 		}
 	}
 });
+
 paella.addPlugin(function() {
 	return class CaptionsPlugin extends paella.ButtonPlugin {
 		getInstanceName() { return "captionsPlugin"; }	// plugin instance will be available in paella.plugins.captionsPlugin
