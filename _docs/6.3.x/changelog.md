@@ -5,6 +5,14 @@
 CHANGELOG
 =========
 
+* Paella 6.3.5
+
+  * Bug fixed in  playback rate.
+
+* Paella 6.3.4
+
+  * webgl engine updated
+
 * Paella 6.3.3
 
   * Bug fixes from the 6.2.x branch.
@@ -29,6 +37,12 @@ CHANGELOG
 
   * Improvements in video zoom UX: now it is necessary to press the ALT key to make the video zoom work.
   * Other minor UX improvements.
+
+* 6.2.7
+
+  * Update Build Dependencies
+  * Update jQuery to 5.3.1
+  * DFXP caption parse fix for jQuery 5.3.0 upgrade
 
 * Paella 6.2.6
 
