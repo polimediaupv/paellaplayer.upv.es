@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.4 - build: ded58ac";
+paella.version = "6.4.4 - build: 9aa6a8a";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -1635,6 +1635,9 @@ function paella_DeferredNotImplemented() {
     });
   }
 
+  var profileReloadCount = 0;
+  var maxProfileReloadCunt = 20;
+
   var Profiles = /*#__PURE__*/function () {
     function Profiles() {
       var _this10 = this;
@@ -1701,11 +1704,17 @@ function paella_DeferredNotImplemented() {
           var profileData = this.loadProfile(profileName) || g_profiles.length > 0 && g_profiles[0];
 
           if (!profileData && g_profiles.length == 0) {
-            // Try to load the profile again later, maybe the profiles are not loaded yet
-            setTimeout(function () {
-              _this11.setProfile(profileName, animate);
-            }, 100);
-            return false;
+            if (profileReloadCount < maxProfileReloadCunt) {
+              profileReloadCount++; // Try to load the profile again later, maybe the profiles are not loaded yet
+
+              setTimeout(function () {
+                _this11.setProfile(profileName, animate);
+              }, 100);
+              return false;
+            } else {
+              console.error("No valid video layout profiles were found. Check that the 'content' attribute setting in 'videoSets', at config.json file, matches the 'content' property in the video manifest.");
+              return false;
+            }
           } else {
             this._currentProfileName = profileName;
             applyProfileWithJson.apply(paella.player.videoContainer, [profileData, animate]);
