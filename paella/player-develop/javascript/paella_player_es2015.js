@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: d19c0d2";
+paella.version = "6.5.0 - build: 45572a3";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2283,6 +2283,9 @@ function paella_DeferredNotImplemented () {
         });
     }
 
+    let profileReloadCount = 0;
+    const maxProfileReloadCunt = 20;
+
 	class Profiles {
         constructor() {
             paella.events.bind(paella.events.controlBarDidHide, () => this.hideButtons());
@@ -2325,6 +2328,7 @@ function paella_DeferredNotImplemented () {
         get currentProfileName() { return this._currentProfileName; }
 
         setProfile(profileName,animate) {
+            
             if (!profileName) {
                 return false;
             }
@@ -2340,11 +2344,18 @@ function paella_DeferredNotImplemented () {
             else {
                 let profileData = this.loadProfile(profileName) || (g_profiles.length>0 && g_profiles[0]);
                 if (!profileData && g_profiles.length==0) {
-                    // Try to load the profile again later, maybe the profiles are not loaded yet
-                    setTimeout(() => {
-                        this.setProfile(profileName,animate);
-                    },100);
-                    return false;
+                    if (profileReloadCount < maxProfileReloadCunt) {
+                        profileReloadCount++;
+                        // Try to load the profile again later, maybe the profiles are not loaded yet
+                        setTimeout(() => {
+                            this.setProfile(profileName,animate);
+                        },100);
+                        return false;
+                    }
+                    else {
+                        console.error("No valid video layout profiles were found. Check that the 'content' attribute setting in 'videoSets', at config.json file, matches the 'content' property in the video manifest.");
+                        return false;
+                    }
                 }
                 else {
                     this._currentProfileName = profileName;
