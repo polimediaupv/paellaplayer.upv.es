@@ -63,7 +63,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.4 - build: 660f7ce";
+paella.version = "6.4.4 - build: 2edd774";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -5574,7 +5574,11 @@ function paella_DeferredNotImplemented() {
         this.stopVideoSync();
         console.debug("Start sync to player:");
         console.debug(this._syncProviderPlayer);
-        var maxDiff = 0.3;
+        var maxDiff = 0.1;
+        var totalTime = 0;
+        var numberOfSyncs = 0;
+        var syncFrequency = 0;
+        var maxSyncFrequency = 0.2;
 
         var sync = function sync() {
           _this77._syncProviderPlayer.currentTime().then(function (t) {
@@ -5582,11 +5586,19 @@ function paella_DeferredNotImplemented() {
               if (player != syncProviderPlayer && player.currentTimeSync != null && Math.abs(player.currentTimeSync - t) > maxDiff) {
                 console.debug("Sync player current time: ".concat(player.currentTimeSync, " to time ").concat(t));
                 console.debug(player);
+                ++numberOfSyncs;
                 player.setCurrentTime(t);
+
+                if (syncFrequency > maxSyncFrequency) {
+                  maxDiff *= 1.5;
+                  console.log("Maximum syncrhonization frequency reached. Increasing max difference syncronization time to ".concat(maxDiff));
+                }
               }
             });
           });
 
+          totalTime += 1000;
+          syncFrequency = numberOfSyncs / (totalTime / 1000);
           _this77._syncTimer = setTimeout(function () {
             return sync();
           }, 1000);
