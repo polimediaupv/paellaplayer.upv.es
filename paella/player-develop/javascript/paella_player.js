@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 5605b13";
+paella.version = "6.5.0 - build: 8a13987";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -20381,7 +20381,7 @@ paella.addPlugin(function () {
         }, function (data) {
           _this201.showOnEnd = !Array.isArray(data) || data.length == 0;
         });
-        onSuccess(!paella.player.isLiveStream() || paella.utils.userAgent.system.Android || paella.utils.userAgent.system.iOS || !paella.player.videoContainer.supportAutoplay());
+        onSuccess(true);
       }
     }, {
       key: "getIndex",
