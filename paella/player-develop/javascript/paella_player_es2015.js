@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 68056b4";
+paella.version = "6.5.0 - build: 05ed6b5";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -19310,6 +19310,7 @@ paella.addPlugin(function() {
           heartbeat = this.config.heartbeat,
           privacy_url = this.config.privacy_policy_url,
           tracking_client = this.config.tracking_client_name,
+          ask_for_concent = this.config.ask_for_concent,
           cookieconsent_base_color = this.config.cookieconsent_base_color,
           cookieconsent_highlight_color = this.config.cookieconsent_highlight_color,
           thisClass = this,
@@ -19323,10 +19324,10 @@ paella.addPlugin(function() {
       function trackMatomo() {
         if (isTrackingPermission() && !tracked && server && site_id){
           if (server.substr(-1) != '/') server += '/';
-          paella.require(server + tracking_client_name + ".js")
+          paella.require(server + tracking_client + ".js")
             .then((matomo) => {
               paella.log.debug("Matomo Analytics Enabled");
-              paella.userTracking.matomotracker = Matomo.getAsyncTracker( server + tracking_client_name + ".php", site_id );
+              paella.userTracking.matomotracker = Matomo.getAsyncTracker( server + tracking_client + ".php", site_id );
               paella.userTracking.matomotracker.client_id = thisClass.config.client_id;
               if (heartbeat && heartbeat > 0) paella.userTracking.matomotracker.enableHeartBeatTimer(heartbeat);
               if (Matomo && Matomo.MediaAnalytics) {
@@ -19451,13 +19452,17 @@ paella.addPlugin(function() {
           trackMatomo();
       };
 
-      initTranslate(navigator.language, function () {
-          paella.log.debug('Matomo: Successfully translated.');
-          initCookieNotification();
-      }, function () {
-          paella.log.debug('Matomo: Error translating.');
-          initCookieNotification();
-      });
+      if (ask_for_concent) {
+        initTranslate(navigator.language, function () {
+            paella.log.debug('Matomo: Successfully translated.');
+            initCookieNotification();
+        }, function () {
+            paella.log.debug('Matomo: Error translating.');
+            initCookieNotification();
+        });
+      } else {
+        trackingPermission = true;
+      }
 
       onSuccess(trackMatomo());
 
