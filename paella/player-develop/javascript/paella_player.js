@@ -65,7 +65,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 05ed6b5";
+paella.version = "6.5.0 - build: a38abc5";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19114,14 +19114,17 @@ paella.addPlugin(function () {
               var cfg = _this177.config; //cfg.autoStartLoad = false;
 
               _this177._hls = new Hls(cfg);
+              _this177.autoQuality = true; // For some streams there are problems if playback does not start after loading the
+              // manifest. This flag is used to pause it again once the video is loaded
 
-              _this177._hls.loadSource(url);
-
-              _this177._hls.attachMedia(video);
-
-              _this177.autoQuality = true;
+              var firstLoad = true;
 
               _this177._hls.on(Hls.Events.LEVEL_SWITCHED, function (ev, data) {
+                if (firstLoad) {
+                  firstLoad = false;
+                  video.pause();
+                }
+
                 _this177._qualities = _this177._qualities || [];
                 _this177._qualityIndex = _this177.autoQuality ? _this177._qualities.length - 1 : data.level;
                 paella.events.trigger(paella.events.qualityChanged, {});
@@ -19171,9 +19174,15 @@ paella.addPlugin(function () {
                 _this177._hls.currentLevel = _this177._hls.levels.length >= initialQualityLevel ? initialQualityLevel : -1;
                 setTimeout(function () {
                   return _this177._hls.currentLevel = -1;
-                }, 1000);
+                }, 1000); // Fixes hls.js problems loading some videos
+
+                video.play();
                 resolve(video);
               });
+
+              _this177._hls.loadSource(url);
+
+              _this177._hls.attachMedia(video);
             } else {
               reject(new Error("HLS not supported"));
             }
