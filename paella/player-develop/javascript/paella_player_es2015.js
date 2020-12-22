@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: cae98a5";
+paella.version = "6.5.0 - build: c2acf22";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -3318,15 +3318,24 @@ class VideoRect extends paella.DomNode {
 
 			$(eventCapture).on('mousemove',(evt) => {
 				if (!this.allowZoom() || !this._zoomAvailable) return;
-				//this.drag = evt.buttons>0;
+				let mouse = mousePos(evt);
+				let offset = {
+					x: mouse.x - this._mouseDown.x,
+					y: mouse.y - this._mouseDown.y
+				};
+
+				// We have not found out why there are sometimes sudden jumps in the
+				// position of the mouse cursos, so we avoid the problem
+				if ((Math.abs(offset.x)>80 || Math.abs(this.y)>80) && this.drag) {
+					this._mouseDown = mouse;
+					return;
+				}
+
+				this.drag = evt.buttons>0;
+
 				if (this.drag) {
 					paella.player.videoContainer.disablePlayOnClick();
-
-					let mouse = mousePos(evt);
-					panImage.apply(this,[{
-						x: mouse.x - this._mouseDown.x,
-						y: mouse.y - this._mouseDown.y
-					}]);
+					panImage.apply(this,[offset]);
 					this._mouseDown = mouse;
 				}
 			});
@@ -3334,7 +3343,7 @@ class VideoRect extends paella.DomNode {
 			$(eventCapture).on('mouseup',(evt) => {
 				if (!this.allowZoom() || !this._zoomAvailable) return;
 				this.drag = false;
-				setTimeout(() => paella.player.videoContainer.enablePlayOnClick(), 10);
+				paella.player.videoContainer.enablePlayOnClick(1000);
 			});
 
 			$(eventCapture).on('mouseleave',(evt) => {
@@ -4699,6 +4708,15 @@ paella.SeekType = {
 	DISABLED: 4
 };
 
+// This function is used to manage the timer to enable and disable the click and double click events
+// interaction with the video container timeout.
+function clearClickEventsTimeout() {
+	if (this._clickEventsTimeout) {
+		clearTimeout(this._clickEventsTimeout);
+		this._clickEventsTimeout = null;
+	}
+}
+
 class VideoContainerBase extends paella.DomNode {
 	
 	constructor(id) {
@@ -4713,14 +4731,14 @@ class VideoContainerBase extends paella.DomNode {
 		this.currentMasterVideoData = null;
 		this.currentSlaveVideoData = null;
 		this._force = false;
-		this._playOnClickEnabled =  true;
+		this._clickEventsEnabled =  true;
 		this._seekDisabled =  false;
 		this._seekType = paella.SeekType.FULL;
 		this._seekTimeLimit = 0;
 		this._attenuationEnabled = false;
 		
 		$(this.domElement).dblclick((evt) => {
-			if (this.firstClick) {
+			if (this._clickEventsEnabled) {
 				paella.player.isFullScreen() ? paella.player.exitFullScreen() : paella.player.goFullScreen();
 			}
 		});
@@ -4728,15 +4746,14 @@ class VideoContainerBase extends paella.DomNode {
 		let dblClickTimer = null;
 		$(this.domElement).click((evt) => {
 			let doClick = () => {
-				if (this.firstClick && !this._playOnClickEnabled) return;
+				if (!this._clickEventsEnabled) return;
 				paella.player.videoContainer.paused()
 					.then((paused) => {
 						// If some player needs mouse events support, the click is ignored
-						if (this.firstClick && this.streamProvider.videoPlayers.some((p) => p.canvasData.mouseEventsSupport)) {
+						if (this.streamProvider.videoPlayers.some((p) => p.canvasData.mouseEventsSupport)) {
 							return;
 						}
 	
-						this.firstClick = true;
 						if (paused) {
 							paella.player.play();
 						}
@@ -4853,16 +4870,25 @@ class VideoContainerBase extends paella.DomNode {
 		this.timeupdateEventTimer = null;
 	}
 
-	enablePlayOnClick() {
-		this._playOnClickEnabled = true;
+	enablePlayOnClick(timeout = 0) {
+		clearClickEventsTimeout.apply(this);
+		if (timeout) {
+			this._clickEventsTimeout = setTimeout(() => {
+				this._clickEventsEnabled = true;
+			}, timeout);
+		}
+		else {
+			this._clickEventsEnabled = true;
+		}
 	}
 
 	disablePlayOnClick() {
-		this._playOnClickEnabled = false;
+		clearClickEventsTimeout.apply(this);
+		this._clickEventsEnabled = false;
 	}
 
 	isPlayOnClickEnabled() {
-		return this._playOnClickEnabled;
+		return this._clickEventsEnabled;
 	}
 
 	play() {
@@ -15888,9 +15914,10 @@ paella.addPlugin(function() {
 		getMenuContent() {
 			let buttonItems = [];
 
+			const minVisibleQuality = this.config.minVisibleQuality !== undefined ? this.config.minVisibleQuality : 100;
 			this._available.forEach((q,index) => {
 				let resH = q.res && q.res.h || 0;
-				if (resH>=this.config.minVisibleQuality || resH<=0) {
+				if (resH>=minVisibleQuality || resH<=0) {
 					buttonItems.push({
 						id: q.shortLabel(),
 						title: q.shortLabel(),
@@ -18440,24 +18467,28 @@ paella.addPlugin(function() {
         wrapperDom.appendChild(zoomButton);
         zoomButton.className = "videoZoomButton btn zoomIn";
         zoomButton.innerHTML = '<i class="glyphicon glyphicon-zoom-in"></i>'
-        $(zoomButton).on('mousedown',() => {
+        $(zoomButton).on('mousedown',(e) => {
+            e.preventDefault();
             paella.player.videoContainer.disablePlayOnClick();
             videoPlayer.zoomIn();
         });
-        $(zoomButton).on('mouseup',() => {
-            setTimeout(() => paella.player.videoContainer.enablePlayOnClick(),10);
+        $(zoomButton).on('mouseup',(e) => {
+            e.preventDefault();
+            paella.player.videoContainer.enablePlayOnClick(1000);
         });
 
         zoomButton = document.createElement('div');
         wrapperDom.appendChild(zoomButton);
         zoomButton.className = "videoZoomButton btn zoomOut";
         zoomButton.innerHTML = '<i class="glyphicon glyphicon-zoom-out"></i>'
-        $(zoomButton).on('mousedown',() => {
+        $(zoomButton).on('mousedown',(e) => {
+            e.preventDefault();
             paella.player.videoContainer.disablePlayOnClick();
             videoPlayer.zoomOut();
         });
-        $(zoomButton).on('mouseup',() => {
-            setTimeout(() => paella.player.videoContainer.enablePlayOnClick(),10);
+        $(zoomButton).on('mouseup',(e) => {
+            e.preventDefault();
+            paella.player.videoContainer.enablePlayOnClick(1000);
         });
 
     }
