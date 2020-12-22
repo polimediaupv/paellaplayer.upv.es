@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.5 - build: 5617da6";
+paella.version = "6.4.5 - build: ca65411";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -15066,9 +15066,10 @@ paella.addPlugin(function() {
 		getMenuContent() {
 			let buttonItems = [];
 
+			const minVisibleQuality = this.config.minVisibleQuality !== undefined ? this.config.minVisibleQuality : 100;
 			this._available.forEach((q,index) => {
 				let resH = q.res && q.res.h || 0;
-				if (resH>=this.config.minVisibleQuality || resH<=0) {
+				if (resH>=minVisibleQuality || resH<=0) {
 					buttonItems.push({
 						id: q.shortLabel(),
 						title: q.shortLabel(),
