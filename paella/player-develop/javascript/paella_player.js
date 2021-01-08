@@ -2,6 +2,10 @@
 
 var _this5 = void 0;
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
@@ -65,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: b2dd4c0";
+paella.version = "6.5.0 - build: 5040fef";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -18114,31 +18118,55 @@ paella.addPlugin(function () {
           id: paella.initDelegate.getId()
         }, function (data, status) {
           var footPrintsData = {};
-          paella.player.videoContainer.duration().then(function (duration) {
-            var trimStart = Math.floor(paella.player.videoContainer.trimStart());
-            var lastPosition = -1;
-            var lastViews = 0;
+          paella.player.videoContainer.duration().then( /*#__PURE__*/function () {
+            var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(duration) {
+              var trimStart, lastPosition, lastViews, i, position, views, j;
+              return regeneratorRuntime.wrap(function _callee$(_context) {
+                while (1) {
+                  switch (_context.prev = _context.next) {
+                    case 0:
+                      _context.t0 = Math;
+                      _context.next = 3;
+                      return paella.player.videoContainer.trimStart();
 
-            for (var i = 0; i < data.length; i++) {
-              var position = data[i].position - trimStart;
+                    case 3:
+                      _context.t1 = _context.sent;
+                      trimStart = _context.t0.floor.call(_context.t0, _context.t1);
+                      lastPosition = -1;
+                      lastViews = 0;
 
-              if (position < duration) {
-                var views = data[i].views;
+                      for (i = 0; i < data.length; i++) {
+                        position = data[i].position - trimStart;
 
-                if (position - 1 != lastPosition) {
-                  for (var j = lastPosition + 1; j < position; j++) {
-                    footPrintsData[j] = lastViews;
+                        if (position < duration) {
+                          views = data[i].views;
+
+                          if (position - 1 != lastPosition) {
+                            for (j = lastPosition + 1; j < position; j++) {
+                              footPrintsData[j] = lastViews;
+                            }
+                          }
+
+                          footPrintsData[position] = views;
+                          lastPosition = position;
+                          lastViews = views;
+                        }
+                      }
+
+                      thisClass.drawFootPrints(footPrintsData);
+
+                    case 9:
+                    case "end":
+                      return _context.stop();
                   }
                 }
+              }, _callee);
+            }));
 
-                footPrintsData[position] = views;
-                lastPosition = position;
-                lastViews = views;
-              }
-            }
-
-            thisClass.drawFootPrints(footPrintsData);
-          });
+            return function (_x) {
+              return _ref.apply(this, arguments);
+            };
+          }());
         });
       }
     }, {

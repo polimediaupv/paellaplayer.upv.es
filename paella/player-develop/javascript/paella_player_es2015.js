@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: b2dd4c0";
+paella.version = "6.5.0 - build: 5040fef";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -14380,8 +14380,8 @@ paella.addPlugin(function() {
 			var thisClass = this;
 			paella.data.read('footprints',{id:paella.initDelegate.getId()},function(data,status) {
 				var footPrintsData = {};
-				paella.player.videoContainer.duration().then(function(duration){
-					var trimStart = Math.floor(paella.player.videoContainer.trimStart());
+				paella.player.videoContainer.duration().then(async (duration) => {
+					var trimStart = Math.floor(await paella.player.videoContainer.trimStart());
 	
 					var lastPosition = -1;
 					var lastViews = 0;
