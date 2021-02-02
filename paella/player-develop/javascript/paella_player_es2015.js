@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 5040fef";
+paella.version = "6.6.0 - build: de79732";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -17992,7 +17992,6 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.usertracking.elasticsearchSaverPlugin"; }
 		
 		checkEnabled(onSuccess) {
-			this.type = 'userTrackingSaverPlugIn';
 			this._url = this.config.url;
 			this._index = this.config.index || "paellaplayer";
 			this._type = this.config.type || "usertracking";
@@ -18028,7 +18027,7 @@ paella.addPlugin(function() {
 						params: p
 					};		
 					
-					paella.ajax.post({url:this._url+ "/"+ this._index + "/" + this._type + "/", params:JSON.stringify(log) });
+					paella.utils.ajax.post({url:this._url+ "/"+ this._index + "/" + this._type + "/", params:JSON.stringify(log) });
 				});
 		}
 	}

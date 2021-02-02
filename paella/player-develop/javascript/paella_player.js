@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.0 - build: 5040fef";
+paella.version = "6.6.0 - build: de79732";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -22853,7 +22853,6 @@ paella.addPlugin(function () {
     }, {
       key: "checkEnabled",
       value: function checkEnabled(onSuccess) {
-        this.type = 'userTrackingSaverPlugIn';
         this._url = this.config.url;
         this._index = this.config.index || "paellaplayer";
         this._type = this.config.type || "usertracking";
@@ -22892,7 +22891,7 @@ paella.addPlugin(function () {
             event: event,
             params: p
           };
-          paella.ajax.post({
+          paella.utils.ajax.post({
             url: _this220._url + "/" + _this220._index + "/" + _this220._type + "/",
             params: JSON.stringify(log)
           });
