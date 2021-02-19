@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.6.0 - build: 6fd30bb";
+paella.version = "6.6.0 - build: f3f263c";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19351,14 +19351,13 @@ paella.addPlugin(function () {
               }]);
             });
           } else {
-          var _This = this;
-
+          var This = this;
           return new Promise(function (resolve) {
             if (!_this185._qualities || _this185._qualities.length == 0) {
-              _This._qualities = [];
+              This._qualities = [];
 
-              _This._hls.levels.forEach(function (q, index) {
-                _This._qualities.push(_This._getQualityObject(index, {
+              This._hls.levels.forEach(function (q, index) {
+                This._qualities.push(This._getQualityObject(index, {
                   index: index,
                   res: {
                     w: q.width,
@@ -19370,8 +19369,8 @@ paella.addPlugin(function () {
 
               if (_this185._qualities.length > 1) {
                 // If there is only one quality level, don't add the "auto" option
-                _This._qualities.push(_This._getQualityObject(_This._qualities.length, {
-                  index: _This._qualities.length,
+                This._qualities.push(This._getQualityObject(This._qualities.length, {
+                  index: This._qualities.length,
                   res: {
                     w: 0,
                     h: 0
@@ -19381,8 +19380,8 @@ paella.addPlugin(function () {
               }
             }
 
-            _This.qualityIndex = _This._qualities.length - 1;
-            resolve(_This._qualities);
+            This.qualityIndex = This._qualities.length - 1;
+            resolve(This._qualities);
           });
         }
       }
