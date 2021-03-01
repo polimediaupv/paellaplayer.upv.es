@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.6.0 - build: 07c1c1f";
+paella.version = "6.6.0 - build: b996137";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
