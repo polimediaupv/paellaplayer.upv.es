@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.1 - build: 9e04eb8";
+paella.version = "6.5.1 - build: 0e9551c";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -15202,6 +15202,8 @@ paella.addPlugin(function() {
 								resolve(video);
 							});
 
+							const rand = Math.floor(Math.random() * 100000000000);
+							url += /\?/.test(url) ? `&cache=${ rand }` : `?cache=${ rand }`;
 							this._hls.loadSource(url);
 							this._hls.attachMedia(video);
 						}
