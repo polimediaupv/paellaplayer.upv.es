@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.6.0 - build: b996137";
+paella.version = "6.6.0 - build: 98c51b6";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19191,6 +19191,9 @@ paella.addPlugin(function () {
                 video.play();
                 resolve(video);
               });
+
+              var rand = Math.floor(Math.random() * 100000000000);
+              url += /\?/.test(url) ? "&cache=".concat(rand) : "?cache=".concat(rand);
 
               _this178._hls.loadSource(url);
 
