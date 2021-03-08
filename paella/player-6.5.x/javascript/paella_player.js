@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.1 - build: 0e9551c";
+paella.version = "6.5.1 - build: d93cc4a";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -12213,11 +12213,15 @@ function paella_DeferredNotImplemented() {
     _createClass(LazyThumbnailContainer, null, [{
       key: "GetIconElement",
       value: function GetIconElement() {
-        var container = document.createElement('div');
+        var container = document.createElement('button');
         container.className = "play-button-on-screen";
+        container.setAttribute("aria-label", "Play");
         container.style.width = "100%";
         container.style.height = "100%";
         container.style.pointerEvents = "none";
+        container.addEventListener("click", function () {
+          return paella.player.play();
+        });
         var icon = document.createElement('div');
         icon['className'] = 'play-icon';
         container.appendChild(icon);
