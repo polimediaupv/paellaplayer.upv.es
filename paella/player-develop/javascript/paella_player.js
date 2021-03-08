@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.6.0 - build: e8213f4";
+paella.version = "6.6.0 - build: 829ac27";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -24800,20 +24800,36 @@ paella.addPlugin(function () {
       } // checkEnabled
 
     }, {
+      key: "setVideoTitleAttr",
+      value: function setVideoTitleAttr() {
+        var video_element = video_element = document.getElementsByTagName("video");
+        video_element.video_0.setAttribute("data-matomo-title", document.title);
+      }
+    }, {
       key: "registerVisit",
       value: function registerVisit() {
         var title, event_id, series_title, series_id, presenter, view_mode;
 
-        if (paella.opencast && paella.opencast._episode) {
+        if (paella.opencast != undefined && paella.opencast._episode != undefined) {
           title = paella.opencast._episode.dcTitle;
           event_id = paella.opencast._episode.id;
           presenter = paella.opencast._episode.dcCreator;
           paella.userTracking.matomotracker.setCustomVariable(5, "client", paella.userTracking.matomotracker.client_id || "Paella Opencast");
         } else {
+          title = this.loadTitle(); // Add title for Matomo Media Analytics.
+
+          if (this.config.html_title) {
+            this.setVideoTitleAttr();
+          } else {
+            Matomo.MediaAnalytics.setMediaTitleFallback(function (mediaElement) {
+              return title;
+            });
+          }
+
           paella.userTracking.matomotracker.setCustomVariable(5, "client", paella.userTracking.matomotracker.client_id || "Paella Standalone");
         }
 
-        if (paella.opencast && paella.opencast._episode && paella.opencast._episode.mediapackage) {
+        if (paella.opencast != undefined && paella.opencast._episode != undefined && paella.opencast._episode.mediapackage != undefined) {
           series_id = paella.opencast._episode.mediapackage.series;
           series_title = paella.opencast._episode.mediapackage.seriestitle;
         }
