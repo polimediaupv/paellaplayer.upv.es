@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.2 - build: 0468000";
+paella.version = "6.5.2 - build: 51bffad";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -2120,24 +2120,44 @@ paella.utils.uuid = function () {
 
       switch (logLevelParam) {
         case "error":
-          this.setLevel(paella.log.kLevelError);
+          this.setLevel(this.kLevelError);
           break;
 
         case "warning":
-          this.setLevel(paella.log.kLevelWarning);
+          this.setLevel(this.kLevelWarning);
           break;
 
         case "debug":
-          this.setLevel(paella.log.kLevelDebug);
+          this.setLevel(this.kLevelDebug);
           break;
 
         case "log":
-          this.setLevel(paella.log.kLevelLog);
+          this.setLevel(this.kLevelLog);
           break;
       }
     }
 
     _createClass(Log, [{
+      key: "kLevelError",
+      get: function get() {
+        return 1;
+      }
+    }, {
+      key: "kLevelWarning",
+      get: function get() {
+        return 2;
+      }
+    }, {
+      key: "kLevelDebug",
+      get: function get() {
+        return 3;
+      }
+    }, {
+      key: "kLevelLog",
+      get: function get() {
+        return 4;
+      }
+    }, {
       key: "logMessage",
       value: function logMessage(level, message) {
         var prefix = "";
@@ -2199,10 +2219,6 @@ paella.utils.uuid = function () {
   }();
 
   paella.log = new Log();
-  paella.log.kLevelError = 1;
-  paella.log.kLevelWarning = 2;
-  paella.log.kLevelDebug = 3;
-  paella.log.kLevelLog = 4;
 })();
 
 paella.AntiXSS = {
