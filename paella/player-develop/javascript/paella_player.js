@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.2 - build: e65a052";
+paella.version = "6.5.2 - build: 9cb9b65";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -9422,15 +9422,21 @@ function paella_DeferredNotImplemented() {
     }, {
       key: "reloadCaptions",
       value: function reloadCaptions(next) {
+        var _paella$player$config, _paella$player$config2;
+
         var self = this;
+        var xhrFields = ((_paella$player$config = paella.player.config.captions) === null || _paella$player$config === void 0 ? void 0 : (_paella$player$config2 = _paella$player$config.downloadOptions) === null || _paella$player$config2 === void 0 ? void 0 : _paella$player$config2.xhrFields) || null;
+
+        if (Object.keys(xhrFields).length) {
+          xhrFields = null;
+        }
+
         jQuery.ajax({
           url: self._url,
           cache: false,
           type: 'get',
           dataType: "text",
-          xhrFields: {
-            withCredentials: true
-          }
+          xhrFields: null
         }).then(function (dataRaw) {
           var parser = captionParserManager._formats[self._format];
 
