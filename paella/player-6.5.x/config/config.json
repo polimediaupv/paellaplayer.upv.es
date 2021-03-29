@@ -109,6 +109,11 @@
   "experimental": {
     "autoplay": true
   },
+  "captions": {
+    "downloadOptions": {
+      "xhrFields": {}
+    }
+  },
   "plugins": {
     "enablePluginsByDefault": false,
     "//**** Instructions: Disable any individual plugin by setting its enable property to false": {
