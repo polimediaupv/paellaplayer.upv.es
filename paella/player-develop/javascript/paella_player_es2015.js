@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.2 - build: 51bffad";
+paella.version = "6.5.3 - build: 5facfe3";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -7521,7 +7521,7 @@ class Caption {
 	reloadCaptions(next) {
 		var self = this;
 	
-		let xhrFields = paella.player.config.captions?.downloadOptions?.xhrFields || null;
+		let xhrFields = paella.player.config.captions?.downloadOptions?.xhrFields || {};
 		if (Object.keys(xhrFields).length) {
 			xhrFields = null;
 		}
@@ -9835,7 +9835,10 @@ paella.ControlsContainer = ControlsContainer;
 			container.style.width = "100%";
 			container.style.height = "100%";
 			container.style.pointerEvents = "none";
-			container.addEventListener("click", () => paella.player.play());
+			container.addEventListener("click", (evt) => {
+				evt.stopPropagation();
+				paella.player.play();
+			});
 		
 			let icon = document.createElement('div');
 			icon['className'] = 'play-icon';

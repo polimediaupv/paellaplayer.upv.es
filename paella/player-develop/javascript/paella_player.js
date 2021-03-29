@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.2 - build: 51bffad";
+paella.version = "6.5.3 - build: 5facfe3";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -9441,7 +9441,7 @@ function paella_DeferredNotImplemented() {
         var _paella$player$config, _paella$player$config2;
 
         var self = this;
-        var xhrFields = ((_paella$player$config = paella.player.config.captions) === null || _paella$player$config === void 0 ? void 0 : (_paella$player$config2 = _paella$player$config.downloadOptions) === null || _paella$player$config2 === void 0 ? void 0 : _paella$player$config2.xhrFields) || null;
+        var xhrFields = ((_paella$player$config = paella.player.config.captions) === null || _paella$player$config === void 0 ? void 0 : (_paella$player$config2 = _paella$player$config.downloadOptions) === null || _paella$player$config2 === void 0 ? void 0 : _paella$player$config2.xhrFields) || {};
 
         if (Object.keys(xhrFields).length) {
           xhrFields = null;
@@ -12241,8 +12241,9 @@ function paella_DeferredNotImplemented() {
         container.style.width = "100%";
         container.style.height = "100%";
         container.style.pointerEvents = "none";
-        container.addEventListener("click", function () {
-          return paella.player.play();
+        container.addEventListener("click", function (evt) {
+          evt.stopPropagation();
+          paella.player.play();
         });
         var icon = document.createElement('div');
         icon['className'] = 'play-icon';
