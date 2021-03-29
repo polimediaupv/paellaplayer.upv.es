@@ -5,6 +5,17 @@
 CHANGELOG
 =========
 
+* Paella 6.5.3
+
+  * New subtitle configuration options have been added.
+  * The log system has been improved.
+  * Fixed a bug in the parsing of subtitles in DFXP format.
+  
+* Paella 6.5.2
+
+  * An accessibility bug has been fixed, which did not allow starting the video with screen readers.
+  * Fixed an issue with matomo media analytics.
+
 * Paella 6.5.1
 
   * The subtitle plugin can now work with servers that require credentials.
