@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.3 - build: 040e01f";
+paella.version = "6.5.3 - build: 6fbdbe7";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -7521,7 +7521,7 @@ class Caption {
 	reloadCaptions(next) {
 		var self = this;
 	
-		let xhrFields = paella.player.config.captions?.downloadOptions?.xhrFields || null;
+		let xhrFields = paella.player.config.captions?.downloadOptions?.xhrFields || {};
 		if (Object.keys(xhrFields).length) {
 			xhrFields = null;
 		}

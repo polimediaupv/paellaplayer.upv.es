@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.3 - build: 040e01f";
+paella.version = "6.5.3 - build: 6fbdbe7";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -9441,7 +9441,7 @@ function paella_DeferredNotImplemented() {
         var _paella$player$config, _paella$player$config2;
 
         var self = this;
-        var xhrFields = ((_paella$player$config = paella.player.config.captions) === null || _paella$player$config === void 0 ? void 0 : (_paella$player$config2 = _paella$player$config.downloadOptions) === null || _paella$player$config2 === void 0 ? void 0 : _paella$player$config2.xhrFields) || null;
+        var xhrFields = ((_paella$player$config = paella.player.config.captions) === null || _paella$player$config === void 0 ? void 0 : (_paella$player$config2 = _paella$player$config.downloadOptions) === null || _paella$player$config2 === void 0 ? void 0 : _paella$player$config2.xhrFields) || {};
 
         if (Object.keys(xhrFields).length) {
           xhrFields = null;
