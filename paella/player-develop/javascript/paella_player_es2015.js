@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.2 - build: 4999a20";
+paella.version = "6.5.2 - build: 0468000";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -1865,12 +1865,12 @@ paella.utils.uuid = function() {
         }
 	}
     
-    Log.kLevelError    = 1;
-    Log.kLevelWarning  = 2;
-    Log.kLevelDebug    = 3;
-    Log.kLevelLog      = 4;
-    
-    paella.log = new Log();	
+	paella.log = new Log();
+	paella.log.kLevelError      = 1;
+	paella.log.kLevelWarning    = 2;
+	paella.log.kLevelDebug      = 3;
+	paella.log.kLevelLog        = 4;
+	
 })();
 
 paella.AntiXSS = {
