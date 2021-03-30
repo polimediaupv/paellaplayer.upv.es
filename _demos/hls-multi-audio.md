@@ -1,6 +1,6 @@
 ---
 videoid: hls-multiaudio-smil
-player: 6.4.0
+use_paella_version: 6.4.0
 ---
 
 # Multi language audio with HLS
