@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.3 - build: 69f8c48";
+paella.version = "6.5.3 - build: 31510df";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -15214,7 +15214,9 @@ paella.addPlugin(function() {
 								setTimeout(() => this._hls.currentLevel = -1, 1000);
 
 								// Fixes hls.js problems loading some videos
-								video.play();
+								try {
+									video.play();
+								} catch (e) {}
 
 								resolve(video);
 							});
