@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.3 - build: defeb41";
+paella.version = "6.5.4 - build: 23b8075";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -7080,6 +7080,7 @@ function paella_DeferredNotImplemented() {
               time = time - trimmingData.start;
             }
 
+            if (time < 0) time = 0;
             resolve(time);
           });
         });
