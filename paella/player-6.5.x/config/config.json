@@ -106,13 +106,11 @@
       "//******* Button plugins": "",
       "edu.harvard.dce.paella.flexSkipPlugin": {
         "enabled": true,
-        "direction": "Rewind",
         "seconds": 10,
         "minWindowSize": 510
       },
       "edu.harvard.dce.paella.flexSkipForwardPlugin": {
         "enabled": true,
-        "direction": "Forward",
         "seconds": 30
       },
       "es.upv.paella.captionsPlugin": {
