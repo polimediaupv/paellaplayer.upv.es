@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.3 - build: a935787";
+paella.version = "6.5.4 - build: c9e6548";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -75,8 +75,6 @@ paella.events = {
 	videoUnloaded:'paella:videoUnloaded',
 	
 	controlBarLoaded:'paella:controlBarLoaded',	
-	
-	flashVideoEvent:'paella:flashVideoEvent',
 	
 	captionAdded: 'paella:caption:add', // Event triggered when new caption is available.
 	captionsEnabled: 'paella:caption:enabled',  // Event triguered when a caption es enabled.
@@ -5632,6 +5630,7 @@ class VideoContainer extends paella.VideoContainerBase {
 				if (trimmingData.enabled) {
 					time = time - trimmingData.start;
 				}
+				if (time < 0) time = 0;
 				resolve(time)
 			});
 		});
