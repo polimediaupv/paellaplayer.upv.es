@@ -67,7 +67,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.5 - build: 69ca111";
+paella.version = "6.4.5 - build: 6010c86";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -15013,8 +15013,13 @@ paella.addPlugin(function () {
       key: "parse",
       value: function parse(content, lang, next) {
         var captions = [];
-        var self = this;
-        var xmlDoc = $.parseXML(content);
+        var self = this; //fix malformed xml replacing the malformed characters with blank
+
+        content = content.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/gm, '');
+        content = content.replace(/&\w+;/gmi, '');
+        content = content.replaceAll('<br>', '');
+        var parser = new DOMParser();
+        var xmlDoc = parser.parseFromString(content, "text/xml");
         var xml = $(xmlDoc);
         var g_lang = xml.attr("xml:lang");
         var lls = xml.find("div");
