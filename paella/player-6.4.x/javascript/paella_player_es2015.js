@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.5 - build: 6010c86";
+paella.version = "6.4.5 - build: e9ff47e";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -8130,6 +8130,12 @@ paella.ControlsContainer = ControlsContainer;
 	paella.VideoLoader = VideoLoader;
 	
 	class AccessControl {
+		constructor() {
+			this.authData =  {
+				permissions: {}
+			}
+		}
+
 		canRead() {
 			return paella_DeferredResolved(true);
 		}
@@ -16369,7 +16375,17 @@ paella.addPlugin(function() {
 		getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate('Share this video'); }
 		
-		checkEnabled(onSuccess) { onSuccess(true); }
+		checkEnabled(onSuccess) {
+			const authData = paella.player.accessControl.authData || {};
+			const permissions = authData.permissions || {};
+			if (permissions && permissions.canShare !== undefined) {
+				onSuccess(permissions.canShare);
+			}
+			else {
+				onSuccess(true);
+			}
+		}
+
 		closeOnMouseOut() { return false; }
 
 		setup() {

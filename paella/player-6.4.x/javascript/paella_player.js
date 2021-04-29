@@ -67,7 +67,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.4.5 - build: 6010c86";
+paella.version = "6.4.5 - build: e9ff47e";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -10287,6 +10287,10 @@ function paella_DeferredNotImplemented() {
   var AccessControl = /*#__PURE__*/function () {
     function AccessControl() {
       _classCallCheck(this, AccessControl);
+
+      this.authData = {
+        permissions: {}
+      };
     }
 
     _createClass(AccessControl, [{
@@ -20867,7 +20871,14 @@ paella.addPlugin(function () {
     }, {
       key: "checkEnabled",
       value: function checkEnabled(onSuccess) {
-        onSuccess(true);
+        var authData = paella.player.accessControl.authData || {};
+        var permissions = authData.permissions || {};
+
+        if (permissions && permissions.canShare !== undefined) {
+          onSuccess(permissions.canShare);
+        } else {
+          onSuccess(true);
+        }
       }
     }, {
       key: "closeOnMouseOut",
