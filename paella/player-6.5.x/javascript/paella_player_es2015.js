@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.4 - build: 3bc5e7d";
+paella.version = "6.5.4 - build: 64a62cd";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2294,7 +2294,7 @@ function paella_DeferredNotImplemented () {
 
             paella.events.bind(paella.events.profileListChanged, () => {
                 if (paella.player && paella.player.videoContainer && 
-                    (!this.currentProfile || this.currentProfileName!=this.currentProfile.id))
+                    (!this.currentProfile || this.currentProfileName!=this.currentProfile.id))
                 {
                     this.setProfile(this.currentProfileName,false);
                 }
@@ -2490,7 +2490,7 @@ function paella_DeferredNotImplemented () {
 				//var selected = source[0];
 				var selected = null;
 				var win_h = $(window).height();
-				var maxRes = params.maxAutoQualityRes || 720;
+				var maxRes = params.maxAutoQualityRes || 720;
 				var diff = Number.MAX_VALUE;
 	
 				source.forEach(function(item,i) { 
@@ -2902,7 +2902,7 @@ paella.Profiles = {
 };
 
 class RelativeVideoSize {
-	get w() { return this._w || 1280; }
+	get w() { return this._w || 1280; }
 	set w(v) { this._w = v; }
 	get h() { return this._h || 720; }
 	set h(v) { this._h = v; }
@@ -3722,7 +3722,7 @@ class Html5Video extends paella.VideoElementBase {
 			return this.domElement;
 		}
 		else {
-			this._video = this._video || document.createElement('video');
+			this._video = this._video || document.createElement('video');
 			return this._video;
 		}
 	}
@@ -5478,7 +5478,7 @@ class StreamProvider {
 		})
 	}
 
-	get qualityStrategy() { return this._qualityStrategy || null; }
+	get qualityStrategy() { return this._qualityStrategy || null; }
 
 	get autoplay() {
 		return this.supportAutoplay && this._autoplay;
@@ -5838,7 +5838,7 @@ class VideoContainer extends paella.VideoContainerBase {
 	}
 
 	masterVideo() {
-		return this.streamProvider.mainVideoPlayer || this.audioPlayer;
+		return this.streamProvider.mainVideoPlayer || this.audioPlayer;
 	}
 
 	getVideoRect(videoIndex) {
