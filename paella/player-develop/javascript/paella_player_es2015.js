@@ -22,7 +22,7 @@ var GlobalParams = {
 
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.4 - build: 9f9b75b";
+paella.version = "6.5.4 - build: 9134cc7";
 
 (function buildBaseUrl() {
 	if (window.paella_debug_baseUrl) {
@@ -2294,7 +2294,7 @@ function paella_DeferredNotImplemented () {
 
             paella.events.bind(paella.events.profileListChanged, () => {
                 if (paella.player && paella.player.videoContainer && 
-                    (!this.currentProfile || this.currentProfileName!=this.currentProfile.id))
+                    (!this.currentProfile || this.currentProfileName!=this.currentProfile.id))
                 {
                     this.setProfile(this.currentProfileName,false);
                 }
@@ -2490,7 +2490,7 @@ function paella_DeferredNotImplemented () {
 				//var selected = source[0];
 				var selected = null;
 				var win_h = $(window).height();
-				var maxRes = params.maxAutoQualityRes || 720;
+				var maxRes = params.maxAutoQualityRes || 720;
 				var diff = Number.MAX_VALUE;
 	
 				source.forEach(function(item,i) { 
@@ -2902,7 +2902,7 @@ paella.Profiles = {
 };
 
 class RelativeVideoSize {
-	get w() { return this._w || 1280; }
+	get w() { return this._w || 1280; }
 	set w(v) { this._w = v; }
 	get h() { return this._h || 720; }
 	set h(v) { this._h = v; }
@@ -3722,7 +3722,7 @@ class Html5Video extends paella.VideoElementBase {
 			return this.domElement;
 		}
 		else {
-			this._video = this._video || document.createElement('video');
+			this._video = this._video || document.createElement('video');
 			return this._video;
 		}
 	}
@@ -5478,7 +5478,7 @@ class StreamProvider {
 		})
 	}
 
-	get qualityStrategy() { return this._qualityStrategy || null; }
+	get qualityStrategy() { return this._qualityStrategy || null; }
 
 	get autoplay() {
 		return this.supportAutoplay && this._autoplay;
@@ -5838,7 +5838,7 @@ class VideoContainer extends paella.VideoContainerBase {
 	}
 
 	masterVideo() {
-		return this.streamProvider.mainVideoPlayer || this.audioPlayer;
+		return this.streamProvider.mainVideoPlayer || this.audioPlayer;
 	}
 
 	getVideoRect(videoIndex) {
@@ -15171,19 +15171,11 @@ paella.addPlugin(function() {
 							let cfg = this.config;
 							//cfg.autoStartLoad = false;
 							this._hls = new Hls(cfg);
-							
+							const hlsStream = this.stream?.sources?.hls?.length>0 && this.stream.sources.hls[0];
+							const isLiveStreaming = hlsStream.isLiveStream;
 							this.autoQuality = true;
 
-							// For some streams there are problems if playback does not start after loading the
-							// manifest. This flag is used to pause it again once the video is loaded
-							let firstLoad = true;
-
 							this._hls.on(Hls.Events.LEVEL_SWITCHED, (ev,data) => {
-								if (firstLoad) {
-									firstLoad = false;
-									video.pause();
-								}
-
 								this._qualities = this._qualities || [];
 								this._qualityIndex = this.autoQuality ? this._qualities.length - 1 : data.level;
 								paella.events.trigger(paella.events.qualityChanged,{});
@@ -15226,10 +15218,12 @@ paella.addPlugin(function() {
 								this._hls.currentLevel = this._hls.levels.length>=initialQualityLevel ? initialQualityLevel : -1;
 								setTimeout(() => this._hls.currentLevel = -1, 1000);
 
-								// Fixes hls.js problems loading some videos
-								try {
-									video.play();
-								} catch (e) {}
+								// Fixes hls.js problems loading some live videos
+								if (isLiveStreaming) {
+									try {
+										//video.play();
+									} catch (e) {}
+								}
 
 								resolve(video);
 							});

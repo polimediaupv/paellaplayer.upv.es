@@ -69,7 +69,7 @@ var GlobalParams = {
 };
 window.paella = window.paella || {};
 paella.player = null;
-paella.version = "6.5.4 - build: 9f9b75b";
+paella.version = "6.5.4 - build: 9134cc7";
 
 (function buildBaseUrl() {
   if (window.paella_debug_baseUrl) {
@@ -19168,20 +19168,16 @@ paella.addPlugin(function () {
         return new Promise(function (resolve, reject) {
           _this180._loadDeps().then(function (Hls) {
             if (Hls.isSupported()) {
+              var _this180$stream, _this180$stream$sourc, _this180$stream$sourc2;
+
               var cfg = _this180.config; //cfg.autoStartLoad = false;
 
               _this180._hls = new Hls(cfg);
-              _this180.autoQuality = true; // For some streams there are problems if playback does not start after loading the
-              // manifest. This flag is used to pause it again once the video is loaded
-
-              var firstLoad = true;
+              var hlsStream = ((_this180$stream = _this180.stream) === null || _this180$stream === void 0 ? void 0 : (_this180$stream$sourc = _this180$stream.sources) === null || _this180$stream$sourc === void 0 ? void 0 : (_this180$stream$sourc2 = _this180$stream$sourc.hls) === null || _this180$stream$sourc2 === void 0 ? void 0 : _this180$stream$sourc2.length) > 0 && _this180.stream.sources.hls[0];
+              var isLiveStreaming = hlsStream.isLiveStream;
+              _this180.autoQuality = true;
 
               _this180._hls.on(Hls.Events.LEVEL_SWITCHED, function (ev, data) {
-                if (firstLoad) {
-                  firstLoad = false;
-                  video.pause();
-                }
-
                 _this180._qualities = _this180._qualities || [];
                 _this180._qualityIndex = _this180.autoQuality ? _this180._qualities.length - 1 : data.level;
                 paella.events.trigger(paella.events.qualityChanged, {});
@@ -19231,11 +19227,12 @@ paella.addPlugin(function () {
                 _this180._hls.currentLevel = _this180._hls.levels.length >= initialQualityLevel ? initialQualityLevel : -1;
                 setTimeout(function () {
                   return _this180._hls.currentLevel = -1;
-                }, 1000); // Fixes hls.js problems loading some videos
+                }, 1000); // Fixes hls.js problems loading some live videos
 
-                try {
-                  video.play();
-                } catch (e) {}
+                if (isLiveStreaming) {
+                  try {//video.play();
+                  } catch (e) {}
+                }
 
                 resolve(video);
               });
