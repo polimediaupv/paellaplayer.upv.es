@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public --no-clear"
+    "dev": "HOST=0.0.0.0 rollup -c -w",
+    "start": "HOST=0.0.0.0 sirv public --no-clear"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -21,6 +21,11 @@
     "svelte-navigator": "^3.1.5"
   },
   "dependencies": {
+    "paella-basic-plugins": "^1.0.10",
+    "paella-core": "^1.0.31",
+    "paella-slide-plugins": "^1.0.8",
+    "paella-user-tracking": "^1.0.9",
+    "paella-zoom-plugin": "^1.0.8",
     "sirv-cli": "^2.0.0",
     "svelte-markdown": "^0.2.2"
   }
