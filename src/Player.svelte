@@ -1,11 +1,22 @@
 <script>
     import { onMount } from 'svelte';
     import { Paella, getUrlParameter } from 'paella-core';
+    import getBasicPluginContext from 'paella-basic-plugins';
+    import getSlidePluginContext from 'paella-slide-plugins';
+    import getZoomPluginContext from 'paella-zoom-plugin';
+    import getUserTrackingPluginContext from 'paella-user-tracking';
 
     export let videoId;
 
     onMount(async () => {
         const initParams = {
+            customPluginContext: [
+                getBasicPluginContext(),
+                getSlidePluginContext(),
+                getZoomPluginContext(),
+                getUserTrackingPluginContext()
+            ],
+
             configResourcesUrl: 'player-config/',
             configUrl: 'player-config/config.json',
 
