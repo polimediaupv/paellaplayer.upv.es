@@ -1,5 +1,7 @@
 <script>
     //import { active } from 'svelte-spa-router';
+    import { onMount } from 'svelte';
+    import lastPacakgeVersion from './lastPackageVersion';
 
     const menuSections = [
         { link: "#/", title: "Home" },
@@ -8,6 +10,12 @@
         { link: "#/about", title: "About" },
         { link: "#/doc/index.md", title: "Documentation" }
     ]
+
+    let paellaCoreVersion = '0.0.0';
+
+    onMount(async () => {
+        paellaCoreVersion = await lastPacakgeVersion('polimediaupv','paella-core');
+    })
 </script>
 
 <header>
@@ -35,8 +43,8 @@
                         <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
                             <text x="27" y="14" fill="#010101" fill-opacity=".3">version</text>
                             <text x="27" y="13">version</text>
-                            <text x="74.5" y="14" fill="#010101" fill-opacity=".3">6.5.4</text>
-                            <text x="74.5" y="13">6.5.4</text>
+                            <text x="74.5" y="14" fill="#010101" fill-opacity=".3">{paellaCoreVersion}</text>
+                            <text x="74.5" y="13">{paellaCoreVersion}</text>
                         </g>
                     </svg>
                 </div>
