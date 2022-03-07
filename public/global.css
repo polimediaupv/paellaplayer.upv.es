@@ -30,3 +30,14 @@ body {
 		width: 100%;
 	}
 }
+
+code.javascript,.json,.sh,.js,.css,.html,.xml {
+	overflow: auto;
+	width: 100%;
+	display: inline-block;
+	background-color: #0a0a0a;
+	color: white;
+	box-sizing: border-box;
+	padding: 14px;
+}
+

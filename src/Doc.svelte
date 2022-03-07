@@ -1,0 +1,23 @@
+<script>
+    import { onMount } from 'svelte';
+    import ExternalMarkdown from './ExternalMarkdown.svelte';
+    
+    export let params = {}
+
+    const prefix = "https://raw.githubusercontent.com/polimediaupv/paella-core/main/doc/"
+    
+    let site = prefix + params.id;
+
+    onMount(() => {
+        window.onhashchange = () => {
+            window.scrollTo(0, 0);
+            window.location.reload();
+        }
+    });
+
+</script>
+
+<ExternalMarkdown {site}></ExternalMarkdown>
+
+<p>This documentation is generated from the <a href="https://github.com/polimediaupv/paella-core/tree/main/doc" target="__blank">paella-core repository at GitHub</a>.</p>
+<p><a href="#/doc/index.md">Documentation index</a></p>

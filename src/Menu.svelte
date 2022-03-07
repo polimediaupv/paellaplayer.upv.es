@@ -1,11 +1,12 @@
 <script>
-    import { active } from 'svelte-hash-router';
+    //import { active } from 'svelte-spa-router';
 
     const menuSections = [
         { link: "#/", title: "Home" },
         { link: "#/features", title: "Features" },
         { link: "#/demos", title: "Demos" },
-        { link: "#/about", title: "About" }
+        { link: "#/about", title: "About" },
+        { link: "#/doc/index.md", title: "Documentation" }
     ]
 </script>
 
@@ -44,7 +45,8 @@
             <div class="menu">
                 <ul>
                     {#each menuSections as menuItem, i (menuItem) }
-                    <li class={menuItem.link == $active.$$href ? 'active' : ''}>
+                    <!--<li class={menuItem.link == $active.$$href ? 'active' : ''}>-->
+                    <li>
                         <a href={menuItem.link}>{menuItem.title}</a>
                     </li>
                     {/each}

@@ -1,14 +1,32 @@
 <script>
-	import { Router } from 'svelte-hash-router';
 	import Menu from './Menu.svelte';
 	import Footer from './Footer.svelte';
+	import Home from './Home.svelte';
+	import Download from './Download.svelte';
+	import About from './About.svelte';
+	import Features from './Features.svelte';
+	import NotFound from './NotFound.svelte';
+	import Demos from './Demos.svelte';
+	import Doc from './Doc.svelte';
+
+	import Router from 'svelte-spa-router';
+
+	const routes = {
+		'/': Home,
+		'/download': Download,
+		'/about': About,
+		'/features': Features,
+		'/demos': Demos,
+		'/doc/:id': Doc,
+		'*': NotFound
+	}
 
 </script>
 
 <Menu />
 <main>
 	<section class="container">
-		<Router />
+		<Router {routes}/>
 	</section>
 	<Footer />	
 </main>
