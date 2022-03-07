@@ -3,6 +3,7 @@
     import showdown from 'showdown';
     
     export let site;
+    export let section;
 
     let htmlText = "";
     
@@ -13,9 +14,8 @@
         if (response.ok) {
             const mdText = await response.text();
 
-            // TODO: Change markdown links
             const linkRE = /\[(.+)\]\(((?!http).+)\)/ig;
-            const links = mdText.replace(linkRE,`[$1](#/doc/$2)`);
+            const links = mdText.replace(linkRE,`[$1](#/${section}/$2)`);
             
             htmlText = converter.makeHtml(links);
         }

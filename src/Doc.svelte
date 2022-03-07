@@ -6,7 +6,9 @@
 
     const prefix = "https://raw.githubusercontent.com/polimediaupv/paella-core/main/doc/"
     
-    let site = prefix + params.id;
+    let page = params.id;
+    let site = prefix + page;
+    let section = "doc"
 
     onMount(() => {
         window.onhashchange = () => {
@@ -17,7 +19,14 @@
 
 </script>
 
-<ExternalMarkdown {site}></ExternalMarkdown>
+{#if page !== 'index.md'}
+    <p><a href="#/doc/index.md">Documentation index</a></p>
+{/if}
+
+<ExternalMarkdown {site} {section}></ExternalMarkdown>
 
 <p>This documentation is generated from the <a href="https://github.com/polimediaupv/paella-core/tree/main/doc" target="__blank">paella-core repository at GitHub</a>.</p>
-<p><a href="#/doc/index.md">Documentation index</a></p>
+
+{#if page !== 'index.md'}
+    <p><a href="#/doc/index.md">Documentation index</a></p>
+{/if}

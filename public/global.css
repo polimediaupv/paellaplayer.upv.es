@@ -41,3 +41,8 @@ code.javascript,.json,.sh,.js,.css,.html,.xml {
 	padding: 14px;
 }
 
+h1 {
+	font-size: 30px;
+	color: #6e6e6e;
+}
+
