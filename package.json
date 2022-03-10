@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "HOST=0.0.0.0 rollup -c -w",
-    "start": "HOST=0.0.0.0 sirv public --no-clear"
+    "start": "HOST=0.0.0.0 sirv docs --no-clear"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "paella-basic-plugins": "^1.0.10",
-    "paella-core": "^1.0.31",
+    "paella-core": "^1.0.32",
     "paella-slide-plugins": "^1.0.8",
     "paella-user-tracking": "^1.0.9",
     "paella-zoom-plugin": "^1.0.8",

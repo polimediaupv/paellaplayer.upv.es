@@ -10,4 +10,3 @@
 <SvelteMarkdown {source} />
 
 <Player videoId="belmar-multiresolution-remote"></Player>
-

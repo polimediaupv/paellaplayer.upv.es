@@ -38,3 +38,8 @@
 
 <div id="player-container"></div>
 
+<style>
+    #player-container {
+        min-height: 450px;
+    }
+</style>

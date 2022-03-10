@@ -2,7 +2,7 @@
     "repositoryUrl": "demos",
     "manifestFileName": "data.json",
 
-    "defaultLayout": "presenter",
+    "defaultLayout": "presenter-presentation",
    
     "logLevel": "INFO",
 
