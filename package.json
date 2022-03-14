@@ -21,6 +21,7 @@
     "svelte-navigator": "^3.1.5"
   },
   "dependencies": {
+    "@beyonk/svelte-google-analytics": "^2.2.0",
     "paella-basic-plugins": "^1.0.10",
     "paella-core": "^1.0.33",
     "paella-slide-plugins": "^1.0.8",
