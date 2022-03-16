@@ -1,12 +1,19 @@
 <script>
-    import { onMount } from 'svelte';
-    import { Paella, getUrlParameter } from 'paella-core';
+    import { onMount, afterUpdate } from 'svelte';
+    import { setCookie, getCookie } from './cookies';
+    import { Paella, getUrlParameter, PlayerState, Events } from 'paella-core';
     import getBasicPluginContext from 'paella-basic-plugins';
     import getSlidePluginContext from 'paella-slide-plugins';
     import getZoomPluginContext from 'paella-zoom-plugin';
     import getUserTrackingPluginContext from 'paella-user-tracking';
 
     export let videoId;
+
+    export let onVideoIdChanged;
+
+    let paella = null;
+    let loading = false;
+    let firstLoad = true;
 
     onMount(async () => {
         const initParams = {
@@ -21,6 +28,14 @@
             configUrl: 'player-config/config.json',
 
             getVideoId: (config,player) => {
+                const cookieVideo = getCookie('nextVideo');
+                if (cookieVideo !== "") {
+                    videoId = cookieVideo;
+                    if (onVideoIdChanged) {
+                        onVideoIdChanged(videoId);
+                    }
+                    return cookieVideo;
+                }
                 if (!videoId) {
                     videoId = getUrlParameter("id");
                 }
@@ -28,11 +43,44 @@
             }
         };
 
-        const paella = new Paella('player-container', initParams);
+        paella = new Paella('player-container', initParams);
 
         paella.loadManifest()
             .then(() => console.log("Done"))
             .catch(err => console.error(err));
+        
+        paella.bindEvent(Events.PLAYER_LOADED, () => {
+            loading = false;
+        });
+    })
+
+    afterUpdate(async () => {
+        if (firstLoad) {
+            firstLoad = false;
+            return;
+        }
+        else {
+            setCookie('nextVideo',"");
+        }
+
+        if (loading) {
+            // To break a player load, the only option is to reload the page
+            setCookie('nextVideo',videoId);
+            location.reload();
+        }
+
+        if (paella && (paella.state === PlayerState.LOADED ||
+        paella.state == PlayerState.MANIFEST))
+        {
+            loading = true;
+            await paella.reload();
+            loading = false;
+        }
+        else if (paella && paella.state === PlayerState.UNLOADED) {
+            loading = true;
+            await paella.load();
+            loading = false;
+        }
     })
 </script>
 

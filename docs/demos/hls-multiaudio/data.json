@@ -21,7 +21,7 @@
 	"streams": [
 		{
 			"sources": {
-				"hls": [
+				"hlsLive": [
 					{
 						"src": "https://repository.paellaplayer.upv.es/hls-multiaudio/presenter.m3u8",
 						"src_test": "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
