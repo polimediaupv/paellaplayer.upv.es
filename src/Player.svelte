@@ -51,7 +51,7 @@
         
         paella.bindEvent(Events.PLAYER_LOADED, () => {
             loading = false;
-        });
+        }, false);
     })
 
     afterUpdate(async () => {
@@ -69,17 +69,20 @@
             location.reload();
         }
 
+        if (paella && paella.state === PlayerState.ERROR) {
+            await paella.unload();
+        }
+
         if (paella && (paella.state === PlayerState.LOADED ||
-        paella.state == PlayerState.MANIFEST))
+            paella.state == PlayerState.MANIFEST))
         {
             loading = true;
-            await paella.reload();
-            loading = false;
+            await paella.unload();
+            await paella.loadManifest();
         }
         else if (paella && paella.state === PlayerState.UNLOADED) {
             loading = true;
             await paella.load();
-            loading = false;
         }
     })
 </script>

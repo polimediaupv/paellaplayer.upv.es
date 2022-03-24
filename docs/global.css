@@ -46,3 +46,6 @@ h1 {
 	color: #6e6e6e;
 }
 
+.progress-indicator-container .progress-indicator-content {
+	width: 0%;
+}

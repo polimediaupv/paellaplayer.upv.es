@@ -1,4 +1,12 @@
+import { setCookie, getCookie } from "./cookies";
+
 export default async function(user,repo) {
+    const cookieName = `packageVersion_${user}_${repo}`;
+    const current = getCookie(cookieName);
+    if (current !== "") {
+        return current;
+    }
+
     const githubApiTags = await fetch(`https://api.github.com/repos/${user}/${repo}/tags`);
     if (githubApiTags.ok) {
         const tagData = await githubApiTags.json();
@@ -17,7 +25,9 @@ export default async function(user,repo) {
                 }
             }
         });
-        return `${lastVersion[0]}.${lastVersion[1]}.${lastVersion[2]}`
+        const version = `${lastVersion[0]}.${lastVersion[1]}.${lastVersion[2]}`;
+        setCookie(cookieName, version, 1/24);
+        return version;
     }
     return "0.0.0";
 }

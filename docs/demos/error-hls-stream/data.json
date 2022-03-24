@@ -1,0 +1,29 @@
+{
+	"metadata": {
+		"duration": 228,
+        "title": "HLS error test",
+		"preview": "https://repository.paellaplayer.upv.es/hls-multiaudio/preview.jpg",
+		"related": []
+	},
+	"streams": [
+		{
+			"sources": {
+				"hls": [
+					{
+						"src": "https://test.streaming.upv.es/not-found-test/not-found-test.m3u8",
+						"mimetype": "video/mp4",
+						"res": {
+							"w": "1920",
+							"h": "1080"
+						}
+					}
+				]
+			},
+			"preview": "",
+			"content":"presenter",
+			"role": "mainAudio"
+		}
+	],
+	"frameList": [
+	]
+}

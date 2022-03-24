@@ -1,38 +1,68 @@
 [
     {
-        "name": "Dual stream video",
-        "description": "",
-        "id": "belmar-multiresolution-remote"
-    },
-    {    
-        "name": "Single stream video",
-        "description": "",
-        "id": "belmar-multiresolution-single"
-    },
-    {
-        "name": "HLS multi quality",
-        "description": "",
-        "id": "hls-multiquality"
-    },
-    {
-        "name": "HLS multi audio",
-        "description": "",
-        "id": "hls-multiaudio"
-    },
-    {
-        "name": "Triple stream",
-        "description": "",
-        "id": "n-stream"
+        "title": "mp4 videos",
+        "demos": [
+            {
+                "name": "Dual stream video",
+                "description": "",
+                "id": "belmar-multiresolution-remote"
+            },
+            {    
+                "name": "Single stream video",
+                "description": "",
+                "id": "belmar-multiresolution-single"
+            },
+            {
+                "name": "Triple stream",
+                "description": "",
+                "id": "n-stream"
+            }
+        ]
     },
     {
-        "name": "Low latency HLS",
-        "description": "",
-        "id": "ll-hls",
-        "disabled": true
+        "title": "hls videos",
+        "demos": [
+            {
+                "name": "HLS multi quality",
+                "description": "",
+                "id": "hls-multiquality"
+            },
+            {
+                "name": "HLS multi audio",
+                "description": "",
+                "id": "hls-multiaudio"
+            },
+            {
+                "name": "Low latency HLS",
+                "description": "",
+                "id": "ll-hls",
+                "disabled": true
+            },
+            {
+                "name": "Captions embedded in HLS playlist",
+                "description": "",
+                "id": "hls-captions"
+            }
+        ]
     },
     {
-        "name": "Captions embedded in HLS playlist",
-        "description": "",
-        "id": "hls-captions"
+        "title": "Error handling",
+        "demos": [
+            {
+                "name": "Error test: manifest file not found",
+                "description": "",
+                "id": "manifest-not-found"
+            },
+            {
+                "name": "Error test: mp4 stream not found",
+                "description": "",
+                "id": "error-mp4-stream"
+            },
+            {
+                "name": "Error test: hls stream not available",
+                "description": "",
+                "id": "error-hls-stream"
+            }
+        ]
     }
 ]

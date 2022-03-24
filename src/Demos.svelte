@@ -33,13 +33,22 @@
 
 <SvelteMarkdown {source} />
 
-<ul>
-    {#each demos as demo}
-        <li><button on:click={loadDemo(demo.id)} class={demo.id==videoId ? 'anchor-button disabled' : 'anchor-button'}>{demo.name}</button></li>
-    {/each}
-</ul>
-
-<Player {videoId} onVideoIdChanged={videoIdChanged}></Player>
+<section class="demos-container">
+    <div class="demos-index">
+        {#each demos as demoSection}
+        <h2>{demoSection.title}</h2>
+        <ul>
+            {#each demoSection.demos as demo}
+                <li><button on:click={loadDemo(demo.id)} class={demo.id==videoId ? 'anchor-button disabled' : 'anchor-button'}>{demo.name}</button></li>
+            {/each}
+        </ul>
+        {/each}
+    </div>
+    
+    <div class="demo-player-container">
+        <Player {videoId} onVideoIdChanged={videoIdChanged}></Player>
+    </div>
+</section>
 
 <style>
     button.anchor-button {
@@ -59,4 +68,31 @@
         text-decoration: none;
         cursor: default;
     }
+
+    section.demos-container {
+        display: flex;
+
+    }
+
+    ul {
+        padding: 0px;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    div.demos-index {
+        width: 20%;
+    }
+
+    div.demos-index h2 {
+        margin: 0;
+    }
+
+    div.demo-player-container {
+        width: 70%;
+        padding: 2px;
+    }
+
 </style>
