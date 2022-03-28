@@ -2,6 +2,8 @@
     import Player from './Player.svelte';
     import { onMount } from 'svelte';
     import {PlayerState} from 'paella-core';
+    import source from '../pages/demos-single-page.md';
+    import SvelteMarkdown from 'svelte-markdown';
 
     let demos = [];
 
@@ -30,6 +32,8 @@
 </script>
 
 <section class="demos-container">
+    <SvelteMarkdown {source}></SvelteMarkdown>
+    
     {#each demos as demoSection}
         <h2>{demoSection.title}</h2>
         {#each demoSection.demos as demo}
