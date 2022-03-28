@@ -8,6 +8,8 @@
 	import NotFound from './NotFound.svelte';
 	import Demos from './Demos.svelte';
 	import Doc from './Doc.svelte';
+	import DemosSinglePage from './DemosSinglePage.svelte';
+
 	import { setCookie, getCookie } from './cookies';
 
 	import Router from 'svelte-spa-router';
@@ -23,6 +25,7 @@
 		'/features': Features,
 		'/demos': Demos,
 		'/doc/:id': Doc,
+		'/demos-all': DemosSinglePage,
 		'*': NotFound
 	}
 

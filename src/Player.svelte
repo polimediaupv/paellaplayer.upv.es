@@ -8,8 +8,10 @@
     import getUserTrackingPluginContext from 'paella-user-tracking';
 
     export let videoId;
+    export let containerId = 'player-container';
 
     export let onVideoIdChanged;
+    export let onPlay;
 
     let paella = null;
     let loading = false;
@@ -43,7 +45,7 @@
             }
         };
 
-        paella = new Paella('player-container', initParams);
+        paella = new Paella(containerId, initParams);
 
         paella.loadManifest()
             .then(() => console.log("Done"))
@@ -52,6 +54,12 @@
         paella.bindEvent(Events.PLAYER_LOADED, () => {
             loading = false;
         }, false);
+
+        paella.bindEvent(Events.PLAY, () => {
+            if (typeof(onPlay) === "function") {
+                onPlay(paella);
+            }
+        });
     })
 
     afterUpdate(async () => {
@@ -87,10 +95,10 @@
     })
 </script>
 
-<div id="player-container"></div>
+<div id={containerId} class="player-container"></div>
 
 <style>
-    #player-container {
+    div.player-container {
         min-height: 450px;
     }
 </style>
