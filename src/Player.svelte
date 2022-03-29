@@ -69,7 +69,7 @@
         if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
             // To break a player load, the only option is to reload the page
             setCookie('nextVideo',videoId);
-            location.reload();
+            //location.reload();
         }
 
         if (paella && paella.state === PlayerState.ERROR) {
