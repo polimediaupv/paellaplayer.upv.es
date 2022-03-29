@@ -13,8 +13,16 @@
     export let onVideoIdChanged;
     export let onPlay;
 
+    export const cancelLoad = (nextVideoId) => {
+        if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
+            // To break a player load, the only option is to reload the page
+            setCookie('nextVideo',nextVideoId);
+            location.reload();
+            //paella.unload();
+        }
+    }
+
     let paella = null;
-    let firstLoad = true;
 
     onMount(async () => {
         const initParams = {
@@ -58,19 +66,7 @@
     })
 
     afterUpdate(async () => {
-        if (firstLoad) {
-            firstLoad = false;
-            return;
-        }
-        else {
-            setCookie('nextVideo',"");
-        }
-
-        if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
-            // To break a player load, the only option is to reload the page
-            setCookie('nextVideo',videoId);
-            //location.reload();
-        }
+        setCookie('nextVideo',"");
 
         if (paella && paella.state === PlayerState.ERROR) {
             await paella.unload();

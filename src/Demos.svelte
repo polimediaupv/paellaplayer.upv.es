@@ -9,6 +9,8 @@
     let demos = [];
     let videoId = params.id || "belmar-multiresolution-remote";
 
+    let cancelLoad
+
     const loadDemos = async () => {
         const response = await fetch('demos/demos.json');
         if (response.ok) {
@@ -26,10 +28,13 @@
     const loadDemo = async (demoId) => {
         videoId = demoId;
         location.hash = `#/demos/${demoId}`;
+        cancelLoad(demoId);
+
     } 
 
     const videoIdChanged = (newVideoId) => {
         videoId = newVideoId;
+        location.hash = `#/demos/${newVideoId}`;
     }
 
 </script>
@@ -56,7 +61,7 @@
                 {/if}
             {/each}
         {/each}
-        <Player {videoId} onVideoIdChanged={videoIdChanged}></Player>
+        <Player {videoId} onVideoIdChanged={videoIdChanged} bind:cancelLoad={cancelLoad}></Player>
     </div>
 </section>
 
