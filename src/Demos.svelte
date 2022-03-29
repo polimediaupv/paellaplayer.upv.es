@@ -4,8 +4,10 @@
     import { onMount } from 'svelte';
     import Player from './Player.svelte';
 
+    export let params = {};
+
     let demos = [];
-    let videoId = "belmar-multiresolution-remote";
+    let videoId = params.id || "belmar-multiresolution-remote";
 
     const loadDemos = async () => {
         const response = await fetch('demos/demos.json');
@@ -23,6 +25,7 @@
 
     const loadDemo = async (demoId) => {
         videoId = demoId;
+        location.hash = `#/demos/${demoId}`;
     } 
 
     const videoIdChanged = (newVideoId) => {
@@ -46,6 +49,13 @@
     </div>
     
     <div class="demo-player-container">
+        {#each demos as demoSection}
+            {#each demoSection.demos as demo}
+                {#if demo.id === videoId}
+                    <h1>{demo.name}</h1>
+                {/if}
+            {/each}
+        {/each}
         <Player {videoId} onVideoIdChanged={videoIdChanged}></Player>
     </div>
 </section>

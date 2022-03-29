@@ -24,6 +24,7 @@
 		'/about': About,
 		'/features': Features,
 		'/demos': Demos,
+		'/demos/:id': Demos,
 		'/doc/:id': Doc,
 		'/demos-all': DemosSinglePage,
 		'*': NotFound

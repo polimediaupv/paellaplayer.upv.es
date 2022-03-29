@@ -14,7 +14,6 @@
     export let onPlay;
 
     let paella = null;
-    let loading = false;
     let firstLoad = true;
 
     onMount(async () => {
@@ -50,10 +49,6 @@
         paella.loadManifest()
             .then(() => console.log("Done"))
             .catch(err => console.error(err));
-        
-        paella.bindEvent(Events.PLAYER_LOADED, () => {
-            loading = false;
-        }, false);
 
         paella.bindEvent(Events.PLAY, () => {
             if (typeof(onPlay) === "function") {
@@ -71,7 +66,7 @@
             setCookie('nextVideo',"");
         }
 
-        if (loading) {
+        if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
             // To break a player load, the only option is to reload the page
             setCookie('nextVideo',videoId);
             location.reload();
@@ -84,12 +79,10 @@
         if (paella && (paella.state === PlayerState.LOADED ||
             paella.state == PlayerState.MANIFEST))
         {
-            loading = true;
             await paella.unload();
             await paella.loadManifest();
         }
         else if (paella && paella.state === PlayerState.UNLOADED) {
-            loading = true;
             await paella.load();
         }
     })
