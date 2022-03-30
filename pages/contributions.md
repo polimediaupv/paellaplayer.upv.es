@@ -19,3 +19,6 @@ To find out in which repository you have to report bugs you can follow these tip
 We are happy to review any pull request that affects the `paella-core` code or any of the plugins included in our repositories, but we will rarely agree to include new plugins. The plugins we have developed are those we use at the Universidad Politécnica de Valencia, and for that reason we can maintain and update them correctly. Including plugins in our repositories that we do not use in our institution ends up being counterproductive for everyone, because we cannot maintain and update them properly.
 
 If you have a plugin or plugin package that you think would be useful to the community, we recommend that you reference any of our plugin repositories to create a repository of your own. It will be better for you, because your role in your contribution will be more visible, and it will be easier to debug and update the code.
+
+Having said that, we would be also glad to know about your plugin, and maybe more people in the community too, so it would be great if you post a notice of it to the paella mailing list: [paellaplayer@upv.es](mailto:paellaplayer@upv.es)
+
