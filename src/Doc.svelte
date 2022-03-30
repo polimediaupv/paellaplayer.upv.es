@@ -1,7 +1,10 @@
 <script>
     import { onMount } from 'svelte';
     import ExternalMarkdown from './ExternalMarkdown.svelte';
+    import SvelteMarkdown from 'svelte-markdown';
     
+    import source from '../pages/documentation.md';
+
     export let params = {}
 
     const prefix = "https://raw.githubusercontent.com/polimediaupv/paella-core/main/doc/"
@@ -21,6 +24,8 @@
 
 {#if page !== 'index.md'}
     <p><a href="#/doc/index.md">Documentation index</a></p>
+{:else}
+    <SvelteMarkdown {source}></SvelteMarkdown>
 {/if}
 
 <ExternalMarkdown {site} {section}></ExternalMarkdown>

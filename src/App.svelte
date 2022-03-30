@@ -9,7 +9,8 @@
 	import Demos from './Demos.svelte';
 	import Doc from './Doc.svelte';
 	import DemosSinglePage from './DemosSinglePage.svelte';
-
+	import Contributions from './Contributions.svelte';
+	
 	import { setCookie, getCookie } from './cookies';
 
 	import Router from 'svelte-spa-router';
@@ -25,6 +26,7 @@
 		'/features': Features,
 		'/demos': Demos,
 		'/demos/:id': Demos,
+		'/contributions': Contributions,
 		'/doc/:id': Doc,
 		'/demos-all': DemosSinglePage,
 		'*': NotFound
