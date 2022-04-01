@@ -31,7 +31,7 @@ body {
 	}
 }
 
-code.javascript,.json,.sh,.js,.css,.html,.xml,.svelte {
+code.javascript,.json,.sh,.js,.css,.html,.xml,.svelte,.yml {
 	overflow: auto;
 	width: 100%;
 	display: inline-block;
