@@ -2,7 +2,7 @@
 
 ## Reference player
 
-You can use our reference player as a base to create your own by [downloading it from our github repository](). 
+You can use our reference player as a base to create your own by [downloading it from our github repository](https://github.com/polimediaupv/paella-player). 
 
 ## Create your own player from scratch
 
