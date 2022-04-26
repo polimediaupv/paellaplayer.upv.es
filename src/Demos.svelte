@@ -37,6 +37,10 @@
         location.hash = `#/demos/${newVideoId}`;
     }
 
+    const downloadManifest = () => {
+        window.open(`demos/${videoId}/data.json`,"__blank");
+    }
+
 </script>
 
 <SvelteMarkdown {source} />
@@ -62,6 +66,9 @@
             {/each}
         {/each}
         <Player {videoId} onVideoIdChanged={videoIdChanged} bind:cancelLoad={cancelLoad}></Player>
+        <div class="demo-actions">
+            <button on:click={() => downloadManifest()}>Download video manifest</button>
+        </div>
     </div>
 </section>
 
@@ -109,5 +116,10 @@
         width: 70%;
         padding: 2px;
     }
+
+    div.demo-actions {
+        margin-top: 5px;
+    }
+
 
 </style>
