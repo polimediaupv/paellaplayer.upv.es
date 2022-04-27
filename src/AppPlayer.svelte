@@ -1,39 +1,17 @@
 <script>
-	import Menu from './Menu.svelte';
-	import Footer from './Footer.svelte';
-	import Home from './Home.svelte';
-	import Download from './Download.svelte';
-	import About from './About.svelte';
-	import Features from './Features.svelte';
-	import NotFound from './NotFound.svelte';
-	import Demos from './Demos.svelte';
-	import Doc from './Doc.svelte';
-	import DemosSinglePage from './DemosSinglePage.svelte';
-	import Contributions from './Contributions.svelte';
+	import Player from './Player.svelte';
 	
-	import { setCookie, getCookie } from './cookies';
-
-	import Router from 'svelte-spa-router';
+	import { setCookie, getCookie } from './cookies';;
 
 	import { onMount } from 'svelte';
 
 	import { GoogleAnalytics } from '@beyonk/svelte-google-analytics';
 
-	const routes = {
-		'/': Home,
-		'/download': Download,
-		'/about': About,
-		'/features': Features,
-		'/demos': Demos,
-		'/demos/:id': Demos,
-		'/contributions': Contributions,
-		'/doc/:id': Doc,
-		'/demos-all': DemosSinglePage,
-		'*': NotFound
-	}
 
 	let ga = null;
 	let cookiesMessage = true;
+
+    let videoId = null;
 
 	function enableAnalytics() {
 		ga.init();
@@ -73,13 +51,7 @@
 	properties={[ 'UA-26470475-6' ]}
 	enabled={false} />
 
-<Menu />
-<main>
-	<section class="container">
-		<Router {routes}/>
-	</section>
-	<Footer />	
-</main>
+<Player {videoId} ></Player>
 
 {#if cookiesMessage}
 <div class="rgpd-message">
@@ -96,21 +68,6 @@
 {/if}
 
 <style>	
-	main {
-		margin-top: -20px;
-	}
-
-	section {
-		padding-top: 40px;
-		padding-bottom: 90px;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-
 	div.rgpd-message {
 		position: fixed;
 		bottom: 0px;
@@ -119,7 +76,6 @@
 		box-shadow: 0px 0px 10px;
 		left: 0px;
 		right: 0px;
-		z-index: 1000;
+        z-index: 1000;
 	}
-
 </style>

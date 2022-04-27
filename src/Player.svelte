@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte';
     import { setCookie, getCookie } from './cookies';
-    import { Paella, getUrlParameter, PlayerState, Events } from 'paella-core';
+    import { Paella, utils, PlayerState, Events } from 'paella-core';
     import getBasicPluginContext from 'paella-basic-plugins';
     import getSlidePluginContext from 'paella-slide-plugins';
     import getZoomPluginContext from 'paella-zoom-plugin';
@@ -46,7 +46,7 @@
                     return cookieVideo;
                 }
                 if (!videoId) {
-                    videoId = getUrlParameter("id");
+                    videoId = utils.getUrlParameter("id");
                 }
                 return videoId;
             }

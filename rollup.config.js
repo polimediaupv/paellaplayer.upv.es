@@ -29,53 +29,106 @@ function serve() {
 	};
 }
 
-export default {
-	input: 'src/main.js',
-	output: {
-		sourcemap: true,
-		format: 'iife',
-		name: 'app',
-		file: 'docs/build/bundle.js'
+export default [
+	{
+		input: 'src/main.js',
+		output: {
+			sourcemap: true,
+			format: 'iife',
+			name: 'app',
+			file: 'docs/build/website.js'
+		},
+		plugins: [
+			string({
+				include: "pages/*.md"
+			}),
+
+			svelte({
+				compilerOptions: {
+					// enable run-time checks when not in production
+					dev: !production
+				}
+			}),
+			// we'll extract any component CSS out into
+			// a separate file - better for performance
+			css({ output: 'website.css' }),
+
+			// If you have external dependencies installed from
+			// npm, you'll most likely need these plugins. In
+			// some cases you'll need additional configuration -
+			// consult the documentation for details:
+			// https://github.com/rollup/plugins/tree/master/packages/commonjs
+			resolve({
+				browser: true,
+				dedupe: ['svelte']
+			}),
+			commonjs(),
+
+			// In dev mode, call `npm run start` once
+			// the bundle has been generated
+			!production && serve(),
+
+			// Watch the `docs` directory and refresh the
+			// browser on changes when not in production
+			!production && livereload('docs'),
+
+			// If we're building for production (npm run build
+			// instead of npm run dev), minify
+			production && terser()
+		],
+		watch: {
+			clearScreen: false
+		}
 	},
-	plugins: [
-		string({
-			include: "pages/*.md"
-		}),
 
-		svelte({
-			compilerOptions: {
-				// enable run-time checks when not in production
-				dev: !production
-			}
-		}),
-		// we'll extract any component CSS out into
-		// a separate file - better for performance
-		css({ output: 'bundle.css' }),
+	{
+		input: 'src/player-standalone.js',
+		output: {
+			sourcemap: true,
+			format: 'iife',
+			name: 'app',
+			file: 'docs/build/player-standalone.js'
+		},
+		plugins: [
+			string({
+				include: "pages/*.md"
+			}),
 
-		// If you have external dependencies installed from
-		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
-		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
-		resolve({
-			browser: true,
-			dedupe: ['svelte']
-		}),
-		commonjs(),
+			svelte({
+				compilerOptions: {
+					// enable run-time checks when not in production
+					dev: !production
+				}
+			}),
+			// we'll extract any component CSS out into
+			// a separate file - better for performance
+			css({ output: 'player-standalone.css' }),
 
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
-		!production && serve(),
+			// If you have external dependencies installed from
+			// npm, you'll most likely need these plugins. In
+			// some cases you'll need additional configuration -
+			// consult the documentation for details:
+			// https://github.com/rollup/plugins/tree/master/packages/commonjs
+			resolve({
+				browser: true,
+				dedupe: ['svelte']
+			}),
+			commonjs(),
 
-		// Watch the `docs` directory and refresh the
-		// browser on changes when not in production
-		!production && livereload('docs'),
+			// In dev mode, call `npm run start` once
+			// the bundle has been generated
+			!production && serve(),
 
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
-		production && terser()
-	],
-	watch: {
-		clearScreen: false
+			// Watch the `docs` directory and refresh the
+			// browser on changes when not in production
+			!production && livereload('docs'),
+
+			// If we're building for production (npm run build
+			// instead of npm run dev), minify
+			production && terser()
+		],
+		watch: {
+			clearScreen: false
+		}
 	}
-};
+];

@@ -41,6 +41,10 @@
         window.open(`demos/${videoId}/data.json`,"__blank");
     }
 
+    const openInNewTab = () => {
+        window.open(`/player.html?id=${videoId}`,"__blank");
+    }
+
 </script>
 
 <SvelteMarkdown {source} />
@@ -67,7 +71,8 @@
         {/each}
         <Player {videoId} onVideoIdChanged={videoIdChanged} bind:cancelLoad={cancelLoad}></Player>
         <div class="demo-actions">
-            <button on:click={() => downloadManifest()}>Download video manifest</button>
+            <button on:click={() => downloadManifest()}>Download Video Manifest</button>
+            <button on:click={() => openInNewTab()}>Open In New Tab</button>
         </div>
     </div>
 </section>
