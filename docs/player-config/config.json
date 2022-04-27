@@ -144,8 +144,7 @@
 
         "es.upv.paella.captionsSelectorPlugin": {
             "enabled": true,
-            "side": "right",
-            "parentContainer": "videoContainer"
+            "side": "right"
         },
 
         "es.upv.paella.qualitySelector": {
@@ -199,6 +198,12 @@
             "context": [
                 "userTracking"
             ]
+        },
+
+        "es.upv.paella.findCaptionsPlugin": {
+            "enabled": true,
+            "side": "right",
+            "description": "Search in captions"
         }
     }
 }
