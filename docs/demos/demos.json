@@ -16,6 +16,11 @@
                 "name": "Triple stream",
                 "description": "",
                 "id": "n-stream"
+            },
+            {
+                "name": "WebVTT captions",
+                "description": "",
+                "id": "webvtt-captions"
             }
         ]
     },
