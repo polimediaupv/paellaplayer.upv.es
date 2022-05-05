@@ -47,11 +47,6 @@
                 "description": "",
                 "id": "ll-hls",
                 "disabled": true
-            },
-            {
-                "name": "Captions embedded in HLS playlist",
-                "description": "",
-                "id": "hls-captions"
             }
         ]
     },
