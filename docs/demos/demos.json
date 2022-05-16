@@ -38,9 +38,9 @@
                 "id": "hls-multiaudio"
             },
             {
-                "name": "HLS multi audio (wowza)",
+                "name": "HLS multi quality - multi language (wowza SMIL)",
                 "description": "",
-                "id": "hls-multiaudio-smil"
+                "id": "hls-multiaudio-smil-1"
             },
             {
                 "name": "Low latency HLS",
