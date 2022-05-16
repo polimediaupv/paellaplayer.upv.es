@@ -38,7 +38,7 @@
                 "id": "hls-multiaudio"
             },
             {
-                "name": "HLS multi quality - multi language (wowza SMIL)",
+                "name": "Multi quality/langs (wowza SMIL)",
                 "description": "",
                 "id": "hls-multiaudio-smil-1"
             },
