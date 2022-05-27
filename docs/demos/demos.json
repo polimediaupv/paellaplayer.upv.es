@@ -69,5 +69,20 @@
                 "id": "error-hls-stream"
             }
         ]
+    },
+    {
+        "title": "Audio player",
+        "demos": [
+            {
+                "name": "Audio only",
+                "description": "",
+                "id": "audio-only"
+            },
+            {
+                "name": "Audio and images",
+                "description": "",
+                "id": "audio-and-images"
+            }
+        ]
     }
 ]

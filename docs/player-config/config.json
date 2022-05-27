@@ -59,6 +59,16 @@
             }
         },
 
+        "es.upv.paella.audioVideoFormat": {
+            "enabled": true,
+            "order": 3
+        },
+
+        "es.upv.paella.imageVideoFormat": {
+            "enabled": true,
+            "order": 2
+        },
+
         "es.upv.paella.mp4VideoFormat": {
             "enabled": true,
             "order": 1
@@ -124,6 +134,11 @@
         },
 
         "es.upv.paella.videoCanvas": {
+            "enabled": true,
+            "order": 1
+        },
+
+        "es.upv.paella.audioCanvas": {
             "enabled": true,
             "order": 1
         },
