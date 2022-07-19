@@ -6,6 +6,13 @@
    
     "logLevel": "INFO",
 
+    "progressIndicator": {
+        "showTotal": true,
+        "parentContainer": "buttonArea",
+        "side": "left",
+        "visible": true
+    },
+    
     "plugins": {
         "es.upv.paella.singleVideo": {
             "enabled": true,
@@ -219,6 +226,16 @@
             "enabled": true,
             "side": "right",
             "description": "Search in captions"
+        },
+
+        "es.upv.paella.slideMapProgressBarPlugin": {
+            "enabled": true,
+            "markColor": {
+                "mouseOut": "#0A0A0A",
+                "mouseHover": "#A9A9A9"
+            },
+            "markWidth": 3,
+            "drawBackground": false
         }
     }
 }

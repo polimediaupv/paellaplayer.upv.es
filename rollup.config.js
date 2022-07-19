@@ -5,6 +5,7 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import { string } from 'rollup-plugin-string';
+import svg from 'rollup-plugin-svg-import';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -41,6 +42,10 @@ export default [
 		plugins: [
 			string({
 				include: "pages/*.md"
+			}),
+
+			svg({
+				stringify: true
 			}),
 
 			svelte({

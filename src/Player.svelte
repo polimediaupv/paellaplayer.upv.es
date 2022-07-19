@@ -7,6 +7,23 @@
     import getZoomPluginContext from 'paella-zoom-plugin';
     import getUserTrackingPluginContext from 'paella-user-tracking';
 
+    // Customized icons
+    import backwardIcon from './icons/backwardIcon.svg';
+    import captionsIcon from './icons/captionsIcon.svg';
+    import downloadIcon from './icons/downloadIcon.svg';
+    import findCaptionsIcon from './icons/findCaptionsIcon.svg';
+    import forwardIcon from './icons/forwardIcon.svg';
+    import fullscreenIcon from './icons/fullscreenIcon.svg';
+    import keyboardIcon from './icons/keyboardIcon.svg';
+    import layoutIcon from './icons/layoutIcon.svg';
+    import screenIcon from './icons/screenIcon.svg';
+    import slidesIcon from './icons/slidesIcon.svg';
+    import volumeHighIcon from './icons/volumeHighIcon.svg';
+    import volumeLowIcon from './icons/volumeLowIcon.svg';
+    import volumeMidIcon from './icons/volumeMidIcon.svg';
+    import volumeMuteIcon from './icons/volumeMuteIcon.svg';
+    import windowedIcon from './icons/windowedIcon.svg';
+
     export let videoId;
     export let containerId = 'player-container';
 
@@ -55,7 +72,24 @@
         paella = new Paella(containerId, initParams);
 
         paella.loadManifest()
-            .then(() => console.log("Done"))
+            .then(() => {
+                paella.addCustomPluginIcon("es.upv.paella.backwardButtonPlugin","backwardIcon",backwardIcon);
+                paella.addCustomPluginIcon("es.upv.paella.captionsSelectorPlugin","captionsIcon",captionsIcon);
+                paella.addCustomPluginIcon("es.upv.paella.downloadsPlugin","downloadIcon",downloadIcon);
+                paella.addCustomPluginIcon("es.upv.paella.findCaptionsPlugin","findCaptionsIcon",findCaptionsIcon);
+                paella.addCustomPluginIcon("es.upv.paella.forwardButtonPlugin","forwardIcon",forwardIcon);
+                paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","fullscreenIcon",fullscreenIcon);
+                paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","windowedIcon",windowedIcon);
+                paella.addCustomPluginIcon("es.upv.paella.keyboardShortcutsHelp","keyboardIcon",keyboardIcon);
+                paella.addCustomPluginIcon("es.upv.paella.layoutSelector","layoutIcon",layoutIcon);
+                paella.addCustomPluginIcon("es.upv.paella.qualitySelector","screenIcon",screenIcon);
+                paella.addCustomPluginIcon("es.upv.paella.audioSelector","screenIcon",screenIcon);
+                paella.addCustomPluginIcon("es.upv.paella.frameControlButtonPlugin","photoIcon",slidesIcon);
+                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeHighIcon",volumeHighIcon);
+                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeLowIcon",volumeLowIcon);
+                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMidIcon",volumeMidIcon);
+                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMuteIcon",volumeMuteIcon);
+            })
             .catch(err => console.error(err));
 
         paella.bindEvent(Events.PLAY, () => {
