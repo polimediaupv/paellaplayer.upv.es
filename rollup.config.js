@@ -99,6 +99,10 @@ export default [
 				include: "pages/*.md"
 			}),
 
+			svg({
+				stringify: true
+			}),
+			
 			svelte({
 				compilerOptions: {
 					// enable run-time checks when not in production
