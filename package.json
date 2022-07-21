@@ -27,7 +27,7 @@
     "paella-core": "^1.2.2",
     "paella-slide-plugins": "^1.2.1",
     "paella-user-tracking": "^1.0.14",
-    "paella-zoom-plugin": "^1.0.11",
+    "paella-zoom-plugin": "^1.2.0",
     "showdown": "^2.0.2",
     "sirv-cli": "^2.0.0",
     "svelte-markdown": "^0.2.2",
