@@ -10,7 +10,10 @@
         "showTotal": true,
         "parentContainer": "buttonArea",
         "side": "left",
-        "visible": true
+        "visible": true,
+        "showHandler": true,
+        "hideHandlerOnMouseOut": true,
+        "showRemainingProgress": true
     },
     
     "plugins": {

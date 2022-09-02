@@ -2,3 +2,32 @@
 .video-canvas .button-area button {
 	width: 30px;
 }
+
+.progress-indicator {
+    width: 100%;
+    margin-left: 0%;
+    height: 10px;
+}
+
+:root {
+	--handler-size: 16px;
+}
+
+.progress-indicator-handler {
+    background-color: white;
+	width: var(--handler-size);
+    height: var(--handler-size);
+	margin-left: calc(-1 * var(--handler-size) / 2);
+}
+
+:root {
+    --progress-bar-height: 4px;
+}
+
+.progress-indicator-container .progress-indicator-content {
+    height: var(--progress-bar-height);
+}
+
+.progress-indicator-container .progress-indicator-remaining {
+    height: var(--progress-bar-height);
+}
