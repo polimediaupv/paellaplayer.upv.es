@@ -1,7 +1,8 @@
 {
 	"metadata": {
 		"duration": 228,
-        "title": "HLS multi quality - multi language (wowza SMIL)"
+        "title": "HLS multi quality - multi language (wowza SMIL)",
+		"preview": "preview.jpg"
 	},
 	"streams": [
 		{
