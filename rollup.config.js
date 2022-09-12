@@ -6,6 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import { string } from 'rollup-plugin-string';
 import svg from 'rollup-plugin-svg-import';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -40,6 +41,8 @@ export default [
 			file: 'docs/build/website.js'
 		},
 		plugins: [
+			sourcemaps(),
+
 			string({
 				include: "pages/*.md"
 			}),
@@ -95,6 +98,8 @@ export default [
 			file: 'docs/build/player-standalone.js'
 		},
 		plugins: [
+			sourcemaps(),
+			
 			string({
 				include: "pages/*.md"
 			}),
