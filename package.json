@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@beyonk/svelte-google-analytics": "^2.2.0",
-    "paella-core": "^1.3.2",
+    "paella-core": "^1.4.2",
     "paella-basic-plugins": "^1.2.0",
     "paella-slide-plugins": "^1.2.1",
     "paella-zoom-plugin": "^1.2.0",
-    "paella-user-tracking": "^1.0.14",
+    "paella-user-tracking": "^1.4.0",
     "showdown": "^2.0.2",
     "sirv-cli": "^2.0.0",
     "svelte-markdown": "^0.2.2",
