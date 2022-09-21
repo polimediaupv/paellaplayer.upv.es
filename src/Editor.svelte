@@ -4,11 +4,14 @@
 
     let editorContainer = null;
 
+    export let text = ""
+    export let height = "auto";
+
     onMount(async () => {
         const my = editor => {
             let code = editor.textContent;
             code = code.replace(
-                /(\"[a-z0-9\_\-\s]*\")/gi,
+                /(\"[a-z0-9\_\-\s\.]*\")/gi,
                 '<font class="string">$1</font>'
             );
             code = code.replace(
@@ -35,10 +38,13 @@
         }
 
         const jar = CodeJar(editorContainer, my);
+        jar.onUpdate(code => {
+            text = code;
+        })
     });
 </script>
 
-<div class="editor" bind:this={editorContainer} />
+<div class="editor" style="max-height: {height}" bind:this={editorContainer}>{text}</div>
 
 <style>
     .editor {

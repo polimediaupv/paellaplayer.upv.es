@@ -10,6 +10,7 @@
 	import Doc from './Doc.svelte';
 	import DemosSinglePage from './DemosSinglePage.svelte';
 	import Contributions from './Contributions.svelte';
+	import Playground from './Playground.svelte';
 	
 	import { setCookie, getCookie } from './cookies';
 
@@ -29,6 +30,7 @@
 		'/contributions': Contributions,
 		'/doc/:id': Doc,
 		'/demos-all': DemosSinglePage,
+		'/playground': Playground,
 		'*': NotFound
 	}
 

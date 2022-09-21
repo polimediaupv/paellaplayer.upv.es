@@ -7,6 +7,7 @@ import css from 'rollup-plugin-css-only';
 import { string } from 'rollup-plugin-string';
 import svg from 'rollup-plugin-svg-import';
 import sourcemaps from 'rollup-plugin-sourcemaps';
+import json from '@rollup/plugin-json';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -42,6 +43,8 @@ export default [
 		},
 		plugins: [
 			sourcemaps(),
+
+			json(),
 
 			string({
 				include: "pages/*.md"
@@ -99,6 +102,8 @@ export default [
 		},
 		plugins: [
 			sourcemaps(),
+			
+			json(),
 			
 			string({
 				include: "pages/*.md"

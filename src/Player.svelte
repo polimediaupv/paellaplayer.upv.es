@@ -41,6 +41,10 @@
         }
     }
 
+    export const reloadPlayer = async () => {
+        await paella.reload();
+    }
+
     let paella = null;
 
     onMount(async () => {
