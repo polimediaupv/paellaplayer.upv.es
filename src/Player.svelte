@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte';
     import { setCookie, getCookie } from './cookies';
-    import { Paella, utils, PlayerState, Events } from 'paella-core';
+    import { Paella, utils, PlayerState, Events, defaultLoadConfigFunction } from 'paella-core';
     import getBasicPluginContext from 'paella-basic-plugins';
     import getSlidePluginContext from 'paella-slide-plugins';
     import getZoomPluginContext from 'paella-zoom-plugin';
@@ -30,6 +30,8 @@
     export let onVideoIdChanged;
     export let onPlay;
 
+    export let config;
+
     export const cancelLoad = (nextVideoId) => {
         if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
             // To break a player load, the only option is to reload the page
@@ -52,6 +54,15 @@
 
             configResourcesUrl: 'player-config/',
             configUrl: 'player-config/config.json',
+
+            loadConfig: async (configUrl,player) => {
+                if (config) {
+                    return config;
+                }
+                else {
+                    return await defaultLoadConfigFunction(configUrl,player);
+                }
+            },
 
             getVideoId: (config,player) => {
                 const cookieVideo = getCookie('nextVideo');
