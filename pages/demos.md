@@ -11,4 +11,10 @@ In the following link, you can test the paella-core's new ability to load multip
 
 - [Multiple instances of paella player on a single page](#/demos-all)
 
+# Playground page
+
+Experiment with the `paella-core` configuration options using the playground page:
+
+- [paella-core playground](#/playground)
+
 # Paella Player demos
