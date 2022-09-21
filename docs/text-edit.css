@@ -1,0 +1,24 @@
+
+.brackets {
+    color: blue;
+}
+
+.string {
+    color: #6699e8;
+}
+
+.number {
+    color: #005880;
+}
+
+.boolean-true {
+    color: green;
+}
+
+.boolean-false {
+   color: #d25f5f
+}
+
+.separator {
+    color: #6f7578;
+}

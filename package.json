@@ -10,6 +10,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
+    "codejar": "^3.6.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
@@ -25,7 +26,7 @@
   "dependencies": {
     "@beyonk/svelte-google-analytics": "^2.2.0",
     "paella-basic-plugins": "^1.2.0",
-    "paella-core": "^1.5.0",
+    "paella-core": "^1.5.1",
     "paella-slide-plugins": "^1.2.1",
     "paella-user-tracking": "^1.4.0",
     "paella-zoom-plugin": "^1.2.0",
