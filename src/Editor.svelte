@@ -1,5 +1,6 @@
 <script>
     import {CodeJar} from 'codejar';
+    import {withLineNumbers} from 'codejar/linenumbers';
     import { onMount } from 'svelte';
 
     let editorContainer = null;
@@ -11,8 +12,20 @@
         const my = editor => {
             let code = editor.textContent;
             code = code.replace(
-                /(\"[a-z0-9\_\-\s\.]*\")/gi,
-                '<font class="string">$1</font>'
+                /(\"[a-z0-9\_\-\s\.]*\")(\s*\:)/gi,
+                '<font class="key">$1</font>$2'
+            );
+            code = code.replace(
+                /(\:\s*)(\"[a-z0-9\_\-\s\.]*\")/gi,
+                '$1<font class="string">$2</font>'
+            );
+            code = code.replace(
+                /(\[|\,)(\s*)(\"[a-z0-9\_\-\s\.]*\")/gi,
+                '$1$2<font class="string">$3</font>'
+            );
+            code = code.replace(
+                /(\:|\[|\,)(\s*)([0-9\-\.]+)/g,
+                '$1$2<font class="number">$3</font>'
             );
             code = code.replace(
                 /(\:|\[|\,)(\s*)([0-9\-\.]+)/g,
@@ -37,7 +50,7 @@
             editor.innerHTML = code;
         }
 
-        const jar = CodeJar(editorContainer, my);
+        const jar = CodeJar(editorContainer, withLineNumbers(my, {backgroundColor: "auto", color: "auto"}));
         jar.onUpdate(code => {
             text = code;
         })

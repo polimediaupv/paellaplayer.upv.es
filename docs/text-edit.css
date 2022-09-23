@@ -1,24 +1,39 @@
+.editor {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: rgb(35, 35, 35);
+    color: white;
+}
+
+.codejar-linenumbers {
+    color: white;
+    background-color: #6f7578;
+}
 
 .brackets {
-    color: blue;
+    color: rgb(228, 228, 255);
+}
+
+.key {
+    color: #9bc9e4;
 }
 
 .string {
-    color: #6699e8;
+    color: #daa477;
 }
 
 .number {
-    color: #005880;
+    color: #c4e4f3;
+    font-weight: bolder;
 }
 
 .boolean-true {
-    color: green;
+    color: rgb(164, 255, 164);
 }
 
 .boolean-false {
-   color: #d25f5f
+   color: #ffa0a0
 }
 
 .separator {
-    color: #6f7578;
+    color: #b5c1c6;
 }

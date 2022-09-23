@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte';
     import { setCookie, getCookie } from './cookies';
-    import { Paella, utils, PlayerState, Events, defaultLoadConfigFunction } from 'paella-core';
+    import { Paella, utils, PlayerState, Events, defaultLoadConfigFunction, defaultLoadVideoManifestFunction } from 'paella-core';
     import getBasicPluginContext from 'paella-basic-plugins';
     import getSlidePluginContext from 'paella-slide-plugins';
     import getZoomPluginContext from 'paella-zoom-plugin';
@@ -31,6 +31,7 @@
     export let onPlay;
 
     export let config;
+    export let manifest;
 
     export const cancelLoad = (nextVideoId) => {
         if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
@@ -81,6 +82,15 @@
                     videoId = utils.getUrlParameter("id");
                 }
                 return videoId;
+            },
+
+            loadVideoManifest: async (videoManifestUrl,config,player) => {
+                if (manifest) {
+                    return manifest;
+                }
+                else {
+                    return await defaultLoadVideoManifestFunction(videoManifestUrl,config,player);
+                }
             }
         };
 
