@@ -2,53 +2,26 @@
     import {CodeJar} from 'codejar';
     import {withLineNumbers} from 'codejar/linenumbers';
     import { onMount } from 'svelte';
+    import { json, css } from './syntax-coloring';
 
     let editorContainer = null;
 
     export let text = ""
     export let height = "auto";
+    export let language = "json";
 
     onMount(async () => {
         const my = editor => {
-            let code = editor.textContent;
-            code = code.replace(
-                /(\"[a-z0-9\_\-\s\.]*\")(\s*\:)/gi,
-                '<font class="key">$1</font>$2'
-            );
-            code = code.replace(
-                /(\:\s*)(\"[a-z0-9\_\-\s\.]*\")/gi,
-                '$1<font class="string">$2</font>'
-            );
-            code = code.replace(
-                /(\[|\,)(\s*)(\"[a-z0-9\_\-\s\.]*\")/gi,
-                '$1$2<font class="string">$3</font>'
-            );
-            code = code.replace(
-                /(\:|\[|\,)(\s*)([0-9\-\.]+)/g,
-                '$1$2<font class="number">$3</font>'
-            );
-            code = code.replace(
-                /(\:|\[|\,)(\s*)([0-9\-\.]+)/g,
-                '$1$2<font class="number">$3</font>'
-            );
-            code = code.replace(
-                /(\{|\}|\[|\])/g,
-                '<font class="brackets">$1</font>'
-            );
-            code = code.replace(
-                /(\:|\,)/g,
-                '<font class="separator">$1</font>'
-            );
-            code = code.replace(
-                /(true)/gi,
-                '<font class="boolean-true">$1</font>'
-            );
-            code = code.replace(
-                /(false)/gi,
-                '<font class="boolean-false">$1</font>'
-            );
-            editor.innerHTML = code;
-        }
+            switch (language) {
+            case 'json':
+                json(editor);
+                break;
+            case 'css':
+                css(editor);
+                break;
+            }
+            
+        };
 
         const jar = CodeJar(editorContainer, withLineNumbers(my, {backgroundColor: "auto", color: "auto"}));
         jar.onUpdate(code => {

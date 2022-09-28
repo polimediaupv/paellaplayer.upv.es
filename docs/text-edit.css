@@ -37,3 +37,19 @@
 .separator {
     color: #b5c1c6;
 }
+
+.css-property {
+    color: #c8e5ff;
+}
+
+.css-code {
+    color: #ffecbc;
+}
+
+.css-query {
+    color: #bcffc7;
+}
+
+.css-separator {
+    color: rgb(162, 189, 166);
+}

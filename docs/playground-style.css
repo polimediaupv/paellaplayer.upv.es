@@ -1,0 +1,43 @@
+:root {
+    --main-bg-color: #1F2937;
+    --main-bg-color-hover: #1F2937;
+    --main-bg-gradient: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(31,41,55,1) 35%, rgba(31,41,55,0.28755252100840334) 100%);
+    --secondary-bg-color: #1F2937;
+    --secondary-bg-color-hover: #1F2937;
+
+    --highlight-bg-color: #F70404;
+    --highlight-bg-color-hover: #F60202;
+
+    --base-video-rect-background-color: #9CA3AF;
+
+    --progress-bar-height: 6px;
+}
+
+
+.video-container {
+    background-color: #9CA3AF;
+}
+
+.progress-indicator {
+    height: 20px;
+    width: 98%;
+    margin-left: 1%;
+}
+
+.progress-indicator .progress-indicator-content {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    height: var(--progress-bar-height);
+}
+
+.progress-indicator .progress-indicator-remaining {
+    border-radius: 20px;
+    height: var(--progress-bar-height);
+    background-color: #D1D5DB;
+}
+
+.progress-indicator .progress-indicator-handler {
+    background-color: white;
+    width: 16px;
+    height: 16px;
+}
