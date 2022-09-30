@@ -106,7 +106,8 @@
             "enabled": true,
             "side": "right",
             "order": 101,
-            "parentContainer": "videoContainer"
+            "parentContainer": "videoContainer",
+            "menuTitle": "Layout"
         },
 
         "es.upv.paella.playbackRateButton": {
@@ -114,7 +115,8 @@
             "side": "right",
             "order": 102,
             "parentContainer": "videoContainer",
-            "rates": [0.75, 1, 1.5, 2]
+            "rates": [0.75, 1, 1.5, 2],
+            "menuTitle": "Playback Rate"
         },
 
         "es.upv.paella.volumeButtonPlugin": {
@@ -200,7 +202,8 @@
             "enabled": true,
             "order": 80,
             "description": "Keyboard Shortcuts",
-            "side": "right"
+            "side": "right",
+            "menuTitle": "Keyboard Shortcuts"
         },
 
         "es.upv.paella.userEventTracker": {
