@@ -6,22 +6,39 @@
     import Editor from './Editor.svelte';
     import defaultConfig from "../docs/player-config/config.json";
     import defaultManifest from "../docs/demos/belmar-multiresolution-remote/data.json";
+    import demos from "../docs/demos/demos.json";
 
     export let params = {};
+
+    let updateEditorText;
+
+    const ids = [];
+    demos.forEach(group => {
+        if (group.id !== "error-handling") {
+            group.demos.forEach(id => ids.push(id));
+        }
+    });
 
     let config = defaultConfig;
     let configText = JSON.stringify(config, "", "  ");
     let error = "";
 
-    // TODO: load manifest from a video ID
-    let manifest = defaultManifest;
-    let manifestText = JSON.stringify(manifest, "", "  ");
+    let manifest = {};
+    let manifestText = ""
     let videoId = params.id || "belmar-multiresolution-remote";
+
+    const loadManifest = async (id) => {
+        const response = await fetch(`demos/${id.id}/data.json`);
+        if (response.ok) {
+            manifest = await response.json();
+            manifestText = JSON.stringify(manifest,"","  ");
+            setTimeout(() => updateEditorText(), 100);
+        }
+    }
 
 
     let styleText = "";
     let styleElem = null;
-
 
     let reloadPlayer;
 
@@ -38,6 +55,9 @@
     }
 
     onMount(async () => {
+        manifest = defaultManifest;
+        manifestText = JSON.stringify(manifest, "", "  ");
+
         const defaultCssResponse = await fetch("playground-style.css");
         styleText = await defaultCssResponse.text();
         reloadStyle(styleText);
@@ -68,6 +88,11 @@
         }
     }
 
+    const idChanged = async (evt) => {
+        const selected = ids[evt.target.selectedIndex];
+        loadManifest(selected);
+    }
+
 </script>
 
 <SvelteMarkdown {source}></SvelteMarkdown>
@@ -87,27 +112,29 @@
         <li class="{ tabPage === 'style' ? 'current' : '' }">
             <button on:click={() => tabPage = 'style' }>Custom Styles</button>
         </li>
+        <li class="tools">
+            <button on:click={() => reload()}>ReloadPlayer</button>
+        </li>
     </ul>
     { #if tabPage === 'config' }
         <div class="editor-config-page">
             <Editor class="editor-container" height="200px" bind:text={configText} language="json"></Editor>
-            <div class="editor-buttons">
-                <button on:click={reload}>Reload</button>
-            </div>
         </div>
     { :else if tabPage === 'manifest' }
         <div class="editor-manifest-page">
-            <Editor class="editor-container" height="200px" bind:text={manifestText} language="json"></Editor>
-            <div class="editor-buttons">
-                <button on:click={reload}>Reload</button>
+            <div class="tab-tools-container">
+                <label for="videoIdSelector">Example video manifests:</label>
+                <select id="videoIdSelector" name="videoIdSelector" on:change="{idChanged}">
+                    {#each ids as id}
+                        <option value={id}>{id.name}</option>
+                    {/each}
+                </select>
             </div>
+            <Editor class="editor-container" height="200px" bind:text={manifestText} bind:updateText={updateEditorText} language="json"></Editor>
         </div>
     { :else if tabPage === 'style' }
         <div class="editor-style-page">
             <Editor class="editor-container" height="200px" bind:text={styleText} language="css"></Editor>
-            <div class="editor-buttons">
-                <button on:click={reload}>Reload</button>
-            </div>
         </div>
     { /if }
 </section>
@@ -152,6 +179,27 @@
         pointer-events: none;
         background-color: #cc0000;
         color: white;
+    }
+
+    .editor-section ul .tools {
+        margin-left: auto;
+    }
+
+    .editor-section ul .tools button {
+        background-color: #cc0000;
+    }
+
+    .editor-section ul .tools button:hover {
+        background-color: red;
+    }
+
+    .tab-tools-container {
+        background-color: #4c4c4c;
+        border: 1px solid black;
+        color: white;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 20px;
     }
 
 </style>

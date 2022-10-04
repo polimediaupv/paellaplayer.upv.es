@@ -2,9 +2,7 @@
 	"metadata": {
 		"duration": 909.13,
 		"title": "mp4 error test",
-		"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/belmar-preview.jpg",
-		"related": [
-        ]
+		"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/belmar-preview.jpg"
 	},
 	"streams": [
 		{
@@ -20,7 +18,6 @@
 					}
 				]
 			},
-			"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/presentation_cut.jpg",
 			"content":"presentation"
 		}
 	],

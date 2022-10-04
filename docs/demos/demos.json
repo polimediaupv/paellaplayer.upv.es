@@ -1,6 +1,7 @@
 [
     {
         "title": "mp4 videos",
+        "id": "mp4",
         "demos": [
             {
                 "name": "Dual stream video",
@@ -26,6 +27,7 @@
     },
     {
         "title": "hls videos",
+        "id": "hls",
         "demos": [
             {
                 "name": "HLS multi quality",
@@ -52,6 +54,7 @@
     },
     {
         "title": "Error handling",
+        "id": "error-handling",
         "demos": [
             {
                 "name": "Error test: manifest file not found",
@@ -72,6 +75,7 @@
     },
     {
         "title": "Audio player",
+        "id": "audio",
         "demos": [
             {
                 "name": "Audio only",

@@ -18,8 +18,8 @@
 					}
 				]
 			},
-			"preview": "",
-			"content":"presenter"
+			"content":"presenter",
+			"role": "mainAudio"
 		},
 		{
 			"sources": {

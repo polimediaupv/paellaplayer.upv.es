@@ -10,6 +10,14 @@
     export let height = "auto";
     export let language = "json";
 
+    let jar = null;
+
+    export const updateText = () => {
+        if (jar) {
+            jar.updateCode(text);
+        }
+    };
+
     onMount(async () => {
         const my = editor => {
             switch (language) {
@@ -23,11 +31,12 @@
             
         };
 
-        const jar = CodeJar(editorContainer, withLineNumbers(my, {backgroundColor: "auto", color: "auto"}));
+        jar = CodeJar(editorContainer, withLineNumbers(my, {backgroundColor: "auto", color: "auto"}));
         jar.onUpdate(code => {
             text = code;
         })
     });
+
 </script>
 
 <div class="editor" style="max-height: {height}" bind:this={editorContainer}>{text}</div>

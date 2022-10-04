@@ -2,8 +2,7 @@
 	"metadata": {
 		"duration": 228,
         "title": "HLS live",
-		"preview": "https://repository.paellaplayer.upv.es/hls-multiaudio/preview.jpg",
-		"related": []
+		"preview": "https://repository.paellaplayer.upv.es/hls-multiaudio/preview.jpg"
 	},
 	"streams": [
 		{
@@ -15,7 +14,6 @@
 					}
 				]
 			},
-			"preview": "",
 			"content":"presenter",
 			"role": "mainAudio"
 		}
