@@ -177,7 +177,8 @@
         "es.upv.paella.qualitySelector": {
             "enabled": true,
             "side": "right",
-            "parentContainer": "videoContainer"
+            "parentContainer": "videoContainer",
+            "menuTitle": "Select quality"
         },
 
         "es.upv.paella.audioSelector": {
@@ -242,6 +243,12 @@
             },
             "markWidth": 3,
             "drawBackground": false
+        },
+
+        "es.upv.paella.customTimeProgressIndicator": {
+            "enabled": false,
+            "textSize": "large",
+            "showTotal": false
         }
     }
 }

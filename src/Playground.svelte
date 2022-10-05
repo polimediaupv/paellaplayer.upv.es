@@ -10,7 +10,39 @@
 
     export let params = {};
 
-    let updateEditorText;
+    const storedData = {
+        savedConfig: null,
+        savedManifest: null,
+        savedStyle: null
+    };
+
+    const loadStoredData = (dataItem, type) => {
+        storedData[dataItem] = window.localStorage.getItem(dataItem);
+
+        if (type === 'json') {
+            try {
+                storedData[dataItem] = JSON.parse(storedData[dataItem]);
+            }
+            catch (e) {
+                storedData[dataItem] = null;
+            }
+        }
+    }
+
+    const saveData = (dataItem, data) => {
+        if (typeof(data) === "object") {
+            data = JSON.stringify(data);
+        }
+        window.localStorage.setItem(dataItem, data);
+    }
+
+    loadStoredData("savedConfig","json");
+    loadStoredData("savedManifest","json");
+    loadStoredData("savedStyle");
+
+    let updateConfigText;
+    let updateManifestText;
+    let updateStyleText;
 
     const ids = [];
     demos.forEach(group => {
@@ -19,7 +51,7 @@
         }
     });
 
-    let config = defaultConfig;
+    let config = storedData.savedConfig || defaultConfig;
     let configText = JSON.stringify(config, "", "  ");
     let error = "";
 
@@ -32,7 +64,7 @@
         if (response.ok) {
             manifest = await response.json();
             manifestText = JSON.stringify(manifest,"","  ");
-            setTimeout(() => updateEditorText(), 100);
+            setTimeout(() => updateManifestText(), 100);
         }
     }
 
@@ -55,11 +87,17 @@
     }
 
     onMount(async () => {
-        manifest = defaultManifest;
+        manifest = storedData.savedManifest || defaultManifest;
         manifestText = JSON.stringify(manifest, "", "  ");
 
-        const defaultCssResponse = await fetch("playground-style.css");
-        styleText = await defaultCssResponse.text();
+
+        if (!storedData.savedStyle) {
+            const defaultCssResponse = await fetch("playground-style.css");
+            styleText = await defaultCssResponse.text();
+        }
+        else {
+            styleText = storedData.savedStyle;
+        }
         reloadStyle(styleText);
     })
 
@@ -82,6 +120,10 @@
             await reloadPlayer();
 
             reloadStyle(styleText);
+
+            saveData("savedConfig", config);
+            saveData("savedManifest", manifest);
+            saveData("savedStyle", styleText);
         }
         catch(err) {
             error = currentError + err.message;
@@ -93,6 +135,18 @@
         loadManifest(selected);
     }
 
+    const loadDefaultConfig = () => {
+        config = defaultConfig;
+        configText = JSON.stringify(config, "", "  ");
+        setTimeout(() => updateConfigText(), 100);
+    }
+
+    const loadDefaultStyle = async () => {
+        const defaultCssResponse = await fetch("playground-style.css");
+        styleText = await defaultCssResponse.text();
+        reloadStyle(styleText);
+        setTimeout(() => updateStyleText(), 100);
+    }
 </script>
 
 <SvelteMarkdown {source}></SvelteMarkdown>
@@ -118,7 +172,10 @@
     </ul>
     { #if tabPage === 'config' }
         <div class="editor-config-page">
-            <Editor class="editor-container" height="200px" bind:text={configText} language="json"></Editor>
+            <div class="tab-tools-container">
+                <button on:click={loadDefaultConfig}>Load Default</button>
+            </div>
+            <Editor class="editor-container" height="200px" bind:text={configText} bind:updateText={updateConfigText} language="json"></Editor>
         </div>
     { :else if tabPage === 'manifest' }
         <div class="editor-manifest-page">
@@ -130,11 +187,14 @@
                     {/each}
                 </select>
             </div>
-            <Editor class="editor-container" height="200px" bind:text={manifestText} bind:updateText={updateEditorText} language="json"></Editor>
+            <Editor class="editor-container" height="200px" bind:text={manifestText} bind:updateText={updateManifestText} language="json"></Editor>
         </div>
     { :else if tabPage === 'style' }
         <div class="editor-style-page">
-            <Editor class="editor-container" height="200px" bind:text={styleText} language="css"></Editor>
+            <div class="tab-tools-container">
+                <button on:click={loadDefaultStyle}>Load Default</button>
+            </div>
+            <Editor class="editor-container" height="200px" bind:text={styleText} bind:updateText={updateStyleText} language="css"></Editor>
         </div>
     { /if }
 </section>
