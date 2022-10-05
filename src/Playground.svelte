@@ -147,6 +147,27 @@
         reloadStyle(styleText);
         setTimeout(() => updateStyleText(), 100);
     }
+
+    const downloadText = (text,type,filename) => {
+        const a = document.createElement('a');
+        const blob = new Blob([text], { type });
+        const url = URL.createObjectURL(blob);
+        a.setAttribute('href',url);
+        a.setAttribute('download', filename);
+        a.click();
+    }
+
+    const downloadConfig = () => {
+        downloadText(configText,'application/json','config.json');
+    }
+
+    const downloadManifest = () => {
+        downloadText(manifestText,'application/json','data.json');
+    }
+
+    const downloadStyle = () => {
+        downloadText(configText,'text/css','custom_style.json');
+    }
 </script>
 
 <SvelteMarkdown {source}></SvelteMarkdown>
@@ -174,6 +195,7 @@
         <div class="editor-config-page">
             <div class="tab-tools-container">
                 <button on:click={loadDefaultConfig}>Load Default</button>
+                <button on:click={downloadConfig}>Download</button>
             </div>
             <Editor class="editor-container" height="200px" bind:text={configText} bind:updateText={updateConfigText} language="json"></Editor>
         </div>
@@ -186,6 +208,7 @@
                         <option value={id}>{id.name}</option>
                     {/each}
                 </select>
+                <button on:click={downloadManifest}>Download</button>
             </div>
             <Editor class="editor-container" height="200px" bind:text={manifestText} bind:updateText={updateManifestText} language="json"></Editor>
         </div>
@@ -193,6 +216,7 @@
         <div class="editor-style-page">
             <div class="tab-tools-container">
                 <button on:click={loadDefaultStyle}>Load Default</button>
+                <button on:click={downloadStyle}>Download</button>
             </div>
             <Editor class="editor-container" height="200px" bind:text={styleText} bind:updateText={updateStyleText} language="css"></Editor>
         </div>
