@@ -166,7 +166,7 @@
     }
 
     const downloadStyle = () => {
-        downloadText(configText,'text/css','custom_style.json');
+        downloadText(configText,'text/css','custom_style.css');
     }
 </script>
 

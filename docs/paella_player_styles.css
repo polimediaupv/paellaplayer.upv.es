@@ -1,33 +1,47 @@
+:root {
+    --main-bg-color: #1F2937;
+    --main-bg-color-hover: #1F2937;
+    --main-bg-gradient: linear-gradient(
+        0deg, 
+        rgba(2,0,36,1) 0%, 
+        rgba(31,41,55,1) 35%, 
+        rgba(31,41,55,0.28755252100840334) 100%);
+    --secondary-bg-color: #1F2937;
+    --secondary-bg-color-hover: #1F2937;
 
-.video-canvas .button-area button {
-	width: 30px;
+    --highlight-bg-color: #F70404;
+    --highlight-bg-color-hover: #F60202;
+
+    --base-video-rect-background-color: #9CA3AF;
+
+    --progress-bar-height: 6px;
+}
+
+
+.video-container {
+    background-color: #9CA3AF;
 }
 
 .progress-indicator {
-    width: 100%;
-    margin-left: 0%;
-    height: 10px;
+    height: 20px;
+    width: 98%;
+    margin-left: 1%;
 }
 
-:root {
-	--handler-size: 16px;
+.progress-indicator .progress-indicator-content {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    height: var(--progress-bar-height);
 }
 
-.progress-indicator-handler {
+.progress-indicator .progress-indicator-remaining {
+    border-radius: 20px;
+    height: var(--progress-bar-height);
+    background-color: #D1D5DB;
+}
+
+.progress-indicator .progress-indicator-handler {
     background-color: white;
-	width: var(--handler-size);
-    height: var(--handler-size);
-	margin-left: calc(-1 * var(--handler-size) / 2);
-}
-
-:root {
-    --progress-bar-height: 4px;
-}
-
-.progress-indicator-container .progress-indicator-content {
-    height: var(--progress-bar-height);
-}
-
-.progress-indicator-container .progress-indicator-remaining {
-    height: var(--progress-bar-height);
+    width: 16px;
+    height: 16px;
 }
