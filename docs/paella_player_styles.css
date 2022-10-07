@@ -49,3 +49,19 @@
 .video-canvas .button-area button {
     padding-top: 5px;
 }
+
+.video-canvas .button-area button {
+    width: 35px;
+}
+
+@media (max-width: 1020px) {
+    .video-canvas .button-area button {
+        width: 30px;
+    }
+}
+  
+@media (max-width: 800px) {
+    .video-canvas .button-area button {
+        width: 25px;
+    }
+}
