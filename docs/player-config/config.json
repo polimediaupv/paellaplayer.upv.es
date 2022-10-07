@@ -253,7 +253,7 @@
         "es.upv.paella.qualitySelector": {
             "enabled": true,
             "side": "right",
-            "parentContainer": "videoContainer",
+            "parentContainer": "playbackBar",
             "menuTitle": "Select quality"
         },
 
@@ -340,7 +340,7 @@
             "side": "left",
             "order": 1
         },
-        
+
         "es.upv.paella.prevSlideNavigatorButton": {
             "enabled": true,
             "content": [
