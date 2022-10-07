@@ -45,3 +45,7 @@
     width: 16px;
     height: 16px;
 }
+
+.video-canvas .button-area button {
+    padding-top: 5px;
+}

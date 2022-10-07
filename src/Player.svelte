@@ -149,6 +149,6 @@
 
 <style>
     div.player-container {
-        min-height: 450px;
+        min-height: 500px;
     }
 </style>
