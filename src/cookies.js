@@ -21,3 +21,22 @@ export const getCookie = (cname) => {
     }
     return "";
 }
+
+export const getCookieConsentData = () => {
+  const analytical = getCookie('enable-analytics');
+  return {
+    analytical: /true/i.test(analytical) || false
+  };
+}
+
+export const setCookieConsentData = ({ analytical = false }) => {
+  setCookie('enable-analytics', analytical ? "true" : "false" );
+}
+
+export const isConsentSaved = () => {
+  return getCookie('enable-analytics') !== "";
+}
+
+export const clearConsentData = () => {
+  setCookie('enable-analytics','');
+}

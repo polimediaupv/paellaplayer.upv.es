@@ -12,7 +12,7 @@
 	import Contributions from './Contributions.svelte';
 	import Playground from './Playground.svelte';
 	
-	import { setCookie, getCookie } from './cookies';
+	import { getCookieConsentData, isConsentSaved, setCookieConsentData, clearConsentData } from './cookies';
 
 	import Router from 'svelte-spa-router';
 
@@ -36,6 +36,7 @@
 
 	let ga = null;
 	let cookiesMessage = true;
+	const gaMeasurementId = 'UA-26470475-6';
 
 	function enableAnalytics() {
 		ga.init();
@@ -51,35 +52,30 @@
 	}
 
 	function acceptCookies() {
-		setCookie("enable-analytics","true");
+		setCookieConsentData({ analytical: true });
 		ga.init();
 		cookiesMessage = false;
 		updateCookiesEvent(true);
 	}
 
 	function denyCookies() {
-		setCookie("enable-analytics","false");
+		setCookieConsentData({ analytical: false });
 		cookiesMessage = false;
 		updateCookiesEvent(false);
 	}
 
 	const updateCookies = () => {
-		cookiesMessage = true;
+		clearConsentData();
+		location.reload();
 	};
 
 	onMount(() => {
 		// Find google analytics cookie
-		const analyticsEnabled = getCookie("enable-analytics");
-
-		if (analyticsEnabled === "") {
-			cookiesMessage = true;
-		}
-		else if (analyticsEnabled === "true") {
+		const cookieConsent = getCookieConsentData();
+		cookiesMessage = !isConsentSaved();
+		
+		if (cookieConsent.analytical) {
 			enableAnalytics();
-			cookiesMessage = false;
-		}
-		else if (analyticsEnabled === "false") {
-			cookiesMessage = false;
 		}
 	});
 
@@ -87,7 +83,7 @@
 
 <GoogleAnalytics 
 	bind:this={ga}
-	properties={[ 'UA-26470475-6' ]}
+	properties={[ gaMeasurementId ]}
 	enabled={false} />
 
 <Menu />

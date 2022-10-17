@@ -1,6 +1,6 @@
 <script>
     import { onMount, afterUpdate } from 'svelte';
-    import { setCookie, getCookie } from './cookies';
+    import { setCookie, getCookie, getCookieConsentData } from './cookies';
     import { Paella, utils, PlayerState, Events, defaultLoadConfigFunction, defaultLoadVideoManifestFunction } from 'paella-core';
     import getBasicPluginContext from 'paella-basic-plugins';
     import getSlidePluginContext from 'paella-slide-plugins';
@@ -94,11 +94,8 @@
             },
 
             getCookieConsentFunction: (type) => {
-                if (type === "analytical") {
-                    const value = utils.getCookie("enable-analytics");
-                    return /true/i.test(value) || false;
-                }
-                return false;
+                const consentData = getCookieConsentData();
+                return consentData[type];
             }
         };
 
