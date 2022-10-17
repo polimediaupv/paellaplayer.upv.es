@@ -41,16 +41,31 @@
 		ga.init();
 	}
 
+	function updateCookiesEvent(cookiesEnabled) {
+		const customEvent = new CustomEvent('cookiesUpdated', {
+			detail: {
+				cookiesEnabled
+			}
+		});
+		window.dispatchEvent(customEvent);
+	}
+
 	function acceptCookies() {
 		setCookie("enable-analytics","true");
 		ga.init();
 		cookiesMessage = false;
+		updateCookiesEvent(true);
 	}
 
 	function denyCookies() {
 		setCookie("enable-analytics","false");
 		cookiesMessage = false;
+		updateCookiesEvent(false);
 	}
+
+	const updateCookies = () => {
+		cookiesMessage = true;
+	};
 
 	onMount(() => {
 		// Find google analytics cookie
@@ -80,7 +95,7 @@
 	<section class="container">
 		<Router {routes}/>
 	</section>
-	<Footer />	
+	<Footer onUpdateCookies={updateCookies}/>
 </main>
 
 {#if cookiesMessage}

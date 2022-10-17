@@ -91,10 +91,22 @@
                 else {
                     return await defaultLoadVideoManifestFunction(videoManifestUrl,config,player);
                 }
+            },
+
+            getCookieConsentFunction: (type) => {
+                if (type === "analytical") {
+                    const value = utils.getCookie("enable-analytics");
+                    return /true/i.test(value) || false;
+                }
+                return false;
             }
         };
 
         paella = new Paella(containerId, initParams);
+
+        window.addEventListener('cookiesUpdated', () => {
+            paella.cookieConsent.updateConsentData();
+        })
 
         paella.loadManifest()
             .then(() => {

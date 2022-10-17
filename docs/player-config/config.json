@@ -18,7 +18,27 @@
         "showRemainingProgress": true
     },
 
+    "cookieConsent": [
+        {
+            "type": "necessary",
+            "title": "Necessary",
+            "description": "",
+            "required": true
+        },
+        {
+            "type": "analytical",
+            "title": "Analytical",
+            "description": "",
+            "required": false
+        }
+    ],
+
     "plugins": {
+        "es.upv.paella.matomo": {
+            "enabled": true,
+            "cookieConsent": "tracking"
+        },
+
         "es.upv.paella.singleVideo": {
             "enabled": true,
             "validContent": [

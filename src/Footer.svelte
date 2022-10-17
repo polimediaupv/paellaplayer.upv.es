@@ -1,10 +1,18 @@
 <script>
 
+    export let onUpdateCookies;
+
+    function updateCookies() {
+        if (onUpdateCookies) {
+            onUpdateCookies();
+        }
+    }
 </script>
 
 <div class="container footer">
     <div class="footerText">Supported by:</div>
     <a href="http://www.upv.es" class="upvlogo"><img src="img/upvlogo.png" alt="upvlogo" class="sponsorLogo"></a>
+    <button on:click={updateCookies}>Update cookie settings</button>
 </div>
 
 <style>
