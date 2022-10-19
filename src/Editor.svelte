@@ -7,7 +7,6 @@
     let editorContainer = null;
 
     export let text = ""
-    export let height = "auto";
     export let language = "json";
 
     let jar = null;
@@ -39,13 +38,14 @@
 
 </script>
 
-<div class="editor" style="max-height: {height}" bind:this={editorContainer}>{text}</div>
+<div class="editor" bind:this={editorContainer}>{text}</div>
 
 <style>
     .editor {
         min-height: 100px;
         border: 1px solid black;
         padding: 10px;
+        height: 50vh;
     }
 </style>
 
