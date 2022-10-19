@@ -26,8 +26,20 @@
             "required": true
         },
         {
-            "type": "analytical",
+            "type": "preferences",
+            "title": "Preferences",
+            "description": "",
+            "required": true
+        },
+        {
+            "type": "analytics",
             "title": "Analytical",
+            "description": "",
+            "required": false
+        },
+        {
+            "type": "marketing",
+            "title": "Marketing",
             "description": "",
             "required": false
         }
