@@ -6,6 +6,7 @@
     import getSlidePluginContext from 'paella-slide-plugins';
     import getZoomPluginContext from 'paella-zoom-plugin';
     import getUserTrackingPluginContext from 'paella-user-tracking';
+    import getLayoutPluginContext from 'paella-layout-plugins';
 
     // Customized icons
     import backwardIcon from './icons/backwardIcon.svg';
@@ -54,7 +55,8 @@
                 getBasicPluginContext(),
                 getSlidePluginContext(),
                 getZoomPluginContext(),
-                getUserTrackingPluginContext()
+                getUserTrackingPluginContext(),
+                getLayoutPluginContext()
             ],
 
             configResourcesUrl: 'player-config/',

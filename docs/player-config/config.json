@@ -90,7 +90,7 @@
                         "presentation",
                         "presenter"
                     ],
-                    "icon": "present-mode-3.svg",
+                    "icon": "present-mode-5.svg",
                     "title": "Presenter and presentation"
                 },
                 {
@@ -99,7 +99,7 @@
                         "presenter-2",
                         "presentation"
                     ],
-                    "icon": "present-mode-3.svg",
+                    "icon": "present-mode-5.svg",
                     "title": "Presenter and presentation"
                 },
                 {
@@ -108,8 +108,42 @@
                         "presenter",
                         "presenter-2"
                     ],
-                    "icon": "present-mode-3.svg",
+                    "icon": "present-mode-5.svg",
                     "title": "Presenter and presentation"
+                }
+            ]
+        },
+
+        "es.upv.paella.dualVideoSideBySide": {
+            "enabled": true,
+            "cookieType": "preferences",
+            "validContent": [
+                {
+                    "id": "presenter-presentation-sbs",
+                    "content": [
+                        "presentation",
+                        "presenter"
+                    ],
+                    "icon": "present-mode-3.svg",
+                    "title": "Presenter and presentation side by side"
+                },
+                {
+                    "id": "presenter-2-presentation-sbs",
+                    "content": [
+                        "presenter-2",
+                        "presentation"
+                    ],
+                    "icon": "present-mode-3.svg",
+                    "title": "Presenter and presentation side by side"
+                },
+                {
+                    "id": "presenter-presenter-2-sbs",
+                    "content": [
+                        "presenter",
+                        "presenter-2"
+                    ],
+                    "icon": "present-mode-3.svg",
+                    "title": "Presenter and presentation side by side"
                 }
             ]
         },
