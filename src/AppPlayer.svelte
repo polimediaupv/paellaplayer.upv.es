@@ -48,7 +48,7 @@
 
 <GoogleAnalytics 
 	bind:this={ga}
-	properties={[ 'UA-26470475-6' ]}
+	properties={[ 'G-WR4KH5R0SN' ]}
 	enabled={false} />
 
 <Player {videoId} ></Player>

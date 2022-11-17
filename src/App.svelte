@@ -36,7 +36,7 @@
 
 	let ga = null;
 	let cookiesMessage = true;
-	const gaMeasurementId = 'UA-26470475-6';
+	const gaMeasurementId = 'G-WR4KH5R0SN';
 
 	function enableAnalytics() {
 		ga.init();
