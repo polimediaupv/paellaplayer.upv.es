@@ -216,10 +216,15 @@
 
         "es.upv.paella.audioVideoFormat": {
             "enabled": true,
-            "order": 3
+            "order": 4
         },
 
         "es.upv.paella.imageVideoFormat": {
+            "enabled": true,
+            "order": 3
+        },
+
+        "es.upv.paella.htmlVideoFormat": {
             "enabled": true,
             "order": 2
         },
