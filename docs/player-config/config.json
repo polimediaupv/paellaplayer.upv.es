@@ -5,8 +5,18 @@
     "logLevel": "INFO",
 
     "videoContainer": {
-        "overPlaybackBar": false
+        "overPlaybackBar": true,
+
+        "restorePlaybackRate": true,
+        "restoreVolume": true,
+        "restoreLastTime": {
+            "enabled": true,
+            "remainingSeconds": 5
+        },
+
+        "cookieConsentType": "necessary"
     },
+
 
     "progressIndicator": {
         "showTotal": true,
