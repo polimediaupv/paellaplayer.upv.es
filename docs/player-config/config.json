@@ -31,6 +31,18 @@
         }
     },
 
+    "buttonGroups": [
+        {
+            "enabled": true,
+            "groupName": "optionsContainer",
+            "description": "Options",
+            "icon": "settings-icon.svg",
+            "order": 4,
+            "side": "right",
+            "tabIndex": 10,
+            "parentContainer": "playbackBar"
+        }
+    ],
 
     "progressIndicator": {
         "showTotal": true,
@@ -294,7 +306,7 @@
             "enabled": true,
             "side": "left",
             "order": 3,
-            "parentContainer": "playbackBar",
+            "parentContainer": "optionsContainer",
             "rates": [
                 0.75,
                 1,
@@ -354,13 +366,14 @@
 
         "es.upv.paella.captionsSelectorPlugin": {
             "enabled": true,
-            "side": "right"
+            "side": "right",
+            "parentContainer": "optionsContainer"
         },
 
         "es.upv.paella.qualitySelector": {
             "enabled": true,
             "side": "right",
-            "parentContainer": "playbackBar",
+            "parentContainer": "optionsContainer",
             "menuTitle": "Select quality"
         },
 
@@ -392,7 +405,8 @@
             "order": 80,
             "description": "Keyboard Shortcuts",
             "side": "right",
-            "menuTitle": "Keyboard Shortcuts"
+            "menuTitle": "Keyboard Shortcuts",
+            "parentContainer": "optionsContainer"
         },
 
         "es.upv.paella.userEventTracker": {
@@ -420,7 +434,8 @@
         "es.upv.paella.findCaptionsPlugin": {
             "enabled": true,
             "side": "right",
-            "description": "Search in captions"
+            "description": "Search in captions",
+            "parentContainer": "optionsContainer"
         },
 
         "es.upv.paella.slideMapProgressBarPlugin": {

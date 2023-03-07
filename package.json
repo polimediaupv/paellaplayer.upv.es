@@ -26,8 +26,8 @@
   "dependencies": {
     "@beyonk/svelte-google-analytics": "^2.2.0",
     "@rollup/plugin-json": "^4.1.0",
-    "paella-core": "^1.19.0",
-    "paella-basic-plugins": "^1.18.0",
+    "paella-core": "^1.22.0",
+    "paella-basic-plugins": "^1.22.0",
     "paella-slide-plugins": "^1.8.0",
     "paella-user-tracking": "^1.5.0",
     "paella-zoom-plugin": "^1.2.0",
