@@ -4,6 +4,10 @@
     "defaultLayout": "presenter-presentation",
     "logLevel": "INFO",
 
+    "accessibility": {
+        "clickWithSpacebar": false
+    },
+
     "preferences": {
         "currentSource": "cookie",
         "sources": {
