@@ -21,7 +21,7 @@
     },
 
     "videoContainer": {
-        "overPlaybackBar": true,
+        "overPlaybackBar": false,
 
         "restorePlaybackRate": true,
         "restoreVolume": true,
@@ -501,6 +501,15 @@
             ],
             "side": "left",
             "order": 0
+        },
+
+        "es.upv.paella.liveStreamingProgressIndicator": {
+            "enabled": true,
+            "layer": "foreground",
+            "side": "left",
+            "margin": 10,
+            "textColor": "#AA0000",
+            "circleColor": "#FF0000"
         }
     }
 }

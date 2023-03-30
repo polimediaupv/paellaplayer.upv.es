@@ -45,9 +45,9 @@
                 "id": "hls-multiaudio-smil-1"
             },
             {
-                "name": "Low latency HLS",
+                "name": "HLS live stream",
                 "description": "",
-                "id": "ll-hls",
+                "id": "hls-live",
                 "disabled": true
             }
         ]
