@@ -14,6 +14,7 @@ Our reference player uses the base paella-core library, and a number of extra li
 - paella-zoom-plugin (%VERSION(paella-zoom-plugin)%): allows you to zoom into the video ([git](https://github.com/polimediaupv/paella-zoom-plugin), [npm](https://www.npmjs.com/package/paella-zoom-plugin)).
 - paella-user-tracking (%VERSION(paella-user-tracking)%): integration with usage analysis tools ([git](https://github.com/polimediaupv/paella-user-tracking), [npm](https://www.npmjs.com/package/paella-user-tracking)).
 - paella-layout-plugins (%VERSION(paella-layout-plugins)%): Extra video layout plugins ([git](https://github.com/polimediaupv/paella-layout-plugins), [npm](https://www.npmjs.com/package/paella-layout-plugins)).
+- paella-webgl-plugins (%VERSION(paella-webgl-plugins)%): Canvas plugins that use WebGL to display video, e.g. Video360CanvasPlugin ([git](https://github.com/polimediaupv/paella-webgl-plugins), [npm](https://www.npmjs.com/package/paella-webgl-plugins)).
 
 You can get each of these libraries with npm
 
