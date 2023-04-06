@@ -19,7 +19,7 @@ Our reference player uses the base paella-core library, and a number of extra li
 You can get each of these libraries with npm
 
 ```sh
-npm install --save paella-core paella-basic-plugins paella-slide-plugins paella-zoom-plugin paella-user-tracking
+npm install --save paella-core paella-basic-plugins paella-slide-plugins paella-zoom-plugin paella-user-tracking paella-layout-plugins paella-webgl-plugins
 ```
 
 See the documentation to learn how to use `paella-core` and the plugin libraries.

@@ -22,6 +22,11 @@
                 "name": "WebVTT captions",
                 "description": "",
                 "id": "webvtt-captions"
+            },
+            {
+                "name": "Video 360",
+                "description": "",
+                "id": "video-360"
             }
         ]
     },

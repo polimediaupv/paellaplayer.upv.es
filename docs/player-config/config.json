@@ -94,7 +94,9 @@
         "es.upv.paella.singleVideo": {
             "enabled": true,
             "dualVideoContentIds": [
-                "presenter-presentation-sbs"
+                "presenter-presentation-dynamic",
+                "presenter-2-presentation-dynamic",
+                "presenter-presenter-2-dynamic"
             ],
             "validContent": [
                 {
@@ -126,7 +128,7 @@
         },
 
         "es.upv.paella.dualVideo": {
-            "enabled": true,
+            "enabled": false,
             "validContent": [
                 {
                     "id": "presenter-presentation",
@@ -160,7 +162,7 @@
         },
 
         "es.upv.paella.dualVideoSideBySide": {
-            "enabled": true,
+            "enabled": false,
             "cookieType": "preferences",
             "validContent": [
                 {
@@ -202,6 +204,24 @@
                 { "id": "presenter-presenter-2-dynamic", "content": ["presenter","presenter-2"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" }
             ],
             "tabIndexStart": 200
+        },
+
+        "es.upv.paella.dualVideoPiP": {
+            "enabled": true,
+            "validContent": [
+                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
+                { "id": "presenter-2-presentation-pip", "content": ["presenter-2","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
+                { "id": "presenter-presenter-2-pip", "content": ["presenter","presenter-2"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation-dynamic",
+                "presenter-2-presentation-dynamic",
+                "presenter-presenter-2-dynamic",
+                "presenter-presentation",
+                "presenter-2-presentation",
+                "presenter-presenter-2"
+            ],
+            "tabIndexStart": 20
         },
 
         "es.upv.paella.tripleVideo": {
@@ -397,6 +417,15 @@
         "es.upv.paella.videoCanvas": {
             "enabled": true,
             "order": 1
+        },
+
+        "es.upv.paella.video360Canvas": {
+            "enabled": true,
+            "order": 1,
+            "maxZoom": 2,
+            "minZoom": 0.5,
+            "speedX": 0.4,
+            "speedY": 0.4
         },
 
         "es.upv.paella.audioCanvas": {

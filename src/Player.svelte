@@ -7,6 +7,7 @@
     import getZoomPluginContext from 'paella-zoom-plugin';
     import getUserTrackingPluginContext from 'paella-user-tracking';
     import getLayoutPluginContext from 'paella-layout-plugins';
+    import getWebGLPluginContext from 'paella-webgl-plugins';
 
     // Customized icons
     import backwardIcon from './icons/backwardIcon.svg';
@@ -56,7 +57,8 @@
                 getSlidePluginContext(),
                 getZoomPluginContext(),
                 getUserTrackingPluginContext(),
-                getLayoutPluginContext()
+                getLayoutPluginContext(),
+                getWebGLPluginContext()
             ],
 
             configResourcesUrl: 'player-config/',
@@ -160,6 +162,6 @@
 
 <style>
     div.player-container {
-        min-height: 500px;
+        min-height: 438px;
     }
 </style>
