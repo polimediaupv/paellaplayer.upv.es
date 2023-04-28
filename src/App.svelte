@@ -88,7 +88,7 @@
 
 <Menu />
 <main>
-	<section class="container">
+	<section class="section-container">
 		<Router {routes}/>
 	</section>
 	<Footer onUpdateCookies={updateCookies}/>
