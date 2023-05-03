@@ -163,5 +163,6 @@
 <style>
     div.player-container {
         min-height: 438px;
+        user-select: none;
     }
 </style>

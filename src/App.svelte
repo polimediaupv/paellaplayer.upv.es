@@ -111,7 +111,6 @@
 <style>	
 	main {
 		margin-top: -20px;
-		user-select: none;
 	}
 
 	section {
