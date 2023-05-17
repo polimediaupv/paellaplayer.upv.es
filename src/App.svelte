@@ -11,6 +11,7 @@
 	import DemosSinglePage from './DemosSinglePage.svelte';
 	import Contributions from './Contributions.svelte';
 	import Playground from './Playground.svelte';
+	import Skin from './Skin.svelte';
 	
 	import { getCookieConsentData, isConsentSaved, setCookieConsentData, clearConsentData } from './cookies';
 
@@ -31,6 +32,7 @@
 		'/doc/:id': Doc,
 		'/demos-all': DemosSinglePage,
 		'/playground': Playground,
+		'/skin': Skin,
 		'*': NotFound
 	}
 

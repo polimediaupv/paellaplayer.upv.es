@@ -48,7 +48,7 @@
         await paella.reload();
     }
 
-    let paella = null;
+    export let paella = null;
 
     onMount(async () => {
         const initParams = {
