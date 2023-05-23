@@ -200,9 +200,9 @@
         "es.upv.paella.dualVideoPiP": {
             "enabled": true,
             "validContent": [
-                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
-                { "id": "presenter-2-presentation-pip", "content": ["presenter-2","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
-                { "id": "presenter-presenter-2-pip", "content": ["presenter","presenter-2"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" }
+                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "present-mode-5.svg", "title": "Presenter and presentation" },
+                { "id": "presenter-2-presentation-pip", "content": ["presenter-2","presentation"], "icon": "present-mode-5.svg", "title": "Presenter and presentation" },
+                { "id": "presenter-presenter-2-pip", "content": ["presenter","presenter-2"], "icon": "present-mode-5.svg", "title": "Presenter and presentation" }
             ],
             "dualVideoContentIds": [
                 "presenter-presentation-dynamic",

@@ -14,7 +14,7 @@
     let skinStyle = "";
     let icons = [
         {
-            plugin: "es.upv.paellaplayer.playPauseButton",
+            plugin: "es.upv.paella.playPauseButton",
             identifier: "play",
             icon: 
 `<svg width="16" height="20" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +22,7 @@
 </svg>`
         },
         {
-            plugin: "es.upv.paellaplayer.playPauseButton",
+            plugin: "es.upv.paella.playPauseButton",
             identifier: "pause",
             icon:
 `<svg width="100%" height="100%" viewBox="0 0 24 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -40,26 +40,98 @@
     let paella;
     let reloadPlayer;
 
-    async function loadSkin() {
+    let requestedIcons = [];
+    let requestedPluginIds = [];
+    let requestedIconNames = [];
+    let selectedPluginId = "";
+    let selectedIconName = "";
+    let selectedIcon = "";
+
+    function getSkin() {
         const skin = {
             styleSheets: [
-                skinStyle
             ],
             configOverrides: JSON.parse(skinConfig),
             icons
         }
-        console.log(paella);
-        console.log(skin);
-        await paella.skin.loadSkin(skin);
-        reloadPlayer();
+        if (!/^[\s\n]*$/.test(skinStyle) ) {
+            skin.styleSheets.push(skinStyle);
+        }
+        return skin;
     }
+
+    async function loadSkin() {
+        const skin = getSkin();
+        reloadPlayer(skin);
+    }
+
+    function selectIconImage(icon) {
+        const input = document.createElement('input');
+        input.type = "file";
+        input.accept = "image/svg";
+        input.onchange = async (evt) => {
+            const file = evt.target.files[0];
+            if (icon !== null) {
+                icon.icon = await file.text();
+                icons = icons;
+            }
+            else {
+                selectedIcon = await file.text();
+            }
+        }
+        input.click();
+    }
+
+    function addIcon() {
+        icons = [{
+            plugin: selectedPluginId,
+            identifier: selectedIconName,
+            icon: selectedIcon
+        }, ...icons];
+        selectedIconName = "";
+        selectedIcon = "";
+    }
+
+    function reloadIcons() {
+        requestedIcons = paella.requestedCustomIcons;
+        const ids = [];
+        requestedPluginIds = requestedIcons.filter(iconData => {
+            if (ids.indexOf(iconData.pluginName) === -1) {
+                ids.push(iconData.pluginName);
+                return true;
+            }
+        }).map(({ pluginName }) => pluginName);
+        console.log(requestedPluginIds);
+    }
+
+    function loadIconNames(evt) {
+        selectedPluginId = evt.target.value;
+        requestedIconNames = requestedIcons.filter(iconData => iconData.pluginName === selectedPluginId)
+            .map(({iconName}) => iconName);
+    }
+
+    function downloadSkin() {
+        const blob = new Blob([JSON.stringify(getSkin(),"","\t")], {type:'application/json'});
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = "skin.json";
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+
+    onMount(() => {
+        paella.bindEvent(paella.Events.LOADED, () => {
+            reloadIcons();    
+        })
+    })
 
 </script>
 
 <SvelteMarkdown {source}></SvelteMarkdown>
 
 <section class="player-section">
-    <Player {videoId} {config} bind:paella={paella} bind:reloadPlayer={reloadPlayer}></Player>
+    <Player {videoId} {config} bind:paella={paella} bind:reloadPlayer={reloadPlayer} autoplay={true}></Player>
 </section>
 
 <section class="editor-section">
@@ -71,10 +143,11 @@
             <button on:click={() => tabPage = 'style'}>Style sheet</button>
         </li>
         <li class="{ tabPage === 'icons' ? 'current' : ''}">
-            <button on:click={() => tabPage = 'icons'}>Icons</button>
+            <button on:click={() => { tabPage = 'icons'; reloadIcons(); }}>Icons</button>
         </li>
         <li class="tools">
-            <button on:click={() => loadSkin()}>Load Skin</button>
+            <button on:click={() => loadSkin() }>Reload Skin</button>
+            <button on:click={() => downloadSkin() }>Download Skin File</button>
         </li>
     </ul>
     {#if tabPage === 'config'}
@@ -87,26 +160,58 @@
         </div>
     {:else if tabPage === 'icons'}
         <div class="editor-icon-page">
-            {#each icons as icon, i}
+            <div>
+                <h2>Add new custom icon</h2>
                 <div>
                     <label>
-                        Identifier:
-                        <input name={`identifier_${ i }`} type="text" bind:value={icon.plugin}/>
+                        Plugin identifier:
+                        <select value={selectedPluginId} on:change={(evt) => loadIconNames(evt) }>
+                            {#each requestedPluginIds as pluginId}
+                                <option value={pluginId}>{pluginId}</option>
+                            {/each}
+                        </select>
                     </label>
-                </div>
-                <div>
                     <label>
-                        Name:
-                        <input name={`name_${ i }`} type="text" bind:value={icon.identifier}/>
+                        Icon identifier:
+                        <select value={selectedIconName} on:change={evt => selectedIconName = evt.target.value}>
+                            {#each requestedIconNames as iconName}
+                                <option value={iconName}>{iconName}</option>
+                            {/each}
+                        </select>
                     </label>
+                    <i class="icon-preview">{@html selectedIcon}</i>
+                    <button on:click={async () => await selectIconImage(null)}>Pick SVG Image</button>
+                    <button on:click={() => addIcon()}>Add Custom Icon</button>
                 </div>
-                <div>
-                    <label>
-                        Icon SVG:
-                        <Editor class="editor-container" height="100px" bind:text={icon.icon} language="html"></Editor>
-                    </label>
+            </div>
+            <div>
+                <h2>Custom icons added</h2>
+                <div class="added-skin-icons">
+                    {#each icons as icon, i}
+                        <div class="skin-icon">
+                            <div>
+                                <label>
+                                    <span>Identifier:</span>
+                                    <input name={`identifier_${ i }`} type="text" bind:value={icon.plugin}/>
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <span>Name:</span>
+                                    <input name={`name_${ i }`} type="text" bind:value={icon.identifier}/>
+                                </label>
+                            </div>
+                            <div class="icon-actions">
+                                <label>
+                                    <i class="icon-preview">{@html icon.icon}</i>
+                                    <button on:click={async () => await selectIconImage(icon)}>Select Icon</button>
+                                </label>
+                                <button class="remove-icon-button">Remove</button>
+                            </div>
+                        </div>
+                    {/each}
                 </div>
-            {/each}
+            </div>
         </div>
     {/if}
 </section>
@@ -168,6 +273,60 @@
         padding-top: 5px;
         padding-bottom: 5px;
         padding-left: 20px;
+    }
+
+    .editor-icon-page {
+        border: 1px solid black;
+        padding: 20px;
+    }
+
+    .added-skin-icons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .skin-icon {
+        width: 30%;
+        border: 1px solid black;
+        border-radius: 7px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .skin-icon label span {
+        display: inline-block;
+        width: 30%;
+        text-align: right;
+    }
+
+    .skin-icon label input {
+        width: 60%;
+    }
+    .icon-actions {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .icon-actions button {
+        height: 30px;
+    }
+
+    i.icon-preview {
+        display: block;
+        width: 65px;
+        height: 65px;
+        padding: 10px;
+        border: 1px dotted gray;
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
+    :global(i.icon-preview svg) {
+        width: 100%;
+        height: 100%;
     }
 
 </style>

@@ -35,6 +35,8 @@
     export let config;
     export let manifest;
 
+    export let autoplay = false;
+
     export const cancelLoad = (nextVideoId) => {
         if (paella && (paella.state === PlayerState.LOADING_MANIFEST || paella.state === PlayerState.LOADING_PLAYER)) {
             // To break a player load, the only option is to reload the page
@@ -44,8 +46,13 @@
         }
     }
 
-    export const reloadPlayer = async () => {
-        await paella.reload();
+    export const reloadPlayer = async (skinObject = null) => {
+        if (skinObject) {
+            await paella.skin.loadSkin(skinObject);
+        }
+        else {
+            await paella.reload();
+        }
     }
 
     export let paella = null;
@@ -129,6 +136,16 @@
                 paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMuteIcon",volumeMuteIcon);
 
                 utils.loadStyle('./paella_player_styles.css');
+
+                if (autoplay) {
+                    return paella.load();
+                }
+                else {
+                    return Promise.resolve();
+                }
+            })
+            .then(() => {
+
             })
             .catch(err => console.error(err));
 
