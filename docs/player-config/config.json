@@ -92,6 +92,42 @@
         },
 
         "es.upv.paella.singleVideo": {
+            "enabled": false,
+            "dualVideoContentIds": [
+                "presenter-presentation-dynamic",
+                "presenter-2-presentation-dynamic",
+                "presenter-presenter-2-dynamic"
+            ],
+            "validContent": [
+                {
+                    "id": "presenter",
+                    "content": [
+                        "presenter"
+                    ],
+                    "icon": "present-mode-2.svg",
+                    "title": "Presenter"
+                },
+                {
+                    "id": "presentation",
+                    "content": [
+                        "presentation"
+                    ],
+                    "icon": "present-mode-1.svg",
+                    "title": "Presentation"
+                },
+                {
+                    "id": "presenter-2",
+                    "content": [
+                        "presenter-2"
+                    ],
+                    "icon": "present-mode-1.svg",
+                    "title": "Presentation"
+                }
+            ],
+            "tabIndexStart": 200
+        },
+
+        "es.upv.paella.singleVideoDynamic": {
             "enabled": true,
             "dualVideoContentIds": [
                 "presenter-presentation-dynamic",

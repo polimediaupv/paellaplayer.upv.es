@@ -27,6 +27,16 @@
                 "name": "Video 360",
                 "description": "",
                 "id": "video-360"
+            },
+            {
+                "name": "Portrait video",
+                "description": "",
+                "id": "portrait"
+            },
+            {
+                "name": "Portrait dual video",
+                "description": "",
+                "id": "portrait-dual"
             }
         ]
     },
