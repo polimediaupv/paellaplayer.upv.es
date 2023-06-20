@@ -24,6 +24,11 @@
                 "id": "webvtt-captions"
             },
             {
+                "name": "DFXP captions",
+                "description": "",
+                "id": "dfxp-captions"
+            },
+            {
                 "name": "Video 360",
                 "description": "",
                 "id": "video-360"

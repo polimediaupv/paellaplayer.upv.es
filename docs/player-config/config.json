@@ -482,6 +482,10 @@
             "enabled": true
         },
 
+        "es.upv.paella.dfxpManifestCaptionsPlugin": {
+            "enabled": true
+        },
+
         "es.upv.paella.hlsCaptionsPlugin": {
             "enabled": true
         },
@@ -531,7 +535,12 @@
             "enabled": true,
             "side": "right",
             "description": "Search in captions",
-            "parentContainer": "optionsContainer"
+            "parentContainer": "optionsContainer",
+            "resizeable": true,
+            "closeActions": {
+                "closeButton": true,
+                "clickOutside": false
+            }
         },
 
         "es.upv.paella.slideMapProgressBarPlugin": {
