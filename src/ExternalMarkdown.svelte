@@ -4,6 +4,7 @@
     
     export let site;
     export let section;
+    export let folder;
 
     let htmlText = "";
     
@@ -15,7 +16,7 @@
             const mdText = await response.text();
 
             const linkRE = /\[(.+)\]\(((?!http).+)\)/ig;
-            const links = mdText.replace(linkRE,`[$1](#/${section}/$2)`);
+            const links = folder ? mdText.replace(linkRE,`[$1](#/${section}/${folder}/$2)`) : mdText.replace(linkRE,`[$1](#/${section}/$2)`);
             
             htmlText = converter.makeHtml(links);
         }

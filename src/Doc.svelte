@@ -10,7 +10,8 @@
     const prefix = "https://raw.githubusercontent.com/polimediaupv/paella-core/main/doc/"
     
     let page = params.id;
-    let site = prefix + page;
+    let folder = params.folder;
+    let site = folder ? `${prefix}${folder}/${page}` : `${prefix}${page}`;
     let section = "doc"
 
     onMount(() => {
@@ -28,7 +29,7 @@
     <SvelteMarkdown {source}></SvelteMarkdown>
 {/if}
 
-<ExternalMarkdown {site} {section}></ExternalMarkdown>
+<ExternalMarkdown {site} {section} {folder}></ExternalMarkdown>
 
 <p>This documentation is generated from the <a href="https://github.com/polimediaupv/paella-core/tree/main/doc" target="__blank">paella-core repository at GitHub</a>.</p>
 

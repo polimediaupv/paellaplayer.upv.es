@@ -30,6 +30,8 @@
 		'/demos/:id': Demos,
 		'/contributions': Contributions,
 		'/doc/:id': Doc,
+		'/doc/:folder/:id': Doc,
+		'/doc/*/../:id': Doc,
 		'/demos-all': DemosSinglePage,
 		'/playground': Playground,
 		'/skin': Skin,
