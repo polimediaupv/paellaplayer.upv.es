@@ -31,6 +31,10 @@ body {
 	}
 }
 
+img {
+	max-width: 100%;
+}
+
 code.javascript,.json,.sh,.js,.css,.html,.xml,.svelte,.yml,.m3u8 {
 	overflow: auto;
 	width: 100%;
