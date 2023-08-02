@@ -225,6 +225,7 @@
         padding: 20px;
     }
 
+    /*
     .error-output-section {
         padding: 20px;
     }
@@ -232,6 +233,7 @@
     .error-output {
         color: red;
     }
+    */
 
     .editor-section ul {
         display: flex;
@@ -266,6 +268,7 @@
         background-color: red;
     }
 
+    /*
     .tab-tools-container {
         background-color: #4c4c4c;
         border: 1px solid black;
@@ -273,7 +276,7 @@
         padding-top: 5px;
         padding-bottom: 5px;
         padding-left: 20px;
-    }
+    }*/
 
     .editor-icon-page {
         border: 1px solid black;

@@ -29,7 +29,9 @@
     <SvelteMarkdown {source}></SvelteMarkdown>
 {/if}
 
-<ExternalMarkdown {site} {section} {folder}></ExternalMarkdown>
+<article class="documentation">
+    <ExternalMarkdown {site} {section} {folder}></ExternalMarkdown>
+</article>
 
 <p>This documentation is generated from the <a href="https://github.com/polimediaupv/paella-core/tree/main/doc" target="__blank">paella-core repository at GitHub</a>.</p>
 
