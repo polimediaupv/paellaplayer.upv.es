@@ -56,20 +56,25 @@
     }
 
     export let paella = null;
+    let nativePlayer = null;
 
     const checkNativePlayer = async () => {
         const container = document.getElementById(containerId);
         if (paella.streams.isNativelyPlayable && paella.streams.isAudioOnly) {
-            const player = paella.streams.nativePlayer;
-            player.setAttribute("controls","controls");
+            nativePlayer = paella.streams.nativePlayer;
+            nativePlayer.setAttribute("controls","controls");
             container.classList.add("native-player");
             container.innerHTML = "";
-            container.appendChild(player);
+            container.appendChild(nativePlayer);
             await paella.unload();
             return true;
         }
         else {
             container.classList.remove("native-player");
+            if (nativePlayer) {
+                container.removeChild(nativePlayer);
+                nativePlayer = null;
+            }
             return false;
         }
     }
