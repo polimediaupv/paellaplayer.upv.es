@@ -57,3 +57,17 @@ h1 {
 .captions-search-container .search-results {
 	max-height: 33vh;
 }
+
+.player-container {
+	min-height: 438px;
+	user-select: none;
+}
+
+.player-container.native-player {
+	min-height: auto;
+	height: auto;
+}
+
+.player-container.native-player audio {
+	width: 100%;
+}

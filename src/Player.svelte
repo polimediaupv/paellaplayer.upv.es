@@ -57,6 +57,23 @@
 
     export let paella = null;
 
+    const checkNativePlayer = async () => {
+        const container = document.getElementById(containerId);
+        if (paella.streams.isNativelyPlayable && paella.streams.isAudioOnly) {
+            const player = paella.streams.nativePlayer;
+            player.setAttribute("controls","controls");
+            container.classList.add("native-player");
+            container.innerHTML = "";
+            container.appendChild(player);
+            await paella.unload();
+            return true;
+        }
+        else {
+            container.classList.remove("native-player");
+            return false;
+        }
+    }
+
     onMount(async () => {
         const initParams = {
             customPluginContext: [
@@ -116,49 +133,49 @@
             paella.cookieConsent.updateConsentData();
         })
 
-        paella.loadManifest()
-            .then(() => {
-                paella.addCustomPluginIcon("es.upv.paella.backwardButtonPlugin","backwardIcon",backwardIcon);
-                paella.addCustomPluginIcon("es.upv.paella.captionsSelectorPlugin","captionsIcon",captionsIcon);
-                paella.addCustomPluginIcon("es.upv.paella.downloadsPlugin","downloadIcon",downloadIcon);
-                paella.addCustomPluginIcon("es.upv.paella.findCaptionsPlugin","findCaptionsIcon",findCaptionsIcon);
-                paella.addCustomPluginIcon("es.upv.paella.forwardButtonPlugin","forwardIcon",forwardIcon);
-                paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","fullscreenIcon",fullscreenIcon);
-                paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","windowedIcon",windowedIcon);
-                paella.addCustomPluginIcon("es.upv.paella.keyboardShortcutsHelp","keyboardIcon",keyboardIcon);
-                paella.addCustomPluginIcon("es.upv.paella.layoutSelector","layoutIcon",layoutIcon);
-                paella.addCustomPluginIcon("es.upv.paella.qualitySelector","screenIcon",screenIcon);
-                paella.addCustomPluginIcon("es.upv.paella.audioSelector","screenIcon",screenIcon);
-                paella.addCustomPluginIcon("es.upv.paella.frameControlButtonPlugin","photoIcon",slidesIcon);
-                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeHighIcon",volumeHighIcon);
-                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeLowIcon",volumeLowIcon);
-                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMidIcon",volumeMidIcon);
-                paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMuteIcon",volumeMuteIcon);
+        try {
+            await paella.loadManifest();
 
-                utils.loadStyle('./paella_player_styles.css');
+            paella.addCustomPluginIcon("es.upv.paella.backwardButtonPlugin","backwardIcon",backwardIcon);
+            paella.addCustomPluginIcon("es.upv.paella.captionsSelectorPlugin","captionsIcon",captionsIcon);
+            paella.addCustomPluginIcon("es.upv.paella.downloadsPlugin","downloadIcon",downloadIcon);
+            paella.addCustomPluginIcon("es.upv.paella.findCaptionsPlugin","findCaptionsIcon",findCaptionsIcon);
+            paella.addCustomPluginIcon("es.upv.paella.forwardButtonPlugin","forwardIcon",forwardIcon);
+            paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","fullscreenIcon",fullscreenIcon);
+            paella.addCustomPluginIcon("es.upv.paella.fullscreenButton","windowedIcon",windowedIcon);
+            paella.addCustomPluginIcon("es.upv.paella.keyboardShortcutsHelp","keyboardIcon",keyboardIcon);
+            paella.addCustomPluginIcon("es.upv.paella.layoutSelector","layoutIcon",layoutIcon);
+            paella.addCustomPluginIcon("es.upv.paella.qualitySelector","screenIcon",screenIcon);
+            paella.addCustomPluginIcon("es.upv.paella.audioSelector","screenIcon",screenIcon);
+            paella.addCustomPluginIcon("es.upv.paella.frameControlButtonPlugin","photoIcon",slidesIcon);
+            paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeHighIcon",volumeHighIcon);
+            paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeLowIcon",volumeLowIcon);
+            paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMidIcon",volumeMidIcon);
+            paella.addCustomPluginIcon("es.upv.paella.volumeButtonPlugin","volumeMuteIcon",volumeMuteIcon);
 
-                if (autoplay) {
-                    return paella.load();
-                }
-                else {
-                    return Promise.resolve();
-                }
-            })
-            .then(() => {
+            utils.loadStyle('./paella_player_styles.css');
 
-            })
-            .catch(err => console.error(err));
-
-        paella.bindEvent(Events.PLAY, () => {
-            if (typeof(onPlay) === "function") {
-                onPlay(paella);
+            if (autoplay) {
+                return paella.load();
             }
-        });
-    })
+
+            paella.bindEvent(Events.PLAY, () => {
+                if (typeof(onPlay) === "function") {
+                    onPlay(paella);
+                }
+            });
+            
+            await checkNativePlayer();
+        }
+        catch (err) {
+            console.error(err);
+        }
+    });
+
+        
 
     afterUpdate(async () => {
         setCookie('nextVideo',"");
-
         if (paella && paella.state === PlayerState.ERROR) {
             await paella.unload();
         }
@@ -168,18 +185,15 @@
         {
             await paella.unload();
             await paella.loadManifest();
+            await checkNativePlayer()
         }
         else if (paella && paella.state === PlayerState.UNLOADED) {
-            await paella.load();
+            await paella.loadManifest();
+            if (!await checkNativePlayer()) {
+                await paella.load();
+            }
         }
     })
 </script>
 
 <div id={containerId} class="player-container"></div>
-
-<style>
-    div.player-container {
-        min-height: 438px;
-        user-select: none;
-    }
-</style>
