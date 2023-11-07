@@ -69,11 +69,23 @@
                 "description": "",
                 "id": "hls-live",
                 "disabled": true
-            },
+            }
+            
+        ]
+    },
+    {
+        "title": "Live Streaming",
+        "id": "live",
+        "demos": [
             {
                 "name": "À Punt Live TV",
                 "description": "",
                 "id": "live_tv_a_punt"
+            },
+            {
+                "name": "UPV Radio",
+                "description": "",
+                "id": "live_upv_radio"
             }
         ]
     },

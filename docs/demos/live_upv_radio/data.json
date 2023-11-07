@@ -1,0 +1,25 @@
+{
+    "metadata": {
+        "title": "UPV Radio",
+        "preview": "https://media.upv.es/resources/streaming/3d309339-b9f8-4c26-8fc2-78c9a0b549b7/slides/radio-fondo-2019.jpg"
+    },
+    "streams": [
+        {
+            "sources": {
+                "hlsLive": [
+                    {
+                        "src": "https://streaming.upv.es/radioupv/onlineradio/playlist.m3u8",
+                        "mimetype": "video/mp4",
+                        "res": {
+                            "w": 1280,
+                            "h": 720
+                        },
+                        "isLiveStream": true
+                    }
+                ]
+            },
+            "content": "presenter"
+        }
+    ],
+    "frameList": []
+}
