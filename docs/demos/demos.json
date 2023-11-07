@@ -69,6 +69,11 @@
                 "description": "",
                 "id": "hls-live",
                 "disabled": true
+            },
+            {
+                "name": "À Punt Live TV",
+                "description": "",
+                "id": "live_tv_a_punt"
             }
         ]
     },
