@@ -28,7 +28,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "paella-core": "^1.46.1",
     "paella-basic-plugins": "^1.44.0",
-    "paella-slide-plugins": "^1.41.1",
+    "paella-slide-plugins": "^1.41.3",
     "paella-zoom-plugin": "^1.41.1",
     "paella-user-tracking": "^1.42.0",
     "paella-layout-plugins": "^1.41.0",
