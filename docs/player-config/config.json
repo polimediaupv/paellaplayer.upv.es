@@ -398,6 +398,11 @@
             "popUpType": "no-modal"
         },
 
+        "es.upv.paella.hlsCaptionsSelectorPlugin": {
+            "enabled": true,
+            "side": "right"
+        },
+
         "es.upv.paella.audioSelector": {
             "enabled": true,
             "side": "right",
