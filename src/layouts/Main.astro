@@ -1,0 +1,58 @@
+---
+import '@fontsource-variable/fredoka';
+import '@fontsource-variable/lexend';
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<h1>{title}</h1>
+        <slot />
+	</body>
+</html>
+
+<style is:global={true}>
+    :root {
+        --color-dark: #343434;
+        --color-darker: #262626;
+        --color-darkest: #1d1d1d;
+        --color-light: #e7e7e7;
+        --color-main: #e0ab1b;
+        --color-main-comp: #00a310;
+        --color-mid: #5c5c5c;
+        --color-sec-comp: #01860a;
+        --color-secondary: #624802;
+    }
+
+    body {
+        font-family: 'Lexend Variable', sans-serif;
+        font-size: 14px;
+        font-weight: 200;
+    }
+
+    h1 {
+        font-family: 'Fredoka Variable', sans-serif;
+        font-weight: 500;
+        font-size: 24px;
+        margin: 8px 0;
+    }
+
+    h2 {
+        margin: 8px 0;
+        font-family: 'Lexend Variable', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    p {
+        margin: 2px 0;
+    }
+</style>

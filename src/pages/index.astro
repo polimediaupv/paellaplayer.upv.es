@@ -1,0 +1,27 @@
+---
+import MainLayout from "@/layouts/Main.astro";
+import PaellaLogo from "@/icons/PaellaLogo.astro"
+
+---
+
+<MainLayout title={"Paella Player"}>
+	<h2><i><PaellaLogo solid={true} color="primary" /></i>The video player for lectures</h2>
+	<p>The Paella (pronounced paeja) Player is an Open Source JavaScript video player capable of playing an unlimited number of audio & video streams synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more. It is easy to install and customize for your own needs.</p>
+	
+</MainLayout>
+
+<style>
+	.paella-logo {
+		width: 44px;
+	}
+
+	h2 {
+		display: flex;
+		align-items: center;
+	}
+
+	i {
+		width: 44px;
+		display: block;
+	}
+</style>

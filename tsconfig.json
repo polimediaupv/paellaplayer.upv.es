@@ -1,0 +1,9 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".", // Esto permite que los alias de ruta sean relativos a este archivo tsconfig.json
+    "paths": {
+      "@/*": ["./src/*"] // Esto mapea "@" a la carpeta "src" en la raíz del proyecto
+    }
+  }
+}
