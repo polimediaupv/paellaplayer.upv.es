@@ -554,6 +554,7 @@
                 "mouseOut": "#0A0A0A",
                 "mouseHover": "#A9A9A9"
             },
+            "markStyle": "diamond",
             "markWidth": 3,
             "drawBackground": false
         },
