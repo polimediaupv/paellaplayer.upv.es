@@ -8,6 +8,7 @@
     import getUserTrackingPluginContext from 'paella-user-tracking';
     import getLayoutPluginContext from 'paella-layout-plugins';
     import getWebGLPluginContext from 'paella-webgl-plugins';
+    import getAIPluginContext from 'paella-ai-plugins';
 
     // Customized icons
     import backwardIcon from './icons/backwardIcon.svg';
@@ -87,7 +88,8 @@
                 getZoomPluginContext(),
                 getUserTrackingPluginContext(),
                 getLayoutPluginContext(),
-                getWebGLPluginContext()
+                getWebGLPluginContext(),
+                getAIPluginContext()
             ],
 
             configResourcesUrl: 'player-config/',

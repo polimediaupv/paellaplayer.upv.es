@@ -591,6 +591,25 @@
             "margin": 10,
             "textColor": "#AA0000",
             "circleColor": "#FF0000"
+        },
+
+        "es.upv.paella.aiToolsPopUpPlugin": {
+            "enabled": true,
+            "side": "right",
+            "chat": {
+                "enabled": false                
+            }
+        },
+        "es.upv.paella.aitools.fileDataPlugin": {
+            "enabled": true,
+            "context": ["aitools"],
+            "files": {
+                "summary": { "file": "aitools/summary.txt" },
+                "faq": { "file": "aitools/faq.md" },
+                "study_plan": { "file": "aitools/study_plan.md" },
+                "timeline": { "file": "aitools/timeline.md" },
+                "podcast": { "file": "aitools/podcast_script.json", "media": "aitools/podcast_audio.mp3" }
+            }
         }
     }
 }
