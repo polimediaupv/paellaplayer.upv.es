@@ -597,7 +597,7 @@
             "enabled": true,
             "side": "right",
             "chat": {
-                "enabled": false                
+                "enabled": true                
             }
         },
         "es.upv.paella.aitools.fileDataPlugin": {
