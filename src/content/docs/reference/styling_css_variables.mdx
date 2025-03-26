@@ -1,0 +1,173 @@
+---
+title: "Styling: CSS variables"
+description: A reference of the CSS variables we can use to style Paella Player
+---
+
+The general styles of Paella Player and its standard user interface components are defined in the `paella-core` library. They are designed in such a way that they can be customized mainly by modifying the values of a number of CSS variables. This makes it unnecessary to know the internal structure of the DOM tree. 
+
+In addition, the use of CSS variables to configure the appearance of the player makes it possible to make future changes to the DOM tree, while maintaining the compatibility of the modified CSS styles, as long as these changes are made only by modifying the CSS variables.
+
+## Player sizes
+
+Most sizes and margins can be controlled with CSS variables. To understand which variables to modify, the first thing to do is to understand the structure of the player containers. The player is divided into three main areas:
+
+![player container sizes](images/player-container-areas.webp)
+
+<ul>
+    <li><code style="color: #0099aa">player container</code>: is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document..</li>
+    is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document.
+    <li><code style="color: #ff5588">playback bar container</code>: the container that encompasses the playback bar and the pop-up display area, so it is divided into two parts vertically. The height of the lower part, which corresponds to the playback bar, depends on the final height of the playback bar, and this size in turn depends on the size of the elements that make up the playback bar.</li>
+    <li><code style="color: #0055ee">pop up wrapper</code>: the pop-up container is placed inside the upper part of the playbar container. In this area is where the pop ups are displayed, which can be aligned to the left, to the right or occupy the entire width of the container. In any case, the pop ups will always be displayed aligned to the bottom of the pop up wrapper container.</li>
+</ul>
+
+<blockquote>
+Note: The video can occupy the whole <span style="color: #0099aa">player container</span>, so that the playback bar is placed over it, or it can be placed on the top of the playback bar, which would correspond to the <span style="color: #ff5588">top area of the playback bar container</span>. This option is not controlled by CSS, but is configured in the player configuration file.
+</blockquote>
+
+These are the CSS properties that control the sizes of the containers in the above figure:
+
+![player container sizes](images/player-container-sizes.webp)
+
+- <code style="color: #ff5588">`--playback-bar-container-padding`</code>: is the padding that separates the playback bar container from the border of the video container.
+- <code style="color: #0055ee">`--popup-wrapper-padding`</code>: is the padding that separates the pop up wrapper from the playback bar container.
+- <code style="color: #ee7700">`--playback-bar-container-gap`</code>: is the gap left between the playbar area and the popup container.
+- <code style="color: #007744">`--playback-bar-width`</code>: is the width of the playback bar. If this size is changed, the playback bar will always be displayed centered.
+
+## Playback bar
+
+The playback bar is the main user interface element of Paella Player. It is the area where the user interacts with the buttons, and where the player displays the progress of the video.
+
+The playback bar is divided into two main areas: the <code style="color: #00aa33">progress indicator</code> area and the <code style="color:rgb(130, 0, 170)">buttons</code> area.
+
+We can control the padding of the buttons and the padding of the progress indicator with the following variables:
+
+- <code style="color: #00aa33">`--progress-indicator-padding`</code>: padding of the progress indicator area.
+- <code style="color:rgb(130, 0, 170)">`--playback-bar-buttons-padding`</code>: padding of the buttons area.
+
+In addition, the progress indicator is divided into two sections: the elapsed section and the remaining section. We can define the background color of each of these sections with the following variables:
+
+- <code style="color:rgb(17, 143, 227)">`--progress-indicator-completed-bg-color`</code>: background color of the elapsed section.
+- <code style="color:rgb(101, 101, 101)">`--progress-indicator-remaining-bg-color`</code>: background color of the remaining section.
+
+![playback bar 1](images/playback-bar-1.webp)
+
+### Slide markers
+
+The progress bar can be displayed in two different ways depending on the characteristics of the video. If the video has slide markers, the progress bar is displayed as follows:
+
+![playback bar 2](images/playback-bar-2.webp)
+
+In this case, each independent marker will have elapsed and remaining sections, which will be displayed or not depending on the progress of the video. In this case we can control the background color of these sections with two different variables, in case we want to differentiate the background color of the elapsed and remaining sections from the slide markers and the playback bar without markers:
+
+- <code style="color:rgb(17, 143, 227)">`--slide-marker-elapsed-color`</code>: background color of the elapsed section.
+- <code style="color:rgb(101, 101, 101)">`--slide-marker-remaining-color`</code>: background color of the remaining section.
+
+Note that a video will only display the playback bar in one of two ways, as whether or not a video has slide markers is a feature of the video, not the player or its state.
+
+If you want to set the same elapsed and remaining color for both progress bar display modes, simply change the value of `--progress-indicator-complete-bg-color` and `--progress-indicator-remaining-bg-color`, since the `--slide-marker-elapsed-color` and `--slide-marker-remaining-color` variables are initialized by default with the value of the first two.
+
+### Progress indicator sizes
+
+In the progress indicator we can control three sizes:
+
+- <code style="color:rgb(4, 144, 114)">`--progress-indicator-height`</code>: is the height of the progress indicator bar. If the video does not have slide marks, the size of the progress indicator will be defined by this variable.
+- <code style="color:rgb(0, 40, 170)">`--progress-indicator-slide-marker-height`</code>: is the height of the slide marker, which is displayed only when the mouse cursor is over the marker. If the cursor is not over the marker, the size it will be the size specified by `--progress-indicator-height`.
+- <code style="color:rgb(197, 132, 0)">`--slide-marker-gap`</code>: is the size of the gap between the slide markers.
+
+![playback bar 3](images/playback-bar-3.webp)
+
+
+### Button sizes
+
+TODO: Add the variables to control the size of the buttons.
+
+
+
+## **`:root`**
+
+### Basic
+
+**Colors:**
+
+- `--main-fg-color`: main foreground color.
+- `--main-bg-color`: main background color.
+- `--main-bg-color-hover`: background color for the `hover` state.
+- `--secondary-bg-color`: secondary background color.
+- `--secondary-bg-color-hover`: secondary background color for the `hover` state.
+- `--highlight-bg-color`: highlight background color, for example, one selected option in a menu.
+- `--highlight-bg-color-hover`: highlight background color for the `hover` state.
+- `--main-border-color`: main border color used in some elements. The default styles of Paella Player may not use any borders. To configure borders, refer to the elements that use them, for example, the playback bar.
+- `--main-outline-color`: main outline color for the input controls. This color is used in the input controls in `focus-visible` state.
+
+**Other:**
+
+- `--player-font-family`: Font family used in the player elements.
+- `--popup-backdrop-filter`: Backdrop filter used in the pop up elements, such as menus.
+- `--popup-backdrop-filter-hover`: Backdrop filter for the `hover` state.
+
+### Playback bar
+
+- `--playback-bar-width`: This is the width of the playback bar. The default is `100%`. If you reduce this size, the playback bar will remain centered at the bottom of the player.
+- `--playback-bar-radius`: The value of the `border-radius` property for the playbar.
+- `--playback-bar-container-padding`: This padding controls the separation between the playbar and the player border. It controls the padding of the UI container, so it can be used to control all padding, vertical and horizontal padding, or all four padding properties independently. Note, however, that the playbar is always placed aligned to the bottom edge of the window, so the top padding will never affect it.
+- `--playback-bar-border-color`
+- `--playback-bar-border-style`
+- `--playback-bar-border-width`
+- `--playback-bar-shadow`
+
+Example: floating playback bar with rounded borders:
+
+![rounded playback bar](images/floating-playback-bar.jpg)
+
+```css
+:root {
+    --playback-bar-width: calc(100% - 2 * var(--playback-bar-container-padding));
+    --playback-bar-radius: 10px;
+    --playback-bar-container-padding: 5px;
+    --playback-bar-border-color: var(--main-border-color);
+    --playback-bar-border-style: solid;
+    --playback-bar-border-width: 0;
+    --playback-bar-shadow: 0 0 5px 0 var(--main-border-color);
+}
+```
+
+### Playback Bar buttons
+
+- `--progress-indicator-font-size`
+- `--button-fixed-width`
+- `--button-fixed-height`
+- `--button-border-radius`
+- `--button-icon-size` por defecto es la mitad de --button-fixed-width
+- `--small-text-size`
+- `--medium-text-size`
+- `--large-text-size`
+
+## **`:playback-bar`**
+
+- `--playback-bar-buttons-padding`
+- `--playback-bar-gradient`
+- `--playback-bar-gradient-hover`
+- `--playback-bar-backdrop-filter`
+- `--playback-bar-backdrop-filter-hover`
+
+Example: black over white playback bar
+
+![Black over white playback bar](images/black-over-white-playback-bar.jpg)
+
+```css
+:root {
+    --highlight-bg-color: #61b2f9;
+    --highlight-bg-color-hover: #97c9f5;
+    --main-fg-color: rgb(54, 54, 54);
+    --main-bg-color: rgba(170, 170, 170, 0.923);
+    --main-bg-color: rgba(248, 248, 248, 0.78);
+    --secondary-bg-color: rgb(241, 241, 241);
+    --secodnary-bg-color-highlight: white;
+}
+
+.playback-bar {
+    --playback-bar-gradient: linear-gradient(0deg, rgb(255 255 255 / 70%) 0%, rgb(255 255 255 / 50%) 60%, rgb(255 255 255 / 0%) 100%);
+    --playback-bar-gradient-hover: linear-gradient(0deg, rgb(255 255 255 / 80%) 0%, rgb(255 255 255 / 80%) 0%);
+    --playback-bar-buttons-padding: 15px 15px;
+}
+```
