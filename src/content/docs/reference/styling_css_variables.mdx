@@ -14,10 +14,9 @@ Most sizes and margins can be controlled with CSS variables. To understand which
 ![player container sizes](images/player-container-areas.webp)
 
 <ul>
-    <li><code style="color: #0099aa">player container</code>: is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document..</li>
-    is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document.
+    <li><code style="color: #0099aa">player container</code>: is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document.</li>
     <li><code style="color: #ff5588">playback bar container</code>: the container that encompasses the playback bar and the pop-up display area, so it is divided into two parts vertically. The height of the lower part, which corresponds to the playback bar, depends on the final height of the playback bar, and this size in turn depends on the size of the elements that make up the playback bar.</li>
-    <li><code style="color: #0055ee">pop up wrapper</code>: the pop-up container is placed inside the upper part of the playbar container. In this area is where the pop ups are displayed, which can be aligned to the left, to the right or occupy the entire width of the container. In any case, the pop ups will always be displayed aligned to the bottom of the pop up wrapper container.</li>
+    <li><code style="color: #0055ee">pop up wrapper</code>: the pop-up container is placed inside the upper part of the playback bar container. In this area is where the pop ups are displayed, which can be aligned to the left, to the right or occupy the entire width of the container. In any case, the pop ups will always be displayed aligned to the bottom of the pop up wrapper container.</li>
 </ul>
 
 <blockquote>
@@ -28,9 +27,9 @@ These are the CSS properties that control the sizes of the containers in the abo
 
 ![player container sizes](images/player-container-sizes.webp)
 
-- <code style="color: #ff5588">`--playback-bar-container-padding`</code>: is the padding that separates the playback bar container from the border of the video container.
-- <code style="color: #0055ee">`--popup-wrapper-padding`</code>: is the padding that separates the pop up wrapper from the playback bar container.
-- <code style="color: #ee7700">`--playback-bar-container-gap`</code>: is the gap left between the playbar area and the popup container.
+- <code style="color: #ff5588">`--playback-bar-container-padding`</code>: is the padding that separates the playback bar container from the border of the video container. Internally, this variable is used as the value of the `padding` property of the video container, so it can be initialised with a general padding, a vertical and a horizontal padding or with a separate padding for each side.
+- <code style="color: #0055ee">`--popup-wrapper-padding`</code>: is the padding that separates the pop up wrapper from the playback bar container. As with the previous variable, the value of this variable is used as the padding of the pop-up container. In this case, the top padding will have no effect, because the pop ups are always aligned to the bottom and sides.
+- <code style="color: #ee7700">`--playback-bar-container-gap`</code>: is the gap left between the playbar area and the popup container. Internamentelly, the playback bar container is a flex container, so this variable is used as the value of the `gap` property of the playback bar container.
 - <code style="color: #007744">`--playback-bar-width`</code>: is the width of the playback bar. If this size is changed, the playback bar will always be displayed centered.
 
 ## Playback bar
@@ -43,6 +42,8 @@ We can control the padding of the buttons and the padding of the progress indica
 
 - <code style="color: #00aa33">`--progress-indicator-padding`</code>: padding of the progress indicator area.
 - <code style="color:rgb(130, 0, 170)">`--playback-bar-buttons-padding`</code>: padding of the buttons area.
+
+Both previous variables are used as the value of the `padding` property of the corresponding area, so we can specify a general padding, a vertical and a horizontal padding or a separate padding for each side.
 
 In addition, the progress indicator is divided into two sections: the elapsed section and the remaining section. We can define the background color of each of these sections with the following variables:
 
@@ -70,19 +71,81 @@ If you want to set the same elapsed and remaining color for both progress bar di
 
 In the progress indicator we can control three sizes:
 
-- <code style="color:rgb(4, 144, 114)">`--progress-indicator-height`</code>: is the height of the progress indicator bar. If the video does not have slide marks, the size of the progress indicator will be defined by this variable.
+- <code style="color:rgb(4, 144, 114)">`--progress-indicator-height`</code>: is the height of the progress indicator bar.
 - <code style="color:rgb(0, 40, 170)">`--progress-indicator-slide-marker-height`</code>: is the height of the slide marker, which is displayed only when the mouse cursor is over the marker. If the cursor is not over the marker, the size it will be the size specified by `--progress-indicator-height`.
 - <code style="color:rgb(197, 132, 0)">`--slide-marker-gap`</code>: is the size of the gap between the slide markers.
 
 ![playback bar 3](images/playback-bar-3.webp)
 
 
-### Button sizes
+### Other playback bar sizes
 
-TODO: Add the variables to control the size of the buttons.
+We can also control the size of the buttons in the playback bar, its icons, the font size and the border radius of the buttons and the playback bar itself.
 
 ![button plugin sizes](images/button-plugin-sizes.webp)
 
+- <code style="color:rgb(1, 156, 164)">`--playback-bar-border-radius`</code>: this variable is used as the value of the `border-radius` property of the playback bar, so you can set the same value for all corners or set a different value for each corner.
+- <code style="color:rgb(0, 51, 170)">`--button-fixed-width`</code>: is the width of the buttons in the playback bar. Depending on the configuration of each plugin, a button can have a fixed or variable width. This property only affects fixed-width buttons, hence the prefix `fixed`.
+- <code style="color: #008833">`--button-fixed-height`</code>: is the height of the buttons in the playback bar. The `fixed` prefix indicates that this size is related with the `--button-fixed-width` property, but the buttons can not have a non-fixed height.
+- <code>`--button-fixed-size`</code>The <code style="color:rgb(0, 51, 170)">`--button-fixed-width`</code> and <code style="color: #008833">`--button-fixed-height`</code> properties are initialized with this value. If you want to set the same size for both properties, you can use this variable.
+- <code style="color:rgb(116, 0, 170)">`--button-border-radius`</code>: is the border radius of the buttons in the playback bar. This variable is used as the value of the `border-radius` property of the buttons, so you can set the same value for all corners or set a different value for each corner. Note that, by default, the background color of the buttons is transparent, so the border radius will not be visible until you point the mouse cursor over the button.
+- <code>`--button-icon-size`</code>: is the size of the icons in the buttons. By default, this size is half the value of `--button-fixed-width`, but you can set it to any value you want.
+
+### Font sizes
+
+The playback bar can hold three different font sizes. When a plugin needs to display a text, it can use one of these three sizes. For example, the time indicator next to the volume control is a non-interactive `ButtonPlugin`, with variable width, and it displays the time using the medim font size. The quality selector and the playback rate plugins are interactive `ButtonPlugin`s, with fixed width, and they display the text using the small font size.
+
+![playback bar 4](images/playback-bar-4.webp)
+
+- `--small-text-size`: is the small font size.
+- `--medium-text-size`: is the medium font size.
+- `--large-text-size`: is the large font size.
+
+<blockquote>
+<strong>Note:</strong> The default values of the `--button-fixed-size` and the `--*-text-size` are defined using text font relative sizes, but if you change the size of the buttons, you'll probably need to change the font sizes as well.
+</blockquote>
+
+## Colors
+
+The colours of interface elements can be defined in a granular way (e.g. the background colour of a button) or in a global way. In the default `paella-core` styles there are a number of generic colours, which are then used as defaults in the other variables that control the colours in a granular way. Generally, it will be enough to modify the global colours, but if you need to modify a specific variable you can do that too.
+
+TODO:
+
+--button-color, --icon-color, --icon-fill-color, --icon-stroke-color, --button-background, --button-background-hover, --button-background-active
+
+### Set colors for a specific button
+
+It is also possible to specify specific colours for certain `ButtonPlugin` plugins (or their derivatives). Plugins of type `ButtonPlugin` initialise the `name` attribute of the button with the plugin identifier:
+
+```html
+<button type="button" name="es.upv.paella.playPauseButton" class="fixed-width" aria-label="play" title="play">
+    ...
+</button>
+```
+
+Therefore, you can specify the properties for a specific button using the following selectors:
+
+```css
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"] {
+    color: var(--highlight-bg-color);
+    background-color: var(--main-fg-color);
+
+    & svg {
+        fill: white;
+        stroke: white;
+    }
+}
+
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"]:hover {
+    background-color: var(--highlight-bg-color);
+}
+
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"]:active {
+    background-color: var(--highlight-bg-color-hover);
+}
+```
+
+Note that when specifying properties for a specific button, you cannot simply modify the values of CSS variables. In this case you will have to directly change the properties you want to modify. The properties that affect the colour of the buttons are the ones you saw in the example above: `color` and `background-color` on the button, and `fill` and `stroke` on the SVG it contains.
 
 
 ## **`:root`**
