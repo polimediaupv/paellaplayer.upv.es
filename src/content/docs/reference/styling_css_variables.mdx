@@ -107,15 +107,241 @@ The playback bar can hold three different font sizes. When a plugin needs to dis
 
 ## Colors
 
-The colours of interface elements can be defined in a granular way (e.g. the background colour of a button) or in a global way. In the default `paella-core` styles there are a number of generic colours, which are then used as defaults in the other variables that control the colours in a granular way. Generally, it will be enough to modify the global colours, but if you need to modify a specific variable you can do that too.
+The colors of interface elements can be defined in a granular way (e.g. the background colour of a button) or in a global way. In the default `paella-core` styles there are a number of generic colors, which are then used as defaults in the other variables that control the colors in a granular way. Generally, it will be enough to modify the global colors, but if you need to modify a specific variable you can do that too.
 
-TODO:
+### Global colors
 
---button-color, --icon-color, --icon-fill-color, --icon-stroke-color, --button-background, --button-background-hover, --button-background-active
+- `--main-fg-color`: main foreground color.
+- `--main-bg-color`: main background color. This color must have a certain contrast with the foreground color, so that the text is readable.
+- `--main-bg-color-hover`: background color for the `hover` state. As with the previous color, this color must have a certain contrast with the foreground color, so that the text is readable.
+- `--secondary-bg-color`: secondary background color. It should be a color similar to `--main-bg-color`, which should also have some contrast with the foreground color.
+- `--secondary-bg-color-hover`: secondary background color for the `hover` state.
+- `--highlight-bg-color`: highlight background color, for example, one selected option in a menu. This color should contrast with the main color, and should also stand out from the background color.
+- `--highlight-bg-color-hover`: highlight background color for the `hover` state.
+- `--main-border-color`: main border color used in some elements.
+- `--main-outline-color`: main outline color for the input controls. This color is used in the input controls in `focus-visible` state.
 
-### Set colors for a specific button
+<blockquote>
+    <strong>Note about SVG code:</strong> In order for `paella-core` to control how SVG icon colors are displayed, internally the fill and stroke colors are specified in the styles. This will only work if the SVG code of the icons does not include the fill and stroke colors explicitly. Also, if the SVG icon is designed to display a fill color but not a stroke color, the root of the image must include the `stroke:none` style attribute. The same applies if the icon is not intended to display a background color, in which case the image root must include the `fill:none` style attribute.
+</blockquote>
 
-It is also possible to specify specific colours for certain `ButtonPlugin` plugins (or their derivatives). Plugins of type `ButtonPlugin` initialise the `name` attribute of the button with the plugin identifier:
+### Specific colors
+
+- `--button-color`: It is the foreground color of the buttons. It is used in the icon and in the button text. By default this variable is initialized with `--main-fg-color`.
+- `--icon-color`: This is the color of the button icon. By default it is `--button-color`.
+- `--icon-fill-color`: Button icons using `paella-core` work by adding the `SVG` code to the DOM tree, and therefore it is possible to modify their fill and stroke color. The fill color is set with this variable. The default is `--icon-color`.
+- `--icon-stroke-color`: This is the stroke color of the button icons, which is initialized by default to `--icon-color`.
+- `--button-background`: This is the background color of the buttons. By default it is transparent, so that it does not interfere with the background color of your container.
+- `--button-background-hover`: Is the background color of the buttons in the `hover` state. By default it is `--highlight-bg-color`.
+- `--button-background-active`: Is the background color of the buttons in the `active` state. By default it is `--highlight-bg-color-hover`.
+
+### Gradients
+
+There are two color gradients that are used in the playback bar area, and they correspond to the gradient for the normal state and the `hover` state:
+
+- `--playback-bar-gradient`: is the gradient used in the playback bar area.
+- `--playback-bar-gradient-hover`: is the gradient used in the playback bar area in the `hover` state.
+
+
+## Timeline handler
+
+The timeline handler is the element that allows you to control the progress of the video. It is a draggable element that can be moved along the progress bar. The handler has three states: `normal`, `hover` and `active`. The `hover` state is when the mouse cursor is over the handler, and the `active` state is when the mouse button is pressed and the handler is being dragged.
+
+![Timeline handler](images/timeline-handler.webp)
+
+It is possible to control a lot of properties of the handler with CSS variables:
+
+- `--handler-size`: Is the size of the handler.
+- `--handler-height`: Is the height of the handler. By default it is initialized with the value of `--handler-size`.
+- `--handler-width`: Is the witdth of the handler. By default it is initialized with the value of `--handler-size`.
+- `--handler-transition-time`: This is the time interval it will take to modify the handler properties between one state and another (normal, hover or active).
+
+To control the appearance of the handler in the different states (normal, hover and active) we have the following variables, which by adding the suffix `-hover` or `-active` are applied to the corresponding states:
+
+- `--handler-scale`: To control the scale of the handler, the property `transform: scale(S)` is used. This variable controls the value of the `S` parameter. The variables for the hover and normal states are `--handler-scale-hover` and `--handler-scale-active`.
+- `--handler-color`: Is the color of the handler. The variables for the hover and normal states are: `--handler-color-active` and `--handler-color-hover`.
+- `--handler-shadow`: Is the shadow of the handler. The variables for the hover and normal states are: `--handler-shadow-hover` and `--handler-shadow-active`.
+- `--handler-radius`: This is the value of the `box-shadow` property of the handler. The variables for the hover and normal states are: `--handler-radius-hover` and `--handler-radius-active`.
+- `--handler-opacity`: This is the opacity of the handler. The variables for the hover and normal states are: `--handler-opacity-hover` and `--handler-opacity-active`.
+- `--handler-border`: This is the border of the handler. The variables for the hover and normal states are: `--handler-border-hover` and `--handler-border-active`.
+
+
+## Effects
+
+### Backdrop filter
+
+The pop up containers and the playback bar include a background effect for the normal and hover states. By default a blur is used, which is more intense in the hover state than in the normal state:
+
+- `--playback-bar-backdrop-filter`: Background filter of the playback bar area.
+- `--playback-bar-backdrop-filter-hover`: Background filter of the playback bar area in the `hover` state.
+- `--popup-backdrop-filter`: Background filter of the pop up windows.
+- `--popup-backdrop-filter-hover`: Background filter of the pop up windows in the `hover` state.
+
+### Shadows
+
+There are several elements that can have a shadow effect. In the default `paella-core` styles, some of these elements do not have the effect applied, but can be added via their corresponding CSS variable:
+
+- `--popup-box-shadow`: It is the value of the `box-shadow` property of pop up windows (e.g. menus).
+- `--playback-bar-shadow`: It is the value of the `box-shadow` property of the playback bar area.
+- `--handler-shadow`: It is the value of the `box-shadow` property for the progress indicator controller.
+- `--handler-shadow-hover`: It is the value of the `box-shadow` property for the progress indicator controller in the `hover` state.
+- `--handler-shadow-active`: It is the value of the `box-shadow` property for the progress indicator controller in the `active` state.
+- `--timeline-preview-box-shadow`: It is the value of the `box-shadow` property for the timeline preview area. This area is the container that displays the preview image and the time instant when we hover the mouse cursor over the timeline.
+
+## All CSS variables
+
+- `--main-fg-color`
+- `--main-bg-color`
+- `--main-bg-color-hover`
+- `--secondary-bg-color`
+- `--secondary-bg-color-hover`
+- `--highlight-bg-color`
+- `--highlight-bg-color-hover`
+- `--main-border-color`
+- `--main-outline-color`
+- `--button-color`
+- `--icon-color`
+- `--icon-fill-color`
+- `--icon-stroke-color`
+- `--player-font-family`
+- `--popup-backdrop-filter`
+- `--popup-backdrop-filter-hover`
+
+- `--popup-wrapper-padding`
+- `--popup-box-shadow`
+
+- `--button-fixed-size`
+- `--button-fixed-width`
+- `--button-fixed-height`
+- `--button-border-radius`
+- `--button-icon-size`
+- `--button-background`
+- `--button-background-hover`
+- `--button-background-active`
+
+- `--progress-indicator-font-size`
+- `--small-text-size`
+- `--medium-text-size`
+- `--large-text-size`
+
+- `--playback-bar-buttons-padding`
+- `--playback-bar-gradient`
+- `--playback-bar-gradient-hover`
+- `--playback-bar-backdrop-filter`
+- `--playback-bar-backdrop-filter-hover`
+- `--playback-bar-width`
+- `--playback-bar-container-padding`
+- `--playback-bar-container-gap`
+- `--playback-bar-border-radius`
+- `--playback-bar-border-color`
+- `--playback-bar-border-style`
+- `--playback-bar-border-width`
+- `--playback-bar-shadow`
+- `--progress-indicator-padding`
+- `--progress-indicator-elapsed-color`
+- `--progress-indicator-remaining-color`
+- `--progress-indicator-height`
+- `--progress-indicator-slide-marker-height`
+- `--progress-bar-radius`
+
+- `--handler-size`
+- `--handler-height`
+- `--handler-width`
+- `--handler-scale`
+- `--handler-color`
+- `--handler-shadow`
+- `--handler-radius`
+- `--handler-opacity`
+- `--handler-border`
+- `--handler-transition-time`
+- `--handler-scale-hover`
+- `--handler-color-hover`
+- `--handler-shadow-hover`
+- `--handler-radius-hover`
+- `--handler-opacity-hover`
+- `--handler-border-hover`
+
+- `--handler-scale-active`
+- `--handler-shadow-active`
+- `--handler-color-active`
+- `--handler-radius-active`
+- `--handler-opacity-active`
+- `--handler-border-active`
+
+- `--elapsed-color`
+- `--remaining-color`
+
+- `--slide-marker-elapsed-color`
+- `--slide-marker-remaining-color`
+- `--slide-marker-gap:`
+
+- `--timeline-preview-gap`
+- `--timeline-preview-border-radius`
+- `--timeline-preview-box-shadow`
+- `--timeline-preview-padding`
+- `--timeline-preview-background`
+- `--timeline-preview-color`
+- `--timeline-preview-max-image-block-size`
+
+- `--video-container-padding`
+- `--video-container-gap`
+- `--video-container-background-color`
+- `--base-video-rect-background-color`
+- `--video-container-message-bkg`
+- `--video-container-message-color`
+
+## Examples
+
+### Floating playback bar with rounded borders:
+
+![rounded playback bar](images/floating-playback-bar.jpg)
+
+```css
+:root {
+    --playback-bar-width: calc(100% - 2 * var(--playback-bar-container-padding));
+    --playback-bar-radius: 10px;
+    --playback-bar-container-padding: 5px;
+    --playback-bar-border-color: var(--main-border-color);
+    --playback-bar-border-style: solid;
+    --playback-bar-border-width: 0;
+    --playback-bar-shadow: 0 0 5px 0 var(--main-border-color);
+}
+```
+
+### Black over white playback bar
+
+![Black over white playback bar](images/black-over-white-playback-bar.jpg)
+
+```css
+:root {
+    --highlight-bg-color: #61b2f9;
+    --highlight-bg-color-hover: #97c9f5;
+    --main-fg-color: rgb(54, 54, 54);
+    --main-bg-color: rgba(170, 170, 170, 0.923);
+    --main-bg-color: rgba(248, 248, 248, 0.78);
+    --secondary-bg-color: rgb(241, 241, 241);
+    --secodnary-bg-color-highlight: white;
+
+    --playback-bar-gradient: linear-gradient(0deg, rgb(255 255 255 / 70%) 0%, rgb(255 255 255 / 50%) 60%, rgb(255 255 255 / 0%) 100%);
+    --playback-bar-gradient-hover: linear-gradient(0deg, rgb(255 255 255 / 80%) 0%, rgb(255 255 255 / 80%) 0%);
+    --playback-bar-buttons-padding: 15px 15px;
+}
+```
+
+### Control the visibility of the timeline handler, depending on its state:
+
+```css
+:root {
+    /* Only visible in hover and active states */
+    --handler-opacity: 0;
+    --handler-opacity-hover: 1;
+    --handler-opacity-active: 1;
+}
+```
+
+### Modify the properties of one specific button
+
+It is also possible to specify specific colors for certain `ButtonPlugin` plugins (or their derivatives). Plugins of type `ButtonPlugin` initialise the `name` attribute of the button with the plugin identifier:
 
 ```html
 <button type="button" name="es.upv.paella.playPauseButton" class="fixed-width" aria-label="play" title="play">
@@ -147,92 +373,3 @@ Therefore, you can specify the properties for a specific button using the follow
 
 Note that when specifying properties for a specific button, you cannot simply modify the values of CSS variables. In this case you will have to directly change the properties you want to modify. The properties that affect the colour of the buttons are the ones you saw in the example above: `color` and `background-color` on the button, and `fill` and `stroke` on the SVG it contains.
 
-
-## **`:root`**
-
-### Basic
-
-**Colors:**
-
-- `--main-fg-color`: main foreground color.
-- `--main-bg-color`: main background color.
-- `--main-bg-color-hover`: background color for the `hover` state.
-- `--secondary-bg-color`: secondary background color.
-- `--secondary-bg-color-hover`: secondary background color for the `hover` state.
-- `--highlight-bg-color`: highlight background color, for example, one selected option in a menu.
-- `--highlight-bg-color-hover`: highlight background color for the `hover` state.
-- `--main-border-color`: main border color used in some elements. The default styles of Paella Player may not use any borders. To configure borders, refer to the elements that use them, for example, the playback bar.
-- `--main-outline-color`: main outline color for the input controls. This color is used in the input controls in `focus-visible` state.
-
-**Other:**
-
-- `--player-font-family`: Font family used in the player elements.
-- `--popup-backdrop-filter`: Backdrop filter used in the pop up elements, such as menus.
-- `--popup-backdrop-filter-hover`: Backdrop filter for the `hover` state.
-
-### Playback bar
-
-- `--playback-bar-width`: This is the width of the playback bar. The default is `100%`. If you reduce this size, the playback bar will remain centered at the bottom of the player.
-- `--playback-bar-radius`: The value of the `border-radius` property for the playbar.
-- `--playback-bar-container-padding`: This padding controls the separation between the playbar and the player border. It controls the padding of the UI container, so it can be used to control all padding, vertical and horizontal padding, or all four padding properties independently. Note, however, that the playbar is always placed aligned to the bottom edge of the window, so the top padding will never affect it.
-- `--playback-bar-border-color`
-- `--playback-bar-border-style`
-- `--playback-bar-border-width`
-- `--playback-bar-shadow`
-
-Example: floating playback bar with rounded borders:
-
-![rounded playback bar](images/floating-playback-bar.jpg)
-
-```css
-:root {
-    --playback-bar-width: calc(100% - 2 * var(--playback-bar-container-padding));
-    --playback-bar-radius: 10px;
-    --playback-bar-container-padding: 5px;
-    --playback-bar-border-color: var(--main-border-color);
-    --playback-bar-border-style: solid;
-    --playback-bar-border-width: 0;
-    --playback-bar-shadow: 0 0 5px 0 var(--main-border-color);
-}
-```
-
-### Playback Bar buttons
-
-- `--progress-indicator-font-size`
-- `--button-fixed-width`
-- `--button-fixed-height`
-- `--button-border-radius`
-- `--button-icon-size` por defecto es la mitad de --button-fixed-width
-- `--small-text-size`
-- `--medium-text-size`
-- `--large-text-size`
-
-## **`:playback-bar`**
-
-- `--playback-bar-buttons-padding`
-- `--playback-bar-gradient`
-- `--playback-bar-gradient-hover`
-- `--playback-bar-backdrop-filter`
-- `--playback-bar-backdrop-filter-hover`
-
-Example: black over white playback bar
-
-![Black over white playback bar](images/black-over-white-playback-bar.jpg)
-
-```css
-:root {
-    --highlight-bg-color: #61b2f9;
-    --highlight-bg-color-hover: #97c9f5;
-    --main-fg-color: rgb(54, 54, 54);
-    --main-bg-color: rgba(170, 170, 170, 0.923);
-    --main-bg-color: rgba(248, 248, 248, 0.78);
-    --secondary-bg-color: rgb(241, 241, 241);
-    --secodnary-bg-color-highlight: white;
-}
-
-.playback-bar {
-    --playback-bar-gradient: linear-gradient(0deg, rgb(255 255 255 / 70%) 0%, rgb(255 255 255 / 50%) 60%, rgb(255 255 255 / 0%) 100%);
-    --playback-bar-gradient-hover: linear-gradient(0deg, rgb(255 255 255 / 80%) 0%, rgb(255 255 255 / 80%) 0%);
-    --playback-bar-buttons-padding: 15px 15px;
-}
-```
