@@ -91,6 +91,26 @@ We can also control the size of the buttons in the playback bar, its icons, the 
 - <code style="color:rgb(116, 0, 170)">`--button-border-radius`</code>: is the border radius of the buttons in the playback bar. This variable is used as the value of the `border-radius` property of the buttons, so you can set the same value for all corners or set a different value for each corner. Note that, by default, the background color of the buttons is transparent, so the border radius will not be visible until you point the mouse cursor over the button.
 - <code>`--button-icon-size`</code>: is the size of the icons in the buttons. By default, this size is half the value of `--button-fixed-width`, but you can set it to any value you want.
 
+### Menus
+
+The drop-down menus in `paella-core` are containers that are displayed above the playback bar. They can be aligned to the left or to the right, or they can occupy the entire width of the playback bar. The position of the container we have seen before, we control it with the `--popup-wrapper-padding` and `--playback-bar-container-gap` properties. The rest of the measures that we can control are shown in the following figure:
+
+![Menu sizes](images/pop-ups.webp)
+
+- <code style="color:rgb(0, 170, 162)">`--popup-border-radius`</code>: This is the `border-radius` property of the menu container. You can specify a value for each corner or a general value for all corners.
+- <code style="color:rgb(170, 0, 128)">`--popup-padding`</code>: It is the `padding` property of the menu container. You can specify a value for each side or a general value for all sides.
+- <code style="color:rgb(170, 111, 0)">`--popup-menu-margin`</code>: This is the `margin` property of the menu item container. We can specify a value for all sides, a vertical and a horizontal value, or a value for each side.
+- <code style="color:rgb(10, 130, 4)">`--popup-menu-gap`</code>: The menu items are placed using a flex container. This variable is the value of the `gap` property for that container.
+
+Other sizes that we can control are:
+
+- <code>`--popup-item-height`</code>: This is the height of the menu items. You can specify the `auto` value to make the height fit the menu content, or you can specify a fixed value. If the value is fixed, the menu text will be adjusted to the size of the item.
+- <code>`--popup-item-border-radius`</code>: This is the `border-radius` property of the menu items. You can specify a value for each corner or a general value for all corners.
+
+To modify the rest of the sizes of the fonts, see the next section.
+
+The rest of the size properties of the menu items are extracted from the buttons (background colors for states, text and icon colors, icon sizes, etc).
+
 ### Font sizes
 
 The playback bar can hold three different font sizes. When a plugin needs to display a text, it can use one of these three sizes. For example, the time indicator next to the volume control is a non-interactive `ButtonPlugin`, with variable width, and it displays the time using the medim font size. The quality selector and the playback rate plugins are interactive `ButtonPlugin`s, with fixed width, and they display the text using the small font size.
@@ -104,6 +124,11 @@ The playback bar can hold three different font sizes. When a plugin needs to dis
 <blockquote>
 <strong>Note:</strong> The default values of the `--button-fixed-size` and the `--*-text-size` are defined using text font relative sizes, but if you change the size of the buttons, you'll probably need to change the font sizes as well.
 </blockquote>
+
+The menus have two texts: on one side is the title of the menu, and on the other side are the texts of the menu items. We can control the size of these texts with the following variables:
+
+- `--popup-title-font-size`
+- `--popup-menu-item-font-size`
 
 ## Colors
 
@@ -190,6 +215,8 @@ There are several elements that can have a shadow effect. In the default `paella
 
 ## All CSS variables
 
+### General variables
+
 - `--main-fg-color`
 - `--main-bg-color`
 - `--main-bg-color-hover`
@@ -204,11 +231,8 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--icon-fill-color`
 - `--icon-stroke-color`
 - `--player-font-family`
-- `--popup-backdrop-filter`
-- `--popup-backdrop-filter-hover`
 
-- `--popup-wrapper-padding`
-- `--popup-box-shadow`
+### Buttons
 
 - `--button-fixed-size`
 - `--button-fixed-width`
@@ -219,10 +243,14 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--button-background-hover`
 - `--button-background-active`
 
+### Fonts
+
 - `--progress-indicator-font-size`
 - `--small-text-size`
 - `--medium-text-size`
 - `--large-text-size`
+
+### Playback bar
 
 - `--playback-bar-buttons-padding`
 - `--playback-bar-gradient`
@@ -244,6 +272,8 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--progress-indicator-slide-marker-height`
 - `--progress-bar-radius`
 
+### Timeline handler 
+
 - `--handler-size`
 - `--handler-height`
 - `--handler-width`
@@ -260,7 +290,6 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--handler-radius-hover`
 - `--handler-opacity-hover`
 - `--handler-border-hover`
-
 - `--handler-scale-active`
 - `--handler-shadow-active`
 - `--handler-color-active`
@@ -268,12 +297,15 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--handler-opacity-active`
 - `--handler-border-active`
 
+### Timelilne colors
+
 - `--elapsed-color`
 - `--remaining-color`
-
 - `--slide-marker-elapsed-color`
 - `--slide-marker-remaining-color`
 - `--slide-marker-gap:`
+
+### Timeline sizes
 
 - `--timeline-preview-gap`
 - `--timeline-preview-border-radius`
@@ -283,12 +315,29 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--timeline-preview-color`
 - `--timeline-preview-max-image-block-size`
 
+### Video container
+
 - `--video-container-padding`
 - `--video-container-gap`
 - `--video-container-background-color`
 - `--base-video-rect-background-color`
 - `--video-container-message-bkg`
 - `--video-container-message-color`
+
+### Pop up/Menus
+
+- `--popup-wrapper-padding`
+- `--popup-backdrop-filter`
+- `--popup-backdrop-filter-hover`
+- `--popup-border-radius`
+- `--popup-box-shadow`
+- `--popup-padding`
+- `--popup-menu-margin`
+- `--popup-menu-gap`
+- `--popup-menu-item-height`
+- `--popup-menu-item-font-size`
+- `--popup-menu-item-border-radius`
+- `--popup-title-font-size`
 
 ## Examples
 
