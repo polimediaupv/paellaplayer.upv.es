@@ -1,0 +1,63 @@
+---
+const { id, manifest } = Astro.props;
+import "@asicupv/paella-core/paella-core.css";
+---
+
+<article>
+    <div class="player-container" id={id}></div>
+</article>
+
+<player-data data-id={id} data-manifest={manifest}></player-data>
+
+<script>
+    // @ts-nocheck
+    import { Paella } from "@asicupv/paella-core";
+
+    async function loadPlayer(containerId: string, manifest?: string) {
+        console.log("Load player with ID:", containerId);
+
+        const player = new Paella(containerId, {
+            configResourcesUrl: '/player-config/',
+            configUrl: '/player-config/config.json',
+            defaultVideoPreview: '/player-config/default_preview_landscape.jpg',
+            
+            getVideoId: (config: any, player: Paella) => {
+                return manifest;
+            }
+        });
+
+        await player.loadManifest();
+    }
+
+    class PlayerLoader extends HTMLElement {
+        connectedCallback() {
+            const id = this.dataset.id;
+            const manifest = this.dataset.manifest;
+            
+            loadPlayer(id ?? "", manifest)
+                .then(() => {
+                    console.log("Player loaded successfully");
+                })
+                .catch((error) => {
+                    console.error("Error loading player:", error);
+                });
+        }
+    }
+    
+    customElements.define("player-data", PlayerLoader);
+</script>
+
+
+<style>
+
+    article {
+        display: grid;
+        place-items: center;
+    }
+
+    .player-container {
+        width: 90%;
+        aspect-ratio: 16 / 9;
+        background-color: rgb(237, 237, 237);
+    }
+</style>
