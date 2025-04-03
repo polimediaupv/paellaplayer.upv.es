@@ -10,7 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@asicupv/paella-basic-plugins": "^2.0.4",
     "@asicupv/paella-core": "^2.1.1",
+    "@asicupv/paella-slide-plugins": "^2.0.2",
+    "@asicupv/paella-video-plugins": "^2.0.3",
+    "@asicupv/paella-zoom-plugin": "^2.0.0",
     "@astrojs/starlight": "^0.32.4",
     "astro": "^5.5.3",
     "sharp": "^0.32.5"

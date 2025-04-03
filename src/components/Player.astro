@@ -1,6 +1,8 @@
 ---
 const { id, manifest } = Astro.props;
 import "@asicupv/paella-core/paella-core.css";
+import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
+import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
 ---
 
 <article>
@@ -12,15 +14,47 @@ import "@asicupv/paella-core/paella-core.css";
 <script>
     // @ts-nocheck
     import { Paella } from "@asicupv/paella-core";
+    import { basicPlugins } from "@asicupv/paella-basic-plugins";
+    import { slidePlugins } from "@asicupv/paella-slide-plugins";
+    import {
+        HlsVideoFormatPlugin,
+        HlsLiveVideoFormatPlugin,
+        HlsCaptionsSelectorButtonPlugin,
+        Mp4MultiQualityVideoFormatPlugin
+    } from '@asicupv/paella-video-plugins';
+    import {
+        ZoomCanvasPlugin,
+        CanvasZoomInButtonPlugin,
+        CanvasZoomOutButtonPlugin,
+        ZoomInButtonPlugin,
+        ZoomOutButtonPlugin,
+        ZoomMenuButtonPlugin
+    } from "@asicupv/paella-zooom-plugin";
 
     async function loadPlayer(containerId: string, manifest?: string) {
         console.log("Load player with ID:", containerId);
 
         const player = new Paella(containerId, {
+            plugins: [
+                ...basicPlugins,
+                ...slidePlugins,
+                HlsVideoFormatPlugin,
+                HlsLiveVideoFormatPlugin,
+                HlsCaptionsSelectorButtonPlugin,
+                Mp4MultiQualityVideoFormatPlugin,
+                ZoomCanvasPlugin,
+                CanvasZoomInButtonPlugin,
+                CanvasZoomOutButtonPlugin,
+                ZoomInButtonPlugin,
+                ZoomOutButtonPlugin,
+                ZoomMenuButtonPlugin
+            ],
+
             configResourcesUrl: '/player-config/',
             configUrl: '/player-config/config.json',
             defaultVideoPreview: '/player-config/default_preview_landscape.jpg',
             
+
             getVideoId: (config: any, player: Paella) => {
                 return manifest;
             }
