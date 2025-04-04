@@ -1,4 +1,7 @@
 ---
+import "@fontsource-variable/fredoka";
+import "@fontsource-variable/lexend";
+
 const { title } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -9,6 +12,33 @@ const { title } = Astro.props;
     <title>{title}</title>
 </head>
 <body>
-    <slot/>
+    <main>
+
+        <slot/>
+    </main>
 </body>
 </html>
+
+<style is:global={true}>
+
+    :root {
+        --color-dark: #343434;
+        --color-darker: #262626;
+        --color-darkest: #1d1d1d;
+        --color-mid: #5c5c5c;
+        --color-light: #e7e7e7;
+        --color-main: #e0ab1b;
+        --color-secondary: #624802;
+        --color-main-comp: #00a310;
+        --color-secondary-comp: #01860a;
+    }
+
+    body {
+        font-family: "Lexend Variable", sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: "Fredoka Variable", sans-serif;
+    }
+
+</style>

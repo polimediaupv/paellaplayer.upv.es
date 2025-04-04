@@ -53,6 +53,36 @@
             "enabled": true
         },
 
+        "es.upv.paella.hlsVideoFormat": {
+            "enabled": true,
+            "order": 0,
+            "audioTrackLabel": "name",
+            "enableCache": true,
+            "forceNative": false,
+            "hlsConfig": {
+            },
+            "corsConfig": {
+                "withCredentials": false,
+                "requestHeaders": {
+                    "Access-Control-Allow-Credentials": false
+                }
+            }
+        },
+        
+        "es.upv.paella.hlsLiveVideoFormat": {
+            "enabled": true,
+            "order": 0,
+            "enableCache": true,
+            "hlsConfig": {
+            },
+            "corsConfig": {
+                "withCredentials": false,
+                "requestHeaders": {
+                    "Access-Control-Allow-Credentials": false
+                }
+            }
+        },
+
         "es.upv.paella.videoCanvas": {
             "enabled": true
         },

@@ -29,7 +29,7 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
         ZoomInButtonPlugin,
         ZoomOutButtonPlugin,
         ZoomMenuButtonPlugin
-    } from "@asicupv/paella-zooom-plugin";
+    } from "@asicupv/paella-zoom-plugin";
 
     async function loadPlayer(containerId: string, manifest?: string) {
         console.log("Load player with ID:", containerId);
@@ -38,16 +38,22 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
             plugins: [
                 ...basicPlugins,
                 ...slidePlugins,
-                HlsVideoFormatPlugin,
+                {
+                    plugin: HlsVideoFormatPlugin,
+                    config: {
+                        enabled: true,
+                        priority: 0
+                    }
+                },
                 HlsLiveVideoFormatPlugin,
                 HlsCaptionsSelectorButtonPlugin,
                 Mp4MultiQualityVideoFormatPlugin,
-                ZoomCanvasPlugin,
-                CanvasZoomInButtonPlugin,
-                CanvasZoomOutButtonPlugin,
-                ZoomInButtonPlugin,
-                ZoomOutButtonPlugin,
-                ZoomMenuButtonPlugin
+                // ZoomCanvasPlugin,
+                // CanvasZoomInButtonPlugin,
+                // CanvasZoomOutButtonPlugin,
+                // ZoomInButtonPlugin,
+                // ZoomOutButtonPlugin,
+                // ZoomMenuButtonPlugin
             ],
 
             configResourcesUrl: '/player-config/',
