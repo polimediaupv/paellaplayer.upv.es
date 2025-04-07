@@ -1,0 +1,54 @@
+---
+import lightLogo from "@/assets/light-logo.webp";
+const currentPath = Astro.url.pathname;
+---
+
+<header>
+    <a href="/"><img src={lightLogo.src} alt="Logo" /></a>
+
+    <menu>
+        <li><a href="/examples" class={/examples/i.test(currentPath) ? "active" : ""}>Examples</a></li>
+        <li><a href="/documentation" class={/documentation/i.test(currentPath) ? "active" : ""}>Documentation</a></li>
+    </menu>
+    <footer>
+        
+    </footer>
+</header>
+
+<style>
+    header {
+        background-color: var(--color-lightest);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1ch;
+
+        & > a > img {
+            height: 4ch;
+        }
+
+        menu {
+            display: flex;
+            gap: 1ch;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            & > li > a {
+                text-decoration: none;
+                color: var(--color-main);
+                font-weight: bold;
+                font-size: 1.2em;
+
+                &:hover {
+                    color: var(--color-secondary);
+                }
+
+                &.active {
+                    color: var(--color-main-comp);
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+</style>
