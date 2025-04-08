@@ -1,0 +1,323 @@
+---
+title: "Astro Integration"
+description: "Integrate Paella Player in a website made with Astro"
+---
+
+As described on [Astro's web site](https://astro.build), Astro is a static site generator that allows you to create fast websites using components from different frameworks. Paella Player can be used in Astro projects. In this document, we will show you how to integrate Paella Player in an Astro project using the `@asicupv/paella-core` package.
+
+## Example project
+
+Let's start by creating a new Astro project. You can use the following command to create a new Astro project:
+
+```bash
+npm create astro@latest
+```
+This command will prompt you to select a template. You can choose the default template or any other template you prefer. Once the project is created, navigate to the project directory:
+
+```bash
+cd my-astro-project
+```
+Next, install the `@asicupv/paella-core` package and its dependencies:
+
+```bash
+npm install @asicupv/paella-core @asicupv/paella-basic-plugins
+```
+
+## Create a Paella Player component
+
+Create a new file called `Player.astro` in the `src/components` directory. This file will contain the code for the Paella Player component. Add the following code to the `Player.astro` file:
+
+```astro
+---
+const { id, manifest } = Astro.props;
+import "@asicupv/paella-core/paella-core.css";
+import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
+---
+
+<article>
+    <div class="player-container" id={id}></div>
+</article>
+
+<player-data data-id={id} data-manifest={manifest}></player-data>
+
+<script>
+    // @ts-nocheck
+    import { Paella } from "@asicupv/paella-core";
+    import { basicPlugins } from "@asicupv/paella-basic-plugins";
+
+    async function loadPlayer(containerId: string, manifest?: string) {
+
+        const player = new Paella(containerId, {
+            plugins: [
+                ...basicPlugins,
+            ],
+
+            configResourcesUrl: '/player-config/',
+            configUrl: '/player-config/config.json',
+
+            getVideoId: (config: any, player: Paella) => {
+                return manifest;
+            }
+        });
+
+        await player.loadManifest();
+    }
+
+    class PlayerLoader extends HTMLElement {
+        connectedCallback() {
+            const id = this.dataset.id;
+            const manifest = this.dataset.manifest;
+            
+            loadPlayer(id ?? "", manifest)
+                .then(() => {
+                    console.log("Player loaded successfully");
+                })
+                .catch((error) => {
+                    console.error("Error loading player:", error);
+                });
+        }
+    }
+    
+    customElements.define("player-data", PlayerLoader);
+</script>
+
+
+<style>
+
+    article {
+        display: grid;
+        place-items: center;
+    }
+
+    .player-container {
+        width: 90%;
+        aspect-ratio: 16 / 9;
+        background-color: rgb(237, 237, 237);
+    }
+
+    :root {
+        --progress-indicator-padding: 6px 15px;
+        --playback-bar-buttons-padding: 0 10px;
+    }
+</style>
+```
+
+## Explanation of the code
+
+First, in the Astro header, we import the necessary CSS files for the player. This code will be generated statically in the server side. The `paella-core` and `paella-basic-plugins` packages are imported in the `<script>` section, because we want to load them in the client side.
+
+We also import the props `id` and `manifest` from the Astro component. The `id` prop is used to identify the player container *id* attribute, and the `manifest` prop is used to load the video manifest identifier. We'll be back on this later.
+
+The `<article>` element contains the player container: a `<div>` element that will contain the player. The `id` attribute readed from the component props is used to identify the player container.
+
+### Pass the `id` and `manifest` props to client side JavaScript
+
+Until now, we have the `id` and `manifest` props only on the server side. In Astro, we can use the `define:vars` attribute in the `<script>` element to pass variables to the client side, but if we do it, the `<script>` element will be generated statically in the server side, and will not have access to the node packages via `import`. To pass data from the server to the client side, and also to load the player node packages, we need to use a custom HTML element, and use its attributes to pass the data.
+
+First, we define a `<player-data>` custom HTML element. This element will be used to pass the `id` and `manifest` props to the client side JavaScript. Then, we create a special `PlayerLoader` class, that extends the `HTMLElement` class. This class will be used to load the player when the custom element is connected to the DOM. The `connectedCallback` method is called when the element is added to the DOM, and it will call the `loadPlayer` function, passing the `id` and `manifest` props as arguments.
+
+Then, we use the `connectedCallback()` function to implement the player load. In this function, we have access to the `id` and `manifest` props, and we can use them to load the player.
+
+To link the `PlayerLoader` class with the `<player-data>` custom element, we use the `customElements.define()` method. This method takes two arguments: the name of the custom element and the class that will be used to implement it. In this case, we use the `PlayerLoader` class to implement the `<player-data>` custom element.
+
+The rest of the code is inside the `loadPlayer` function. This code is the standard code to load the player. You can see more on the [quick start tutorial](/tutorial/quick_start).
+
+## Configuration and repository
+
+Create a `config.json` file inside the `public/player-config/` directory. This file will contain the configuration for the player. You can use the following code as a starting point:
+
+**public/player-config/config.json**
+
+```json
+{
+    "defaultLayout": "presenter-presentation",
+    "repositoryUrl": "/repo",
+    "manifestFileName": "data.json",
+
+    "plugins": {
+        "es.upv.paella.dualVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter-presentation", "content": ["presenter","presentation"], "icon": "presenter-presentation.svg", "title": "Presenter and presentation" }
+            ],
+            
+            "pipContentIds": [
+                "presenter-presentation-pip"
+            ]
+        },
+
+        "es.upv.paella.singleVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter", "content": ["presenter"], "icon": "presenter.svg", "title": "Presenter" },
+                { "id": "presentation", "content": ["presentation"], "icon": "presentation.svg", "title": "Presentation" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.dualVideoPiP": {
+            "enabled": true,
+            "validContent": [
+                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "pip.svg", "title": "PiP mode" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": true
+        },
+
+
+
+        "es.upv.paella.videoCanvas": {
+            "enabled": true
+        },
+
+        "es.upv.paella.playPauseButton": {
+            "enabled": true,
+            "side": "left",
+            "order": 0
+        },
+
+        "es.upv.paella.volumeButtonPlugin": {
+            "enabled": true,
+            "side": "left",
+            "order": 1
+        },
+
+        "es.upv.paella.currentTimeLabel": {
+            "enabled": true,
+            "side": "left",
+            "showTotalTime": true,
+            "order": 2
+        },
+
+        "es.upv.paella.fullscreenButton": {
+            "enabled": true,
+            "side": "right",
+            "order": 3,
+            "description": "Toggle fullscreen"
+        }
+    }
+}
+```
+
+Add the following file in the `public/repo/dual-stream` directory:
+
+**public/repo/dual-stream/data.json**
+
+```json
+{
+    "metadata": {
+    },
+    "streams": [
+        {
+            "sources": {
+                "mp4": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presenter.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presenter",
+            "role": "mainAudio"
+        },
+        {
+            "sources": {
+                "mp4": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presentation.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presentation"
+        }
+    ],
+    "frameList": {
+		"targetContent": "presentation",
+		"frames": [
+			{
+				"id": "frame_854",
+				"mimetype": "image/jpeg",
+				"time": 854,
+				"url": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/3d90109c-9608-44c1-8660-fce3f216d716/presentation_cut.jpg",
+				"thumb": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/403de1df-aa66-44c0-b600-7683acf249b8/presentation_cut.jpg"
+			},
+			{
+				"id": "frame_751",
+				"mimetype": "image/jpeg",
+				"time": 751,
+				"url": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/598bd2ba-4fef-4886-884e-0ab82176f13d/presentation_cut.jpg",
+				"thumb": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/73a6564c-b2d6-4896-b0f1-38129dde2c85/presentation_cut.jpg"
+			},
+			{
+				"id": "frame_0",
+				"mimetype": "image/jpeg",
+				"time": 0,
+				"url": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/7dc22bee-14f3-442c-8f0d-30d8b68c8604/presentation_cut.jpg",
+				"thumb": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/46561b90-85b3-4ad7-a986-cdd9b52ae02b/presentation_cut.jpg"
+			},
+			{
+				"id": "frame_363",
+				"mimetype": "image/jpeg",
+				"time": 363,
+				"url": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/d3194d9b-8f65-403b-a639-9de4311a283b/presentation_cut.jpg",
+				"thumb": "https://repository.paellaplayer.upv.es/belmar-multiresolution/slides/4505b6d9-8a0c-4809-ade3-840e743188ed/presentation_cut.jpg"
+			}
+		]
+	}
+}
+```
+
+This file contains the configuration of a dual stream video. Yoy can learn more about the **video manifest** files in [this document](/tutorial/two_streams).
+
+## Explanation: Load the video manifest from an Astro prop
+
+
+Back on the initialization code, in the `loadPlayer` function we have set the followint `initParams` object in the `Paella` constructor:
+
+```js
+{
+    plugins: [
+        ...basicPlugins,
+    ],
+
+    configResourcesUrl: '/player-config/',
+    configUrl: '/player-config/config.json'
+
+    getVideoId: (config: any, player: Paella) => {
+        return manifest;
+    }
+}
+```
+
+As we can learn in the [quick start tutorial](/tutorial/quick_start), the `plugins` array is used to load the plugins that are not included in the `@asicupv/paella-core` package.
+
+The `configResourcesUrl` and `configUrl` properties are used to load the configuration file. Note that the `configResourcesUrl` and `configUrl` properties corresponds to the `public/player-config/config.json` file that we created before.
+
+The `getVideoId` property is a function that returns the video manifest identifier. The default implementation of this function returns the value of the `id` URL search parameter, for example, `?id=dual-stream`. In our case, we want to use the `manifest` prop that we passed to the component. This is the reason why we set the `getVideoId` property to a function that returns the value of the `manifest` prop.
+
+## Use the Player component in a page
+
+In the `src/pages/index.astro` file, you can use the `Player` component to create a Paella Player instance. Add the following code to the `index.astro` file:
+
+```astro
+---
+import Player from '../components/Player.astro';
+...
+const manifest = "dual-stream";
+const id = "playerContainer";
+---
+
+<main>
+    <h1>Paella Player in Astro</h1>
+    <Player id={id} manifest={manifest} />
+</main>
+```
+
