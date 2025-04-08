@@ -11,7 +11,7 @@ In addition, the use of CSS variables to configure the appearance of the player 
 
 Most sizes and margins can be controlled with CSS variables. To understand which variables to modify, the first thing to do is to understand the structure of the player containers. The player is divided into three main areas:
 
-![player container sizes](images/player-container-areas.webp)
+![player container sizes](styling_css_variables/player-container-areas.webp)
 
 <ul>
     <li><code style="color: #0099aa">player container</code>: is the DOM tree element where the player is placed, and therefore its size and position does not depend on Paella Player. The programmer is responsible for positioning and setting the size within the HTML document.</li>
@@ -25,7 +25,7 @@ Note: The video can occupy the whole <span style="color: #0099aa">player contain
 
 These are the CSS properties that control the sizes of the containers in the above figure:
 
-![player container sizes](images/player-container-sizes.webp)
+![player container sizes](styling_css_variables/player-container-sizes.webp)
 
 - <code style="color: #ff5588">`--playback-bar-container-padding`</code>: is the padding that separates the playback bar container from the border of the video container. Internally, this variable is used as the value of the `padding` property of the video container, so it can be initialised with a general padding, a vertical and a horizontal padding or with a separate padding for each side.
 - <code style="color: #0055ee">`--popup-wrapper-padding`</code>: is the padding that separates the pop up wrapper from the playback bar container. As with the previous variable, the value of this variable is used as the padding of the pop-up container. In this case, the top padding will have no effect, because the pop ups are always aligned to the bottom and sides.
@@ -50,13 +50,13 @@ In addition, the progress indicator is divided into two sections: the elapsed se
 - <code style="color:rgb(17, 143, 227)">`--progress-indicator-completed-bg-color`</code>: background color of the elapsed section.
 - <code style="color:rgb(101, 101, 101)">`--progress-indicator-remaining-bg-color`</code>: background color of the remaining section.
 
-![playback bar 1](images/playback-bar-1.webp)
+![playback bar 1](styling_css_variables/playback-bar-1.webp)
 
 ### Slide markers
 
 The progress bar can be displayed in two different ways depending on the characteristics of the video. If the video has slide markers, the progress bar is displayed as follows:
 
-![playback bar 2](images/playback-bar-2.webp)
+![playback bar 2](styling_css_variables/playback-bar-2.webp)
 
 In this case, each independent marker will have elapsed and remaining sections, which will be displayed or not depending on the progress of the video. In this case we can control the background color of these sections with two different variables, in case we want to differentiate the background color of the elapsed and remaining sections from the slide markers and the playback bar without markers:
 
@@ -75,14 +75,14 @@ In the progress indicator we can control three sizes:
 - <code style="color:rgb(0, 40, 170)">`--progress-indicator-slide-marker-height`</code>: is the height of the slide marker, which is displayed only when the mouse cursor is over the marker. If the cursor is not over the marker, the size it will be the size specified by `--progress-indicator-height`.
 - <code style="color:rgb(197, 132, 0)">`--slide-marker-gap`</code>: is the size of the gap between the slide markers.
 
-![playback bar 3](images/playback-bar-3.webp)
+![playback bar 3](styling_css_variables/playback-bar-3.webp)
 
 
 ### Other playback bar sizes
 
 We can also control the size of the buttons in the playback bar, its icons, the font size and the border radius of the buttons and the playback bar itself.
 
-![button plugin sizes](images/button-plugin-sizes.webp)
+![button plugin sizes](styling_css_variables/button-plugin-sizes.webp)
 
 - <code style="color:rgb(1, 156, 164)">`--playback-bar-border-radius`</code>: this variable is used as the value of the `border-radius` property of the playback bar, so you can set the same value for all corners or set a different value for each corner.
 - <code style="color:rgb(0, 51, 170)">`--button-fixed-width`</code>: is the width of the buttons in the playback bar. Depending on the configuration of each plugin, a button can have a fixed or variable width. This property only affects fixed-width buttons, hence the prefix `fixed`.
@@ -95,7 +95,7 @@ We can also control the size of the buttons in the playback bar, its icons, the 
 
 The drop-down menus in `paella-core` are containers that are displayed above the playback bar. They can be aligned to the left or to the right, or they can occupy the entire width of the playback bar. The position of the container we have seen before, we control it with the `--popup-wrapper-padding` and `--playback-bar-container-gap` properties. The rest of the measures that we can control are shown in the following figure:
 
-![Menu sizes](images/pop-ups.webp)
+![Menu sizes](styling_css_variables/pop-ups.webp)
 
 - <code style="color:rgb(0, 170, 162)">`--popup-border-radius`</code>: This is the `border-radius` property of the menu container. You can specify a value for each corner or a general value for all corners.
 - <code style="color:rgb(170, 0, 128)">`--popup-padding`</code>: It is the `padding` property of the menu container. You can specify a value for each side or a general value for all sides.
@@ -115,7 +115,7 @@ The rest of the size properties of the menu items are extracted from the buttons
 
 The playback bar can hold three different font sizes. When a plugin needs to display a text, it can use one of these three sizes. For example, the time indicator next to the volume control is a non-interactive `ButtonPlugin`, with variable width, and it displays the time using the medim font size. The quality selector and the playback rate plugins are interactive `ButtonPlugin`s, with fixed width, and they display the text using the small font size.
 
-![playback bar 4](images/playback-bar-4.webp)
+![playback bar 4](styling_css_variables/playback-bar-4.webp)
 
 - `--small-text-size`: is the small font size.
 - `--medium-text-size`: is the medium font size.
@@ -172,7 +172,7 @@ There are two color gradients that are used in the playback bar area, and they c
 
 The timeline handler is the element that allows you to control the progress of the video. It is a draggable element that can be moved along the progress bar. The handler has three states: `normal`, `hover` and `active`. The `hover` state is when the mouse cursor is over the handler, and the `active` state is when the mouse button is pressed and the handler is being dragged.
 
-![Timeline handler](images/timeline-handler.webp)
+![Timeline handler](styling_css_variables/timeline-handler.webp)
 
 It is possible to control a lot of properties of the handler with CSS variables:
 
@@ -343,7 +343,7 @@ There are several elements that can have a shadow effect. In the default `paella
 
 ### Floating playback bar with rounded borders:
 
-![rounded playback bar](images/floating-playback-bar.jpg)
+![rounded playback bar](styling_css_variables/floating-playback-bar.jpg)
 
 ```css
 :root {
@@ -359,7 +359,7 @@ There are several elements that can have a shadow effect. In the default `paella
 
 ### Black over white playback bar
 
-![Black over white playback bar](images/black-over-white-playback-bar.jpg)
+![Black over white playback bar](styling_css_variables/black-over-white-playback-bar.jpg)
 
 ```css
 :root {
