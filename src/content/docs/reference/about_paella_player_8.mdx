@@ -2,6 +2,7 @@
 title: "About Paella Player 8"
 description: "In this document we will explain the new features of Paella Player 8."
 ---
+import ImageList from '@/components/ImageList.astro';
 
 ## About Paella Player
 
@@ -242,8 +243,10 @@ The new multi-level menu system offers several benefits:
 
 Plugins developed with the `MenuButtonPlugin` API automatically benefit from these improvements. However, plugins using the `PopUpButtonPlugin` API will continue to function but won't leverage the new navigation features. Developers are encouraged to migrate to the `MenuButtonPlugin` API for optimal results.
 
-![multi-level menu 1](about_paella_player_8/multi-level-menu-1.jpg)
-![multi-level menu 1](about_paella_player_8/multi-level-menu-2.jpg)
+<ImageList minWidth="250px">
+    ![multi-level menu 1](about_paella_player_8/multi-level-menu-1.jpg)
+    ![multi-level menu 1](about_paella_player_8/multi-level-menu-2.jpg)
+</ImageList>
 
 This change brings several benefits, including:
 
