@@ -4,7 +4,7 @@ description: "In this document we will explain the new features of Paella Player
 ---
 import ImageList from '@/components/ImageList.astro';
 
-## About Paella Player
+
 
 Paella Player originated as an alternative video player for [Opencast](https://opencast.org). At that time, the official video player for Opencast was implemented using [Adobe Flash](https://es.wikipedia.org/wiki/Adobe_Flash) technology. As a result, the Flash-based video player used by Opencast was unable to function on mobile, which led to a significant limitation 
 for users who wanted to access video content on their mobile devices.
@@ -23,6 +23,16 @@ libraries, marking a significant milestone in the project's evolution.
 With the release of **Paella Player 8**, we have transitioned to version 2.x of the libraries, which are now grouped under the `@asicupv/-` 
 scope: `@asicupv/paella-core`, `@asicupv/paella-basic-plugins`, and so on. This document will guide you through the new features and 
 improvements introduced in Paella Player 8 compared to its predecessor, version 7.
+
+## Paella Player vs paella-core
+
+Paella Player and Paella-Core are closely related but serve different purposes within the ecosystem:
+
+- **Paella Player**: This is the complete video player application designed for end users. It includes all the necessary components, such as the user interface, plugins, and configurations, to provide a fully functional multi-stream video player. Paella Player is built on top of Paella-Core and leverages its capabilities to deliver a seamless video playback experience.
+
+- **paella-core**: This is the foundational library that provides the core functionality of the multi-stream video player. It includes the API for managing video streams, plugin support, and other essential features. Paella-Core is intended for developers who want to build custom video players or extend the functionality of Paella Player by creating new plugins or integrating additional features.
+
+In summary, Paella-Core is the engine that powers Paella Player, while Paella Player is the complete solution ready to be used by end users or integrated into larger platforms.
 
 ## What's new in Paella Player 8
 
