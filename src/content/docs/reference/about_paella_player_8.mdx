@@ -3,11 +3,37 @@ title: "About Paella Player 8"
 description: "In this document we will explain the new features of Paella Player 8."
 ---
 
+## About Paella Player
+
+Paella Player originated as an alternative video player for [Open Cast](https://opencast.org), previously known as Matterhorn. At that time, the official 
+video player for Matterhorn was implemented using [Adobe Flash](https://es.wikipedia.org/wiki/Adobe_Flash) technology, which made it impossible to play videos on iPhone devices due to 
+Apple's well-known decision to not support Adobe Flash on its mobile devices. This decision was announced by Steve Jobs in 2010, 
+citing concerns over Flash's performance, security, and battery life impact on mobile devices.
+
+As a result, the Flash-based video player used by Matterhorn was unable to function on iPhones, which led to a significant limitation 
+for users who wanted to access video content on their mobile devices.
+
+Paella Player was developed to provide an alternative multi stream video player that could work on a wide range of devices. It was designed to be compatible with HTML5 technology, which allowed it to work seamlessly
+on modern web browsers without the need for Flash.
+
+Initially, until **Paella Player 6**, Paella Player was a monolithic video player implemented in JavaScript. However, with the release of 
+version 7, the project underwent its most significant transformation to date. **Paella Player 7** shifted from being a monolithic player 
+to a modular architecture, comprising multiple libraries. The core library, `paella-core`, implemented the fundamental capabilities of 
+the multi-stream player, including the API for displaying multiple video streams simultaneously and plugin support.
+
+To complement the core library, several additional libraries were developed to provide extra features to the player, such as 
+`paella-basic-plugins`, `paella-slide-plugins`, and `paella-zoom-plugin`. **Paella Player 7** was thus built on top of version 1.x of these 
+libraries, marking a significant milestone in the project's evolution.
+
+With the release of **Paella Player 8**, we have transitioned to version 2.x of the libraries, which are now grouped under the `@asicupv/-` 
+scope: `@asicupv/paella-core`, `@asicupv/paella-basic-plugins`, and so on. This document will guide you through the new features and 
+improvements introduced in Paella Player 8 compared to its predecessor, version 7.
+
+## What's new in Paella Player 8
 
 The new version of Paella introduces significant changes, including:
 
 - **Repository unification**: All previous repositories have been unified into a single repository to simplify development, bug tracking, and feature integration. This change ensures a more cohesive development process and makes it easier for contributors to collaborate and maintain the project.
-
 
 - **Enhanced User Experience**: The user interface has been completely revamped to provide a more modern and intuitive experience. Navigation has been streamlined, making it easier for users to interact with the player and access its features. Additionally, new UI components have been introduced to enhance usability and ensure a consistent experience across different devices and screen sizes.
 
