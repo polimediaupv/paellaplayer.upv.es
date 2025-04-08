@@ -1,0 +1,23 @@
+---
+const { minWidth } = Astro.props;
+const minWidthValue = minWidth || "200px";
+---
+<div class="image-list">
+    <slot />
+</div>
+
+<style is:global define:vars={{ minWidthValue }}>
+    div.image-list > p {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(var(--minWidthValue), 1fr));
+        gap: 1ch;
+        align-items: center;
+        justify-items: center;
+        align-content: center;
+        justify-content: center;
+
+        & > img {
+            margin: 0;
+        }
+    }
+</style>
