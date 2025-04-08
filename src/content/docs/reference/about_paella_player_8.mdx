@@ -10,7 +10,7 @@ for users who wanted to access video content on their mobile devices.
 
 Paella Player was developed to provide an alternative multi stream video player that could work on a wide range of devices. It was designed to be compatible with HTML5 technology, which allowed it to work seamlessly on modern web browsers without the need for Flash.
 
-Initially, until **Paella Player 6**, Paella Player was a monolithic video player implemented in JavaScript. However, with the release of 
+Initially, until **Paella Player 6**, the architecture of the player was monolithic. However, with the release of 
 version 7, the project underwent its most significant transformation to date. **Paella Player 7** shifted from being a monolithic player 
 to a modular architecture, comprising multiple libraries. The core library, `paella-core`, implemented the fundamental capabilities of 
 the multi-stream player, including the API for displaying multiple video streams simultaneously and plugin support.
@@ -25,13 +25,13 @@ improvements introduced in Paella Player 8 compared to its predecessor, version 
 
 ## Paella Player vs paella-core
 
-Paella Player and Paella-Core are closely related but serve different purposes within the ecosystem:
+Paella Player and `paella-core` are closely related but serve different purposes within the ecosystem:
 
-- **Paella Player**: This is the complete video player application designed for end users. It includes all the necessary components, such as the user interface, plugins, and configurations, to provide a fully functional multi-stream video player. Paella Player is built on top of Paella-Core and leverages its capabilities to deliver a seamless video playback experience.
+- **Paella Player**: This is the complete video player application designed for end users. It includes all the necessary components, such as the user interface, plugins, and configurations, to provide a fully functional multi-stream video player. Paella Player is built on top of `paella-core` and leverages its capabilities to deliver a seamless video playback experience.
 
-- **paella-core**: This is the foundational library that provides the core functionality of the multi-stream video player. It includes the API for managing video streams, plugin support, and other essential features. Paella-Core is intended for developers who want to build custom video players or extend the functionality of Paella Player by creating new plugins or integrating additional features.
+- **paella-core**: This is the foundational library that provides the core functionality of the multi-stream video player. It includes the API for managing video streams, plugin support, and other essential features. `paella-core` is intended for developers who want to build custom video players or extend the functionality of Paella Player by creating new plugins or integrating additional features.
 
-In summary, Paella-Core is the engine that powers Paella Player, while Paella Player is the complete solution ready to be used by end users or integrated into larger platforms.
+In summary, `paella-core` is the engine that powers Paella Player, while Paella Player is the complete solution ready to be used by end users or integrated into larger platforms.
 
 ## What's new in Paella Player 8
 
@@ -73,7 +73,7 @@ Although all repositories are now unified, it's worth noting that core library a
 
 ## Paella Player libraries
 
-The introduction of Paella-Core 2.x brings significant enhancements that necessitate updates to codebases previously utilizing version 1.x. The majority of these changes are driven by the transition to a new building system, as well as substantial improvements in user experience and accessibility.
+The introduction of `paella-core` 2.x brings significant enhancements that necessitate updates to codebases previously utilizing version 1.x. The majority of these changes are driven by the transition to a new building system, as well as substantial improvements in user experience and accessibility.
 
 Key Changes and Migration Considerations
 
@@ -244,7 +244,7 @@ In addition, the new progress bar now features an improved slide marker system, 
 
 ### New menus
 
-Paella Core 2.x has replaced the traditional popup-based menu system with a new multi-level menu system that is statically positioned on the playback bar.
+`paella-core` 2.x has replaced the traditional popup-based menu system with a new multi-level menu system that is statically positioned on the playback bar.
 
 The new multi-level menu system offers several benefits:
 - **Native CSS Positioning**: Eliminates the need for JavaScript-based positioning.
@@ -261,10 +261,10 @@ Plugins developed with the `MenuButtonPlugin` API automatically benefit from the
 This change brings several benefits, including:
 
 - Native CSS positioning: The new menu system uses native CSS positioning, eliminating the need for JavaScript-based positioning.
-- Improved accessibility: Paella Core 2.x has more control over the content displayed in menus, allowing for automatic keyboard navigation management. This significantly improves accessibility without requiring plugin developers to worry about these issues.
+- Improved accessibility: `paella-core` 2.x has more control over the content displayed in menus, allowing for automatic keyboard navigation management. This significantly improves accessibility without requiring plugin developers to worry about these issues.
 - Enhanced usability: The new menu system replaces pop-ups with multi-level menus, improving usability and reducing screen space usage.
 
-All plugins implemented using the MenuButtonPlugin API in Paella Core 1.x will automatically benefit from these changes. However, plugins developed using the PopUpButtonPlugin API will continue to function but will not take advantage of automatic navigation management.
+All plugins implemented using the MenuButtonPlugin API in `paella-core` 1.x will automatically benefit from these changes. However, plugins developed using the PopUpButtonPlugin API will continue to function but will not take advantage of automatic navigation management.
 
 In addition to this, the new menu API incorporates a new element: statuses. With this new API it is possible to maintain a status on menu items, and to modify the menu icon and the status icon.
 
@@ -281,7 +281,7 @@ Whenever possible, it is recommended to migrate pop-up plugins to menu plugins t
 
 ### Custom progress bar
 
-Paella Core 2.x now includes a new API that allows developers to create a custom playback bar from scratch. This enables the implementation of new features that are not available in the default playback bar.
+`paella-core` 2.x now includes a new API that allows developers to create a custom playback bar from scratch. This enables the implementation of new features that are not available in the default playback bar.
 
 To create a new playback bar, you need to implement the `getProgressIndicator` function in the player's initialization object. This function returns an instance of the progress indicator component.
 
@@ -347,13 +347,13 @@ The keyboard shortcut plugins have been removed from `paella-core` 2.x. The plat
 
 **Reasoning Behind Removal**
 
-The decision to remove keyboard shortcut management from Paella Core stems from the fact that keyboard control is highly dependent on the specific website implementation. In previous versions of Paella Core (1.x), we encountered issues with websites featuring multiple players on the same page. This complexity made it challenging to manage keyboard shortcuts effectively through plugins.
+The decision to remove keyboard shortcut management from `paella-core` stems from the fact that keyboard control is highly dependent on the specific website implementation. In previous versions of `paella-core` (1.x), we encountered issues with websites featuring multiple players on the same page. This complexity made it challenging to manage keyboard shortcuts effectively through plugins.
 
 In contrast, managing keyboard shortcuts directly through the player's APIs provides a more straightforward and efficient approach. By doing so, developers can tailor keyboard control to their specific use case, ensuring a seamless user experience. This change allows for greater flexibility and customization, as developers can now handle keyboard events in a way that best suits their application.
 
 ### Progress indicator plugins
 
-In Paella Core 1.x, a plugin system allowed developers to draw custom content on top of the progress bar using a canvas element (Progress Indicator Plugins). However, this feature was only used for displaying the slide time markers, and its complexity made it difficult to adapt to different visual styles using CSS. The API was limited to drawing content using the canvas context, which restricted its flexibility. Progress Indicator Plugins Limitations:
+In `paella-core` 1.x, a plugin system allowed developers to draw custom content on top of the progress bar using a canvas element (Progress Indicator Plugins). However, this feature was only used for displaying the slide time markers, and its complexity made it difficult to adapt to different visual styles using CSS. The API was limited to drawing content using the canvas context, which restricted its flexibility. Progress Indicator Plugins Limitations:
 
 - Complexity: The plugin system was overly complex, making it challenging to implement and maintain.
 - Limited styling options: The use of a canvas element made it difficult to apply CSS styles, limiting the ability to customize the appearance of the progress bar.
@@ -363,16 +363,16 @@ For developers who require advanced customization options, the new progress bar 
 
 ### Current time label over the playback bar
 
-The new playback bar in Paella Core 2.x no longer displays the current time indicator on the progress bar. This feature was becoming increasingly less used due to accessibility issues and visual clutter, particularly in videos with multiple slides:
+The new playback bar in `paella-core` 2.x no longer displays the current time indicator on the progress bar. This feature was becoming increasingly less used due to accessibility issues and visual clutter, particularly in videos with multiple slides:
 
 - Visual overload: The presence of multiple time markers on the progress bar could lead to visual confusion, making it difficult for users to focus on the current time.
 - Insufficient contrast: In some cases, the time marker may not have provided sufficient contrast with the surrounding elements, further exacerbating accessibility issues.
 
 ![current time](about_paella_player_8/current-time.jpg)
 
-In Paella Core 2.x, the current time is now displayed through a plugin that can be activated in the button area of the playback bar. This plugin offers the same alignment options as other buttons, allowing for flexible placement and customization. This new approach has several advantages:
+In `paella-core` 2.x, the current time is now displayed through a plugin that can be activated in the button area of the playback bar. This plugin offers the same alignment options as other buttons, allowing for flexible placement and customization. This new approach has several advantages:
 
-- Improved accessibility: By removing the time indicator from the progress bar, Paella Core 2.x reduces visual clutter and improves overall accessibility.
+- Improved accessibility: By removing the time indicator from the progress bar, `paella-core` 2.x reduces visual clutter and improves overall accessibility.
 - Enhanced flexibility: The new plugin-based approach allows users to customize the display of the current time, choosing from various alignment options to suit their needs.
 - Simplified design: The removal of the time indicator from the progress bar results in a cleaner, more streamlined design that focuses on essential playback controls.
 Plugin-Based Solution
