@@ -92,9 +92,9 @@ The introduction of `paella-core` 2.x brings significant enhancements that neces
 
 Key Changes and Migration Considerations
 
-* Scoped packages: The paella-core library and all the plugins packaged are now published under the `@asicupv` scope.
+* Scoped packages: The `paella-core` library and all the plugins packaged are now published under the `@asicupv` scope.
 * Building System Overhaul: The most notable change is the adoption of a Vite, which streamlines the development process and enhances overall build performance.
-* Enhanced User Experience: paella-core 2.x introduces a range of features designed to improve the user experience, including revamped UI components, enhanced navigation, and more intuitive interaction models.
+* Enhanced User Experience: `paella-core` 2.x introduces a range of features designed to improve the user experience, including revamped UI components, enhanced navigation, and more intuitive interaction models.
 * Accessibility Improvements: The latest version prioritizes accessibility.
 
 
@@ -121,7 +121,7 @@ A new library called `@asicupv/paella-video-plugins` is introduced, which will c
 
 In addition to supporting various video formats, a dedicated plugin is provided to enable the display of embedded captions within HLS (HTTP Live Streaming) videos. However, it's essential to note that HLS embedded captions, particularly those generated in real-time, may not be fully compatible with the native captioning system integrated into paella-core.
 
-To address this limitation, our plugin offers a compromise solution. Although it doesn't allow for seamless integration of subtitles with the paella-core system, it does enable the display of embedded captions within HLS videos. This means that users can still benefit from having captions available, even if they are not fully integrated with the paella-core platform.
+To address this limitation, our plugin offers a compromise solution. Although it doesn't allow for seamless integration of subtitles with the `paella-core` system, it does enable the display of embedded captions within HLS videos. This means that users can still benefit from having captions available, even if they are not fully integrated with the `paella-core` platform.
 
 **Improved code size**: The HLS plugins imports the `hls.js` library dynamically. This avoids the need to load this library if the video format is not HLS.
 
@@ -137,7 +137,7 @@ The building system for paella and all its plugin libraries has been changed fro
 
 ### Explicit Plugin Import
 
-The introduction of paella-core 2.x brings a significant change to the building system, specifically affecting the way plugins are imported. As of version 2.x, plugins must be imported using explicit import, which replaces the previous implicit import method. The plugin import system of paella-core 1.0 allows to import all plugins of a plugin module using a *plugin context object*. This import system is based on a feature of Webpack, therefore this method of importing plugins has been removed.
+The introduction of `paella-core` 2.x brings a significant change to the building system, specifically affecting the way plugins are imported. As of version 2.x, plugins must be imported using explicit import, which replaces the previous implicit import method. The plugin import system of `paella-core` 1.0 allows to import all plugins of a plugin module using a *plugin context object*. This import system is based on a feature of Webpack, therefore this method of importing plugins has been removed.
 
 Example of Explicit Plugin Import:
 
@@ -194,9 +194,9 @@ const player = new Paella('player-container', {
 
 ### Manual Inclusion of Stylesheets
 
-Stylesheets were automatically included by Webpack inside the JavaScript code in paella-core 1.x. This posed some security and performance problems. In version 2.x, with the use of Vite instead of Webpack, style sheets are separated from the JavaScript code. For that reason they have to be explicitly included in the code.
+Stylesheets were automatically included by Webpack inside the JavaScript code in `paella-core` 1.x. This posed some security and performance problems. In version 2.x, with the use of Vite instead of Webpack, style sheets are separated from the JavaScript code. For that reason they have to be explicitly included in the code.
 
-This happens both with paella-core styles and with the styles of those libraries that include style sheets. This is an example of how you should include the style sheets in case you use Vite:
+This happens both with `paella-core` styles and with the styles of those libraries that include style sheets. This is an example of how you should include the style sheets in case you use Vite:
 
 ```js
 import '@asicupv/paella-basic-plugins/paella-basic-plugins.css';
@@ -338,7 +338,7 @@ Using CSS variables for customization offers flexibility, reusability, and ease 
 
 ### Removal of Pop-up API
 
-The Pop-up API has been deprecated and removed. This API was initially introduced for historical reasons, as it was used to implement menus in paella-core 1.x. However, with the introduction of the new multi-level menu system, the need for a separate API to create pop-ups has been eliminated.
+The Pop-up API has been deprecated and removed. This API was initially introduced for historical reasons, as it was used to implement menus in `paella-core` 1.x. However, with the introduction of the new multi-level menu system, the need for a separate API to create pop-ups has been eliminated.
 
 Furthermore, the standard HTML dialog element provides a straightforward way to migrate code that previously used Paella's pop-up API. This means that developers can easily transition their existing code to use the native HTML dialog functionality, which offers a more modern and standardized approach to creating interactive dialogs.
 
