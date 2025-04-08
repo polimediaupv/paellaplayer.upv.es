@@ -287,7 +287,7 @@ const playerConfig = {
 };
 ```
 
-## Customization
+## Customization and Skinning
 
 The playback bar has undergone significant changes, resulting in new selectors for styling. To simplify customization, we've introduced CSS variables that allow you to personalize colors, positions, sizes, paddings, and more.
 
@@ -311,9 +311,11 @@ Benefits of Removal:
 This change only affects you if you have directly used the APIs to open pop ups. If you had `PopUpButtonPlugin` plugins, they automatically adapt to the new multi-level menu API. However, whenever possible it is recommended to use `MenuButtonPlugin` first, as this will automatically handle keyboard navigation events.
 
 
-### paella-layout-plugins
+### Paella Layout Plugins
 
-The `paella-layout-plugins` repository has been removed. Layout plugins with static position are deprecated in version 2.x, and all layouts in this library were static, so this library will not be migrated for version 2.x. We do not rule out releasing a new layout library for version 2.x, but for the moment we have preferred to include the basic layouts in paella-core.
+The `paella-layout-plugins` repository has been deprecated and removed in version 2.x. This decision was made because all layouts in this library were static, and static position layouts are no longer supported in the new version. Instead, the basic layouts have been integrated directly into `paella-core`.
+
+While there are currently no plans to release a new layout library for version 2.x, this possibility is not entirely ruled out for the future. For now, developers can rely on the built-in layouts provided by `paella-core` to meet their needs.
 
 ### Keyboard shortcuts
 
@@ -337,12 +339,12 @@ For developers who require advanced customization options, the new progress bar 
 
 ### Current time label over the playback bar
 
-![current time](about_paella_player_8/current-time.jpg)
-
 The new playback bar in Paella Core 2.x no longer displays the current time indicator on the progress bar. This feature was becoming increasingly less used due to accessibility issues and visual clutter, particularly in videos with multiple slides:
 
 - Visual overload: The presence of multiple time markers on the progress bar could lead to visual confusion, making it difficult for users to focus on the current time.
 - Insufficient contrast: In some cases, the time marker may not have provided sufficient contrast with the surrounding elements, further exacerbating accessibility issues.
+
+![current time](about_paella_player_8/current-time.jpg)
 
 In Paella Core 2.x, the current time is now displayed through a plugin that can be activated in the button area of the playback bar. This plugin offers the same alignment options as other buttons, allowing for flexible placement and customization. This new approach has several advantages:
 
