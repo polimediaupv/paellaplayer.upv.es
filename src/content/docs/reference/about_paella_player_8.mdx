@@ -3,8 +3,7 @@ title: "About Paella Player 8"
 description: "In this document we will explain the new features of Paella Player 8."
 ---
 import ImageList from '@/components/ImageList.astro';
-
-
+import { LinkButton } from '@astrojs/starlight/components';
 
 Paella Player originated as an alternative video player for [Opencast](https://opencast.org). At that time, the official video player for Opencast was implemented using [Adobe Flash](https://es.wikipedia.org/wiki/Adobe_Flash) technology. As a result, the Flash-based video player used by Opencast was unable to function on mobile, which led to a significant limitation 
 for users who wanted to access video content on their mobile devices.
@@ -48,7 +47,14 @@ The new version of Paella introduces significant changes, including:
 
 - **Accessibility Improvements**: Accessibility has been a top priority in this release. The player now includes improved keyboard navigation, allowing users to seamlessly move between elements such as the playbar and menus. The introduction of multi-level menus ensures that all users, including those relying on assistive technologies, can easily access and interact with the player’s features. These changes align with modern accessibility standards to provide an inclusive experience.
 
+- **Skinning**: Paella Player 8 introduces a new approach to customization and skinning by leveraging CSS variables. These variables allow developers and designers to easily personalize the player's appearance, including colors, positions, sizes, and paddings, across all components. This simplifies the process of creating unique designs and ensures flexibility and maintainability.
 
+- **Deprecated**: Several features and plugins have been deprecated in Paella Player 8 to streamline the platform and improve usability:
+  - The **Pop-up API** has been removed in favor of the new multi-level menu system, which enhances accessibility and usability.
+  - The **`paella-layout-plugins`** repository has been deprecated, with basic layouts now integrated directly into `paella-core`.
+  - **Keyboard shortcut plugins** have been removed, as keyboard navigation is now managed directly through menus.
+  - The **Progress Indicator Plugins** system has been replaced with a more flexible API for customizing the progress bar.
+  - The **current time label** on the playback bar has been removed to reduce visual clutter and improve accessibility.
 
 ## Repository unification
 
@@ -298,11 +304,20 @@ const playerConfig = {
 
 ## Customization and Skinning
 
-The playback bar has undergone significant changes, resulting in new selectors for styling. To simplify customization, we've introduced CSS variables that allow you to personalize colors, positions, sizes, paddings, and more.
+Paella Player 8 has undergone significant changes, introducing new selectors and CSS variables to simplify the customization of the entire player. These updates allow developers and designers to personalize colors, positions, sizes, paddings, and more across all components of the player.
 
-Our objective is to enable customization of the playback bar solely through modification of CSS variables. This will allow developers and designers to create a unique appearance without worrying about specific selectors and styles.
+Our objective is to enable full customization of the player solely through the modification of CSS variables. This approach allows for the creation of unique appearances without the need to worry about specific selectors or styles for individual components.
 
-Using CSS variables for customization offers flexibility, reusability, and ease of maintenance. We may add new variables in the future to further enhance customization capabilities. For more information on available variables, please refer to our separate documentation.
+Using CSS variables for customization offers flexibility, reusability, and ease of maintenance. In the future, additional variables may be introduced to further enhance customization capabilities. For more information on available variables, please refer to our separate documentation.
+
+<LinkButton
+  href="/reference/styling_css_variables"
+  variant="secondary"
+  icon="external"
+  iconPlacement="start"
+>
+  Related: Styling CSS Variables
+</LinkButton>
 
 ## Things that have been removed
 
