@@ -1,0 +1,28 @@
+---
+import Player from "@/components/Player.astro";
+type PlayerExampleProps = {
+  title: string;
+  description: string;
+  manifest: string;
+  id: string;
+};
+const { title, description, manifest, id } = Astro.props;
+---
+<article>
+    <header>
+        <h2>{title}</h2>
+        <p>{description}</p>
+    </header>
+    <section>
+        <Player id={id} manifest={manifest} />
+    </section>
+</article>
+
+<style>
+    article {
+        display: grid;
+        grid-template-columns: 0.5fr 1fr;
+        grid-template-rows: auto;
+        margin: 5ch 0;
+    }
+</style>

@@ -53,11 +53,12 @@ const { title } = Astro.props;
             "footer";
         justify-items: center;
         background: var(--color-light);
+        box-sizing: border-box;
 
         & > header {
             grid-area: header;
             box-sizing: border-box;
-            width: 100vw;
+            width: 100%;
         }
 
         & > main {

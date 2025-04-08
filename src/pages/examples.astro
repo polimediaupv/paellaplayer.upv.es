@@ -1,14 +1,19 @@
 ---
 import MainTemplate from '@/templates/Main.astro'
 import Player from '@/components/Player.astro'
-
+import PlayerExample from '@/components/PlayerExample.astro'
+import examples from '@/data/examples.json'
 ---
 <MainTemplate title="Paella Player">
     <h1>Examples</h1>
-    <h2>Dual Stream mp4</h2>
-    <Player id="playerContainer" manifest="dual-stream" />
 
-    <h2>HLS Multiquality</h2>
-    <Player id="playerHls" manifest="hls-multiquality" />
+    {examples.map(example => (
+        <PlayerExample
+            title={example.title}
+            description={example.description}
+            manifest={example.manifest}
+            id={example.title.replace(/\s+/g, '-').toLowerCase()}
+        />
+    ))}
     
 </MainTemplate>

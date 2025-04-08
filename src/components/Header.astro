@@ -10,9 +10,6 @@ const currentPath = Astro.url.pathname;
         <li><a href="/examples" class={/examples/i.test(currentPath) ? "active" : ""}>Examples</a></li>
         <li><a href="/documentation" class={/documentation/i.test(currentPath) ? "active" : ""}>Documentation</a></li>
     </menu>
-    <footer>
-        
-    </footer>
 </header>
 
 <style>
@@ -22,6 +19,7 @@ const currentPath = Astro.url.pathname;
         justify-content: space-between;
         align-items: center;
         padding: 1ch;
+        box-sizing: border-box;
 
         & > a > img {
             height: 4ch;
@@ -29,10 +27,11 @@ const currentPath = Astro.url.pathname;
 
         menu {
             display: flex;
-            gap: 1ch;
+            gap: 4ch;
             list-style: none;
             padding: 0;
             margin: 0;
+            box-sizing: border-box;
 
             & > li > a {
                 text-decoration: none;
