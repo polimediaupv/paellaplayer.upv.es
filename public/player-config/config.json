@@ -135,7 +135,7 @@
                 "presentation"
             ],
             "side": "left",
-            "order": 0
+            "order": 1
         },
 
         "es.upv.paella.prevSlideNavigatorButton": {
@@ -144,7 +144,7 @@
                 "presentation"
             ],
             "side": "left",
-            "order": 1
+            "order": 0
         }
     }
 }

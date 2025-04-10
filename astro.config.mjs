@@ -11,6 +11,9 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Documentation',
+			customCss: [
+				'./src/styles/custom.css'
+			],
 			logo: {
 				light: './src/assets/light-logo.webp',
 				dark: './src/assets/dark-logo.webp',
