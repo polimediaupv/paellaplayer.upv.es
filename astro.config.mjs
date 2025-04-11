@@ -20,7 +20,7 @@ export default defineConfig({
 				replacesTitle: true,
 			},
 			social: {
-				github: 'https://github.com/withastro/starlight',
+				github: 'https://github.com/polimediaupv/paella-player'
 			},
 			sidebar: [
 				{
