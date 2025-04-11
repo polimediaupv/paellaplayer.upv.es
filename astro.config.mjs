@@ -33,7 +33,8 @@ export default defineConfig({
 						{ label: 'Init Params', slug: 'tutorial/init_params' },
 						{ label: 'Plugins', slug: 'tutorial/plugins' },
 						{ label: 'Group Buttons', slug: 'tutorial/group_buttons' },
-						{ label: 'Styling', slug: 'tutorial/styling' }
+						{ label: 'Styling', slug: 'tutorial/styling' },
+						{ label: 'Skins', slug: 'tutorial/skins' }
 					],
 				},
 				{

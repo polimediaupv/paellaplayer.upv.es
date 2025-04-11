@@ -1,0 +1,242 @@
+---
+title: Skins
+description: Skins are a way to customize the appearance of your application. Apart from the CSS styles, skins allows you to change icons and configuration settings.
+---
+
+In the previous tutorial we learned how to customize the appearance of Paella Player using CSS styles. In this tutorial we will learn how to customize the appearance of Paella Player using skins.
+
+Skins are a way to customize the appearance of your application. Apart from the CSS styles, skins allows you to change icons and configuration settings. The skins are loaded at runtime and can be changed at any time. The only requirement is that the skin must be loaded before the player is loaded, and if you change the skin, you must reload the player to see the changes.
+
+Note that as the skin can modify the configuration of the player, it allows you to change the plugins that are loaded. This means that you can create a skin that loads different set of plugins, or load the same plugins but using a different configuration. For example, you can create a skin for large screens and another for small ones that group some plugins under a button group.
+
+## Skin structure
+
+A skin is a folder that contains the following files:
+
+- **Skin definition**: A JSON file that defines the skin. This file contains the name of the skin, the description, the author, and the version. It also contains a list of icons and a list of configuration settings that can be changed, and a reference to the CSS file.
+- **CSS file**: A CSS file that contains the styles for the skin. This file is loaded after the default styles and can override them.
+- **Other resources**: if you want to include icons in the skin, you can include them in the skin folder.
+
+The skin must be available online at runtime. For that reason, you must place the skin in the `public` folder. Create a folder called `skins` in the `public` folder, and add a folder called `my-skin` inside it.
+
+```txt
+/public
+    /skins
+        /my-skin
+```
+
+## Create the skin definition file
+
+Add the skin file inside the `public/skins/my-skin` folder. The skin definition file can be called whatever you want. For example, `skin.json` or `my-skin.json`. The only requirement is that the file must be a valid JSON file.
+
+**public/skins/my-skin/skin.json**
+
+```json
+{
+    "name": "My Skin",
+    "description": "My custom skin for Paella Player",
+    "author": "Fernando Serrano Carpena",
+    "styleSheets": [
+        "style.css"
+    ],
+    "icons": [
+        {
+            "plugin": "es.upv.paella.frameControlButtonPlugin",
+            "identifier": "photoIcon",
+            "icon": "slide.svg"
+        }
+    ],
+    "configOverrides": {
+        "videoContainer": {
+            "overPlaybackBar": false
+        }
+    }
+}
+```
+
+### Styles
+
+The property `styleSheets` is an array of strings that contains the names of the CSS files that are loaded when the skin is loaded. The CSS files are loaded in the order they are defined in the array. The CSS files must be relative to the skin folder.
+
+
+### Icons
+
+The property `icons` is an array of objects that contains the icons that are used in the skin. The Paella player instance contains an API that allows you to change the icons of a plugin. To use this API, the plugin must be compatible with the icon API. The property `plugin` is the unique identifier of the plugin. The property `identifier` is the identifier of the icon that you want to change. This identifier is defined by the plugin, and you can find it in the plugin documentation. The property `icon` is the name of the file that you want to use as icon. The path of the icon file is relative to the skin folder.
+
+In this example, we are changing the icon of the `es.upv.paella.frameControlButtonPlugin` plugin. The identifier of the icon is `photoIcon`, and the icon file is `slide.svg`. The icon file must be in the skin folder or in a subfolder of the skin folder.
+
+Add the `slide.svg` file to the `public/skins/my-skin` folder.
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" stroke-width="2" style="fill: none;">
+  <path d="M9 12v-4"></path>
+  <path d="M15 12v-2"></path>
+  <path d="M12 12v-1"></path>
+  <path d="M3 4h18"></path>
+  <path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"></path>
+  <path d="M12 16v4"></path>
+  <path d="M9 20h6"></path>
+</svg>
+```
+
+The path of the icon file is relative to the skin folder. The icon file must be a valid SVG file. Note that the SVG file is loaded inside the DOM tree. Doing this, the SVG file can be styled using CSS. This means that you can change the color of the icon using CSS styles. The icon must be compatible with the icon API requirements.
+
+In this case, look at the `style` attribute of the SVG file. The `fill` property is set to `none`. In addition, the `stroke` property is set to `currentColor`. These attributes have been set because in the case of this icon we want only the outline of the paths to be shown. Also note that none of the elements that make up the icon have a colour defined. Icon colours are set in the `paella-core` styles by the following rule:
+
+```css
+button > i > svg {
+    fill: var(--icon-fill-color);
+    stroke: var(--icon-stroke-color);
+}
+```
+
+<blockquote>
+    Note: we have removed some details of the CSS selector to make it easier to read.
+</blockquote>
+
+In the CSS we are setting the fill and stroke color of the icon at the SVG root level. With this in mind, you will need to set the necessary properties on the SVG elements. In our case, the icon is designed to work without a fill colour, so we set the `fill` attribute to `none` in the style, and all icon elements are left without any colour definition. If you have an icon that internally mixes fills with outlines, then you would have to set the `fill` and `stroke` properties on the icon elements as appropriate. Note that you can also force a fill or stroke colour in the icon's CSS, but this will cause the icon to not take on the colours defined in the player styles.
+
+You can read more about this in the [Customizing icons](/reference/customizing_icons) documentation.
+
+
+### Configuration
+
+The `configOverrides` property is an object that contains the configuration settings that you want to change. The keys of the object are the names of the configuration settings, and the values are the new values that you want to set. You can find the list of configuration settings in the documentation of the player:
+
+[Configuration](/reference/configuration)
+
+The settings we change in the skin will take precedence over the settings defined in the player configuration file, as the skin may require certain settings to work correctly. In this case we are setting the `videoContainer/overPlaybackBar` property to `false`.
+
+If the `overPlaybackBar` property is set to `true`, then the video container will always leave a gap below it for playback controls. In the skin we're designing we want the playback bar to be displayed floating above the video, so it's important to make sure that the `overPlaybackBar` property is set to `false`. Although by default the `overPlaybackBar` property is already `false`, be aware that the developer could change this property in the player's configuration file, so we add this property to the skin to ensure that the playback bar is displayed above the video container.
+
+
+## Create the CSS file
+
+Add the following CSS file to the `public/skins/my-skin` folder:
+
+```css
+:root {
+    --highlight-bg-color: #5091cb;
+    --highlight-bg-color-hover: #48759c;
+    --main-fg-color: rgb(222, 221, 221);
+    --main-bg-color: rgba(26, 26, 26, 0.923);
+    --secondary-bg-color: rgb(49, 49, 49);
+    --secodnary-bg-color-highlight: rgb(66, 66, 66);
+
+    --playback-bar-container-padding: 20px;
+    --playback-bar-container-gap: 10px;
+
+    --playback-bar-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    --playback-bar-border-radius: 10px;
+
+    --popup-wrapper-padding: 15px 15px;
+
+
+    --playback-bar-gradient: linear-gradient(0deg, rgba(33, 33, 33, 0.8) 0%, rgba(26, 26, 26, 0.8) 0%);
+    --playback-bar-gradient-hover: linear-gradient(0deg, rgba(34, 34, 34, 0.8) 0%, rgba(19, 19, 19, 0.8) 0%);
+    --playback-bar-buttons-padding: 5px 15px 15px 15px;
+
+
+    --progress-indicator-padding: 6px 15px 2px 15px;
+    --progress-indicator-slide-marker-height: 13px;
+    --handler-opacity: 0;
+    --handler-color-hover: #bbbbbb;
+    --handler-color-active: #b9b7b7;
+
+    --timeline-preview-gap: 25px;
+    --timeline-preview-border-radius: 20px;
+    --timeline-preview-padding: 15px;
+}
+
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"] {
+    color: var(--highlight-bg-color);
+    background-color: var(--main-fg-color);
+
+    & svg {
+        fill: rgb(36, 36, 36);
+        stroke: rgb(43, 43, 43);
+    }
+}
+
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"]:hover {
+    background-color: var(--highlight-bg-color);
+}
+
+.playback-bar ul>li>button[name="es.upv.paella.playPauseButton"]:active {
+    background-color: var(--highlight-bg-color-hover);
+}
+```
+
+You can learn more about the CSS variables and how to use them in the [CSS variables documentation](/reference/styling_css_variables).
+
+## Load the skin
+
+We start from the following source code, which is the same as in the previous tutorial, except that we have removed the import of the `CSS` file with the styles:
+
+```js
+import { 
+    Paella
+} from '@asicupv/paella-core';
+import {
+    basicPlugins
+} from '@asicupv/paella-basic-plugins';
+import {
+    slidePlugins
+} from '@asicupv/paella-slide-plugins';
+
+import "@asicupv/paella-core/paella-core.css";
+import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
+import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
+
+const initParams = {
+    // Initialization parameters
+    configResourcesUrl: 'settings/',
+    configUrl: 'settings/settings.json',
+    defaultVideoPreview: "/settings/default_preview_landscape.jpg",
+
+    plugins: [
+        ...basicPlugins,
+        ...slidePlugins
+    ]
+};
+const player = new Paella('playerContainer', initParams);
+
+await player.loadManifest();
+```
+
+To load the skin, we use the `skin` API of the `Paella` instance:
+
+```js
+
+...
+
+await player.skin.loadSkin("skins/my-skin/skin.json");
+
+await player.loadManifest();
+```
+
+As the skin can change the player configuration, this API requires to reload the player to take effect. We are calling `loadSkin` before calling `loadManifest`, for that reason the skin API will not make any change to the player state: it is unloaded and will remain unloaded. If we call the `loadSkin` function when the player is already loaded, the player will be reloaded.
+
+We going to make a little experiment. We are going to load the skin after the player is loaded. This will cause the player to be reloaded and the skin to be applied. To do it, we are using the player event API, which we aren't going to explain in detail in this tutorial, but you can read about it in the [Events documentation](/reference/events). After the player is loaded, we are going to load the skin two seconds later. The skin will be applied and the player will be reloaded.
+
+```js
+
+// remove the loadSkin call from here
+//await player.skin.loadSkin("skins/my-skin/skin.json");
+
+await player.loadManifest();
+
+player.bindEvent(player.Events.PLAYER_LOADED, () => {
+        setTimeout(async () => {
+            await player.skin.loadSkin("skins/my-skin/skin.json");
+        }, 2000);
+    },
+    true  // IMPORTANT: unregister the event when the player is unloaded!
+); 
+```
+
+When we change the skin while the player is loaded, `loadSkin` will remember the current time instant of the video, reload the player with the new skin, and jump to the time instant that was saved. This makes it possible to implement plugins that change the player skin.
+
+<blockquote>
+    Note: it is possible for the player reload to fail if the browser has strict security settings where it does not allow videos to play automatically. To avoid this problem, you can make the call to `loadSkin` inside a user event. A button plugin or menu plugin would be a suitable option. However, these options can also be interfered with by strict security settings or browser extensions. For these reasons, to make sure we don't have problems, it is best to load the skin before loading the video manifest and avoid doing so during video playback.
+</blockquote>
