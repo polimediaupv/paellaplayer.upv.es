@@ -1,0 +1,316 @@
+---
+title: Initialization
+description: "In this document, we will learn how to initialize the Paella player. We will see how to create the player instance, specify the list of the plugins that we want to load, and setup other player initialization parameters"
+---
+
+<blockquote>
+    <header>
+        Tutorial: player Initialization
+    </header>
+    You can check the [player initialization tutorial](/tutorial/init_params) to see a basic example of how to use the `initData` object in the player constructor.
+</blockquote>
+
+
+## Create Paella Player instance with basic initialization
+### Load player
+
+To create a new instance of the Paella player, you need create an instance of the `Paella` class, passing to its constructor the DOM element that will contain the player, or the id of that element.
+
+Then, you can load the player and the video manifest in one step using the `load()` function. This function will load the player and the video manifest, and will initialize the player with the data obtained from the manifest. 
+
+```js
+import { Paella } from '@asicupv/paella-core'
+
+const initParams = {};
+const paella = new Paella('container-id', initParams);
+paella.load()
+    .then(() => console.log("Initialization done"))
+    .catch(e => console.error(e));
+```
+
+### Lazy load
+
+To load the minimum amount of data needed to present the video thumbnail, you can load the player in two steps. The `load()` function used in the previous section is implemented like this:
+
+```js
+async load() {
+    await this.loadManifest();
+    await this.loadPlayer();
+}
+```
+
+If you only call `loadManifest()`, paella will only load the manifest and the plugins of type `preload`, which will leave the player ready for the user to complete the load when clicked. At that point the 'loadPlayer()` will be called:
+
+```js
+const paella = new Paella('container-id');
+paella.loadManifest()
+    .then(() => console.log("Initialization done"))
+    .catch(e => console.error(e));
+```
+
+Please, read this [important note about autoplay](/reference/about_autoplay). Currently, `paella-core` does not support automatic playback of videos of any kind. If a video is loaded directly using the `load()` function described above, it will only work if that call is triggered by a user event, such as a `click`.
+
+## Initialization parameters
+
+The (optional) second parameter of the `Paella` constructor is an object that contains the initialization parameters. This object is called `initParams`, and it is used to configure the player. The following attributes are available in this object:
+
+```javascript
+const initParams = {
+    // Initialiation attributes
+    configResourcesUrl: 'config/',    // Location of resources to be configured in the config.json file
+    configUrl: 'config/config.json',    // Used by the default loadConfig function
+    repositoryUrl: 'repository',    // URL to locate the video manifests (see getManifestUrl)
+    manifestFileName: 'data.json',     // manifest file name (can be overrided in config.json)
+
+    // Initialization callbacks
+    loadConfig: default_load_config_function,      // overrides the config.json file load
+    getVideoId: default_video_id_function,     // get the video identifier
+    getManifestUrl: default_manifest_url_function,    // get the video manifest url
+    getManifestFileUrl: default_manifest_file_url_function,   // get the full manifest file url
+    loadVideoManifest: default_load_video_manifest_function,   // get the manifest file content
+    getCookieConsentFunction: default_get_cookie_consent_function,    // get cookie consent preferences function
+    getCookieDescriptionFunction: default_get_cookie_description_function,    // get cookie description function
+  
+  	plugins: [],	// an array of plugin classes to extend Paella Player
+
+    customLoader: [Loader]  // a custom loader class
+} 
+```
+
+### Default initialization functions
+
+```javascript
+import {
+    defaultLoadConfigFunction,
+    defaultGetVideoIdFunction,
+    defaultGetManifestUrlFunction,
+    defaultGetManifestFileUrlFunction,
+    defaultLoadVideoManifestFunction
+} from 'paella-core';
+
+```
+
+The default initialization functions are located at the `@asicupv/paella-core` package. You can use them to customize the behavior of that functions, for example, you can change some configuration parameters implementing your own `loadConfiguration` function, but you can use the `defaultLoadConfigFunction` to use the default configuration loading function and just change the settings you want to modify:
+
+```js
+import {
+    Paella,
+    defaultLoadConfigFunction
+} from '@asicupv/paella-core';
+
+const initParams = {
+    loadConfig: async (configUrl, player) => {
+        const config = await defaultLoadConfigFunction(configUrl, player);
+        utils.mergeObjects(config, {
+            plugins: {
+                // We want to ensure that the play/pause button is enabled, even if
+                // the configuration file disables it.
+                "es.upv.paella.playPauseButton": {
+                    enabled: true
+                }
+            }
+        });
+        return config;
+    }
+}
+const player = new Paella('player-container', initParams);
+...
+```
+
+### defaultLoadConfigFunction
+
+```javascript
+export async function defaultLoadConfigFunction(configUrl,player) {
+    player.log.debug("Using default configuration loading function.");
+    const response = await fetch(configUrl);
+    return response.json();
+}
+```
+
+### defaultGetVideoIdFunction
+
+```javascript
+import { utils } from 'paella-core';
+const { getUrlParameter } = utils;
+
+
+/**
+ * Get video identifier from URL or configuration.
+ * The identifier is selected from the first provider in the following order:
+ * - URL hash parameter: #id=xy
+ * - URL search parameter: ?id=xy
+ * - Configuration option `fallbackId`
+ */
+export async function defaultGetVideoIdFunction(config, player) {
+    player.log.debug("Using default getVideoId function");
+    return getHashParameter("id") || getUrlParameter("id") || config.fallbackId;
+}
+```
+
+### defaultGetManifestUrlFunction
+
+```javascript
+import { utils } from 'paella-core';
+const { joinPath } = utils;
+
+// repoUrl: the value specified in initParams.repositoryUrl
+// videoId: the video identifier returned by initParams.getVideoId()
+export async function defaultGetManifestUrlFunction(repoUrl,videoId,config,player) {
+    player.log.debug("Using default getManifestUrl function");
+    return joinPath([repoUrl,videoId]);
+}
+```
+
+### defaultGetManifestFileUrlFunction
+
+```javascript
+export async function defaultGetManifestFileUrlFunction(manifestUrl,manifestFileName,config,player) {
+    player.log.debug("Using default getManifestFileUrl function");
+    return joinPath([manifestUrl,manifestFileName]);
+}
+```
+
+### defaultLoadVideoManifestFunction
+
+```javascript
+export async function defaultLoadVideoManifestFunction(videoManifestUrl,config,player) {
+    player.log.debug("Using default loadVideoManifest function");
+    const response = await fetch(videoManifestUrl);
+    return response.json();
+}
+```
+
+### defaultGetCookieConsentFunction
+
+See [the document about cookie consent](/reference/cookie_consent) to learn more about the cookie consent system.
+
+```javascript
+export const defaultGetCookieConsentCallback = (type) => {
+    return false;
+}
+```
+
+### defaultGetCookieConsetnDescriptionFunction
+
+```javascript
+export const defaultGetCookieDescriptionCallback = (cookieObject) => {
+    return cookieObject.description;
+}
+```
+
+## Load plugins
+
+Paella Player can be extended using plugins. The `plugins` attribute of the `initParams` object is an array of plugin classes that will be loaded when the player is initialized.
+
+```js
+import {
+    basicPlugins
+} from "@asicupv/paella-basic-plugins"
+const initParams = {
+plugins: [
+    ...basicPlugins
+]
+}
+```
+
+Each plugin library can export an object that contains the list of plugins defined in that package. For example, the `@asicupv/paella-basic-plugins` package exports an object called `basicPlugins`, which contains the list of plugins defined in that package.
+
+The plugin libraries also exports the individual plugin clases, that you can use to import only specific plugins.
+
+```js
+import {
+    FullscreenButtonPlugin
+} from "@asicupv/paella-basic-plugins"
+
+const initParams = {
+plugins: [
+    FullscreenButtonPlugin
+]
+}
+```
+
+Note that, apart from importing the plugin classes, the plugins must be enabled in the configuration file.
+
+**config.json**
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.fullscreenButtonPlugin": {
+            "enabled": true
+        }
+    }
+}
+```
+
+You can also enable a plugin in the `initParams` object, if you import it individually. To do it, instead of using the plugin class, you must use the plugin object, which is an object that contains the plugin class and the default plugin configuration:
+
+```js
+import {
+    FullscreenButtonPlugin
+} from "@asicupv/paella-basic-plugins"
+
+const initParams = {
+    plugins: [
+        {
+            plugin: FullscreenButtonPlugin,
+            config: {
+                enabled: true
+            }
+        }
+    ]
+}
+```
+
+Note that this default configuration is overrided by the configuration file. The only way to ensure that a specific configuration is not overrided is to implement a custom `loadConfiguration` function, as we saw in the header of [initialization parameters section](/reference/initialization#initialization-parameters)`.
+
+## Loader
+
+You can customize the default loader using the `customLoader` attribute. To do it, you must to create a custom `Loader` class, and specify it in this attribute. See how to do it in [this document](/reference/loader).
+
+## Default preview image
+
+The preview image metadata is required in the ([video manifest](/reference/video_manifest)). However, it is possible to define a default image, in case the video manifest does not contain a defined one. If a preview image is defined, then an exception will not be thrown in case the `preview` metadata is not included in the manifest, but simply a warning log will be displayed in the console.
+
+It is possible to define a preview image in two places:
+
+- The configuration file: using the `defaultVideoPreview` attribute.
+
+```json
+{
+    "defaultVideoPreview": "http://myserver.com/default_image.jpg",
+    ...
+}
+```
+
+You can also configure a preview image in portrait mode (paella-core >= 1.12). This preview is usefull when the player uses a [dynamic video layout](video_layout.md), and it is shown in a portrait container, for example, in a smartphone.
+
+```json
+{
+    "defaultVideoPreview": "http://myserver.com/default_image_landscape.jpg",
+    "defaultVideoPreviewPortrait": "http://myserver.com/default_image_portrait.jpg",
+    ...
+}
+```
+
+Setting either of the two preview images (landscape or portrait) will be sufficient to meet the requirement of specifying a preview image, but it is advisable to set both modes.
+
+- The `initParams` object.
+
+```js
+const initParams = {
+    defaultVideoPreview: 'http://myserver.com/default_image.jpg',
+    ...
+};
+
+const player = new Paella('player-container', initParams);
+...
+```
+
+If the image is defined in both places, then the value defined in the configuration file has higher priority.
+
+The URL of the image works differently if it is absolute or relative:
+
+- If the URL is relative, the image will be searched for in the manifest video folder. For example, if the video manifest is `http://myserver.com/myvideo/data.json`, and the preview image is `images/default_preview.jpg`, the final URL will be `http://myserver.com/myvideo/images/default_preview.jpg`.
+- If the URL is absolute or is relative to the site root, then that URL will be used without change.
+

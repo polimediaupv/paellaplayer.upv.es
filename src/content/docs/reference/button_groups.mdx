@@ -1,0 +1,103 @@
+---
+title: "Button Groups"
+description: "Button groups are a set of buttons that are grouped together to perform related actions."
+---
+
+The button groups allows to group several plugins of type button or of types derived from this one, in a menu that is displayed when activating the plugin.
+
+To create a button group, we need to add the group configuration to the configuration file, inside the `buttonGroups` section:
+
+**config.json**
+
+```json
+{
+    "buttonGroups": [
+        {
+            "enabled": true,
+            "menuTitle": "Options",
+            "groupName": "options",
+            "description": "Configuration options",
+            "icon": "settings-icon.svg",
+            "order": 4,
+            "side": "right",
+            "parentContainer": "playbackBar"
+        }
+    ]
+}
+```
+
+The `menuTitle` property is used to specify the title of the menu that will be displayed when the button is activated. The `groupName` property is used to identify the group, and it must be unique. This name will be used in the `parentContainer` property of the buttons that we want to group inside this group.
+
+The `icon` property is used to specify the icon we want to use for the button that will display the menu with the options. The icon must be a file in `svg` format, and will be looked for in a path relative to the location of the configuration file. In the example above, the icon `settings-icon.svg` will be looked for in the same path as the configuration file.
+
+The rest of the properties are the same properties as other button plugins. In fact, a button group is a button plugin, the only difference is that the plugin is created automatically from the configuration options specified in the `buttonGroups` section.
+
+As a button group is a button plugin, you can group other button group plugins inside another group, to create a hierarchy of button groups. This is useful to create submenus, where the buttons are grouped by functionality:
+
+```json
+{
+    "buttonGroups": [
+        {
+            "enabled": true,
+            "menuTitle": "Options",
+            "groupName": "options",
+            "description": "Configuration options",
+            "icon": "settings-icon.svg",
+            "order": 4,
+            "side": "right",
+            "parentContainer": "playbackBar"
+        },
+        {
+            "enabled": true,
+            "menuTitle": "Video options",
+            "groupName": "videoOptions",
+            "description": "Video configuration options",
+            "icon": "video-settings.svg",
+            "order": 0,
+            "side": "right",
+            "parentContainer": "options"
+        },
+        {
+            "enabled": true,
+            "menuTitle": "Captions",
+            "groupName": "captionsOptions",
+            "description": "Captions and subtitles",
+            "icon": "captions-icon.svg",
+            "order": 1,
+            "side": "right",
+            "parentContainer": "options"
+        }
+    ],
+
+    "plugins": {
+        "es.upv.paella.qualitySelectorPlugin": {
+            "enabled": true,
+            "side": "right",
+            "parentContainer": "videoOptions",
+        },
+        "es.upv.paella.playbackRatePlugin": {
+            "enabled": true,
+            "side": "right",
+            "parentContainer": "videoOptions",
+        },
+        "es.upv.paella.captionsSelectorPlugin": {
+            "enabled": true,
+            "side": "right",
+            "parentContainer": "captionsOptions",
+        },
+        "es.upv.paella.searchCaptionsPlugin": {
+            "enabled": true,
+            "side": "right",
+            "parentContainer": "captionsOptions"
+        } 
+    }
+}
+```
+
+<blockquote>
+    **Note:** the plugins used in the previous code are just examples. They may not exist in the current version of Paella.
+</blockquote>
+
+Observe that the `side` property of the button group is set to `right`, which means that the button will be displayed on the right side of the playback bar. If you group plugins inside a button group, the `side` property must be set to the same value as the button group, otherwise the button will not be displayed as a submenu, but will be displayed in the side specified in the `side` property.
+
+All the button plugins have a `title` property, which is used to specify the tooltip of the button. This value is set internally in the button code. It is possible to override the default tooltip text by setting the `description` property in the configuration. When a button is grouped inside a button group, the text shown in the menu item is the same value of the tooltip: the `title` property of the plugin, or the `description` property in the plugin configuration, if it is set.
