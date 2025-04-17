@@ -1,0 +1,305 @@
+---
+title: Plugins of the Core package
+description: This document describes the plugins that are included in the core package of Paella Player. These plugins are used to implement the basic functionality of the player, and are required for the player to work properly.
+---
+
+## [Data plugins](/reference/data_plugins)
+
+### `es.upv.paella.cookieDataPlugin`
+
+Load and store data from cookies.
+
+### `es.upv.paella.localStorageDataPlugin`
+
+Load and store data from the browser local storage
+
+## [Layout plugins](/reference/video_layout)
+
+### `es.upv.paella.singleVideo`
+
+Static layout for videos with one or more streams. This plugin contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams.
+
+The button icons that can be configured:
+
+- plugin identifier: `es.upv.paella.singleVideo`
+- icon names:
+    + `iconSideBySide`: change to a dual stream video.
+
+### `es.upv.paella.singleVideoDynamic`
+
+Dynamic layout for videos with one or more streams. This plugin contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams.
+
+The button icons that can be configured:
+
+- plugin identifier: `es.upv.paella.singleVideoDynamic`
+- icon names:
+    + `iconSideBySide`: change to a dual stream video.
+
+To use the dual stream icon it's necessary to configure the `dualVideoContentIds` attribute in the `es.upv.paella.singleVideo` plugin configuration. This attribute is an array of content identifiers that will be used to switch to a dual video layout:
+
+```json
+"es.upv.paella.singleVideoDynamic": {
+    "dualVideoContentIds": [
+        "presenter-presentation-dynamic",
+        "presenter-2-presentation-dynamic",
+        "presenter-presenter-2-dynamic"
+    ],
+    ...
+},
+"es.upv.paella.dualVideoDynamic": {
+    { "id": "presenter-presentation-dynamic", ... },
+    { "id": "presenter-2-presentation-dynamic", ... },
+    { "id": "presenter-presenter-2-dynamic", ... }
+}
+```
+
+### `es.upv.paella.dualVideo`
+
+Layout for videos with two or more streams. This layout contains buttons that allow you to switch to the layout of a single video. This plugin contains icons that can be configured:
+
+- plugin identifier: `es.upv.paella.dualVideo`
+- icon names:
+    + `iconRotate`: exchange the left video with the right video, in side-by-side mode
+    + `iconMaximize`: maximize video thumbnail.
+    + `iconClose`: close a video.
+    + `iconSwitchSide`: switch the picture-in-picture video side.
+    + `iconMinimize`: minimize a video.
+    + `iconSideBySide`: set the video in side-by-side mode.
+    
+### `es.upv.paella.dualVideoDynamic`
+
+Dynamimc layout for videos with two or more streams. This layout contains buttons that allow you to switch to the layout of a single video. This plugin contains icons that can be configured:
+
+- plugin identifier: `es.upv.paella.dualVideoDynamic`
+- icon names:
+    + `iconSwitchSide`: exchanges the contents of the streams.
+    + `iconMaximize`: maximize a video.
+    + `iconSideBySide`: set both videos to 50% width.
+    + `iconClose`: close a video (setting the corresponding single video layout).
+    + `iconPiP`: set the video in picture-in-picture mode.
+
+To use the picture-in-picture button, it's necessary to configure the `pipContentIds` attribute in the plugin configuration. This attribute is an array of content identifiers that will be used to switch to a picture-in-picture layout:
+
+```json
+"es.upv.paella.dualVideoDynamic": {
+    "pipContentIds": [
+        "presenter-presentation-pip",
+        "presenter-2-presentation-pip",
+        "presenter-presentation-2-pip"
+    ],
+    ...
+},
+"es.upv.paella.dualVideoPiP": {
+    "validContent": [
+        { "id": "presenter-presentation-pip", ... },
+        { "id": "presenter-2-presentation-pip", ... },
+        { "id": "presenter-presenter-2-pip", ... }
+    ],
+    ...
+}
+```
+
+The `allowSwitchSide` property in the configuration allows to enable or disable the button that allows to switch the position of the two videos. By default, this property is set to `true`, but it can be set to `false` if you want to disable this feature.
+
+```json
+"es.upv.paella.dualVideoDynamic": {
+    "allowSwitchSide": false,
+    ...
+}
+```
+
+### `es.upv.paella.dualVideoPiP`
+
+Static layout for videos with two or more streams in picture-in-picture mode. This layout contains buttons that allow you to switch to single video and side-by-side dual video.
+
+This plugin contains icons that can be configured:
+
+- plugin identifier: `es.upv.paella.dualVideoPiP`
+- icon names:
+    + `iconClose`: close a video (setting the corresponding single video layout).
+    + `iconSwitchSide`: exchanges the contents of the streams.
+    + `iconMaximize`: maximize a video.
+    + `iconSideBySide`: change to a dual video side-by-side layout.
+
+To use de side-by-side button, it's necessary to configure the `dualVideoContentIds` attribute in the plugin configuration. This attribute is an array of content identifiers that will be used to switch to a dual video layout:
+
+```json
+"es.upv.paella.dualVideoPiP": {
+    "dualVideoContentIds": [
+        "presenter-presentation-sbs",
+        "presenter-2-presentation-sbs",
+        "presenter-presenter-2-sbs"
+    ],
+    ...
+},
+"es.upv.paella.dualVideoDynamic": {
+    "validContent": [
+        { "id": "presenter-presentation-sbs", ... },
+        { "id": "presenter-2-presentation-sbs", ... },
+        { "id": "presenter-presenter-2-sbs", ... }
+    ],
+    ...
+}
+```
+
+### `es.upv.paella.tripleVideo`
+
+Static layout for videos with three or more streams.
+
+### About singleVideo layout configuration
+
+This layout contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams. It is important to define which layout we want to use to switch back to a two-stream configuration so that the plugin will be able to find it.
+
+At this point, you should check the [documentation on video layouts](/reference/video_layout), but in short, each applicable layout is identified through a valid unique content identifier. This information is defined in the plugin configuration:
+
+**config.json**:
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.singleVideo": {
+            ...
+            "validContent": [
+                {
+                    "id": "presenter-layout",
+                    "content": ["presenter"], 
+                    ...
+                }, 
+                {
+                    "id": "presentation-layout",
+                    "content": ["presentation"]
+                }
+            ]
+        },
+        "es.upv.paella.dualVideo": {
+            ...
+            "validContent": [
+                {
+                    "id": "presenter-presentation-layout", 
+                    "content": ["presenter","presentation"]
+                    ...
+                }
+            ]
+        },
+        "es.upv.paella.tripleVideo": {
+            ...
+            "validContent": [
+                {
+                    "id": "presenter-presenter-2-presentation-layout",
+                    "content": ["presenter","presenter-2","presentation"]
+                    ...
+                }
+            ]
+        },
+    }
+}
+```
+
+In the example above, we have the three layout plugins that are included in `paella-core`. With this configuration, we would have four available contents, which are the elements of the `validContent` arrays of each plugin:
+
+- `presenter-layout`: show the stream with `presenter` content, through the `en.upv.paella.singleVideo` plugin. This means that the stream of the video manifest whose `content` tag corresponds to `presenter` will be displayed.
+- `presentation-layout`: show the stream with `presentation` content, through the `en.upv.paella.singleVideo` plugin. This means that the stream of the video manifest whose `content` tag corresponds to `presentation` will be displayed.
+- `presenter-presentation-layout`: shows the `presentation` and `presenter` streams, through the `en.upv.paella.dualVideo` plugin. This means that the streams of the video manifest whose `content` attribute matches `presentation` and `presenter` will be displayed.
+- `presenter-presenter-2-presentation-layout`: shows the `presenter`, `presentation` and `presenter-2` streams through the `en.upv.paella.tripleVideo` plugin.
+
+To properly configure the singleVideo plugin, we have to specify the list of valid content identifiers that we want to use when the user wants to switch to the dual video layout. This is done using the `dualVideoContentIds` attribute, which is an array in which we place a list of content identifiers of the dual video layout. The layout to be used will be the first one available from the `dualVideoContentIds` list.
+
+For example: in the following configuration two different dual stream plugins are included (the `dualVidieoSideBySide` layout is available in the `paella-layout-plugins` package). In the configuration of the single stream layout we are specifying that we want `presenter-presentation-sbs` to be used, but if this layout is not available, we want to use `presenter-presentation`:
+
+```json
+{
+    "plugins": {
+        ...
+        "es.upv.paella.singleVideo": {
+            "enabled": true,
+            "dualVideoContentIds": [
+                "presenter-presentation-sbs",
+                "presenter-presentation"
+            ],
+            "validContent": [
+                {
+                    "id": "presenter", 
+                    "content": ["presenter"], 
+                    "icon": "present-mode-2.svg", 
+                    "title": "Presenter"
+                },
+                {
+                    "id": "presentation", 
+                    "content": ["presentation"], 
+                    "icon": "present-mode-1.svg", 
+                    "title": "Presentation" 
+                }
+            ]
+        },
+        "es.upv.paella.dualVideo": {
+            "enabled": true,
+            "validContent": [
+                {
+                    "id": "presenter-presentation", 
+                    "content": ["presenter","presentation"], 
+                    "icon": "present-mode-3.svg", 
+                    "title": "Presenter and presentation"
+                }
+            ]
+        },
+        "es.upv.paella.dualVideoSideBySide": {
+            "enabled": true,
+            "validContent": [
+                {
+                    "id": "presenter-presentation-sbs", 
+                    "content": ["presenter","presentation"], 
+                    "icon": "present-mode-3.svg", 
+                    "title": "Presenter and presentation"
+                }
+            ]
+        }
+    }
+}
+```
+
+## [Video format plugins](/reference/video_plugins)
+
+Plugins to implement support for new video formats. Check the documentation about [video format plugins in this document](video_plugin.md).
+
+### `es.upv.paella.imageVideoFormat.js` ###
+
+Support for virtual video composed by a list of images. You can check the documentation about this special video type in [this document](/reference/video_plugin_images).
+
+### `es.upv.paella.mp4VideoFormat.js`
+
+Support for progressive download video. Check the documentation about this format [here](/reference/video_plugin_mp4).
+
+### `es.upv.paella.HtmlVideoFormat.js`
+
+Support for multiformat progressive download video. Check the documentation about this format [here](/reference/video_plugin_html).
+
+### `es.upv.paella.audioVideoFormat.js`
+
+Support for audio-only streams. To use this plugin it's important to enable the `es.upv.paella.audioCanvas` plugin. You can get more information about audio-only format in [this document](/reference/video_plugin_audio).
+
+## [Canvas plugins](/reference/canvas_plugins)
+
+### `es.upv.paella.videoCanvas.js`
+
+Canvas to display HTML-compliant video formats, i.e. those that use the `<video>` element to display multimedia content. [video canvas plugin documentation](/reference/video_canvas_plugin).
+
+### `es.upv.paella.audioCanvas.js`
+
+Canvas to display audio-only streams. This canvas fills the space of the video with an image. The source of the image will depend on the video format used. [audio canvas plugin documentation](/reference/audio_canvas_plugin).
+
+## Other plugins
+
+### `es.upv.paella.playPauseButton.js`
+
+Play and pause button for the tool bar. This button has icons that can be configured:
+
+- plugin identifier: `es.upv.paella.playPauseButton`
+- icon names:
+    + `play`: play button icon.
+    + `pause`: pause button icon.
+    + `replay`: replay button icon.
+
+### `es.upv.paella.vttManifestCaptionsPlugin.js`
+
+Allows to load subtitles in `VTT` format statically defined in the [video manifest](/reference/video_manifest) file.
+

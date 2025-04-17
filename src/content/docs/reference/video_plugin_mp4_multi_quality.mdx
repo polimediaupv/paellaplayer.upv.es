@@ -1,0 +1,95 @@
+---
+title: MP4 Multi Quality Video Plugin
+description: The MP4 multi quality video plugin allows you to play MP4 videos in your player with multiple qualities.
+---
+
+It allows to play video in mp4 format obtained by progressive download. This format is the most compatible, both on the browser and server side, since the video files can be supplied by any HTTP server. The `@asicupv/paella-core` package includes a default implementation of the mp4 plugin, but it does not support multi quality streams. This plugin adds the multi quality functionality to the mp4 plugin. The MP4 Multi Quality Video plugin is included in the `@asicupv/paella-video-plugins` package.
+
+## Loading the plugin
+
+The MP4 Multi Quality Video plugin is not included in the `paella-core` package, so it is not loaded by default. To use it, you need to install the `@asicupv/paella-video-plugins` package and add it at the player initialization:
+
+```bash
+npm install @asicupv/paella-video-plugins
+```
+
+```js
+import { Paella } from '@asicupv/paella-core';
+import { Mp4MultiQualityVideoFormatPlugin } from '@asicupv/paella-video-plugins';
+
+const player = new Paella('playerContainer', {
+    plugins: [
+        Mp4MultiQualityVideoFormatPlugin
+    ]
+});
+```
+
+## Configuration
+
+To use the plugin, you need to enable it at the configuration file. But also note that you can't use the MP4 video plugin and the MP4 multi quality plugin at the same time. If  you do it, Paella Player will use always the plugin with the lowest `order` value in its configuration. If both plugins have the same `order` value, the MP4 video plugin will be used, because it is included in the `paella-core` package, and for that reason it is loaded first.
+
+```json
+{
+    "plugins": {
+        ...
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": false
+        },
+        "es.upv.paella.mp4MultiQualityVideoFormat": {
+            "enabled": true,
+            "order": 2
+        },
+        ...
+    }
+}
+```
+
+## Video manifest format
+
+```json
+{
+  ...
+  "streams": [
+    {
+      "sources": {
+        "mp4": [
+            {
+            "src": "video_720.mp4",
+            "mimetype": "video/mp4",
+            "res": {
+              "w": 1080,
+              "h": 720
+            }
+          },
+          {
+            "src": "video_480.mp4",
+            "mimetype": "video/mp4",
+            "res": {
+              "w": 640,
+              "h": 480
+            }
+          },
+          {
+            "src": "video_360.mp4",
+            "mimetype": "video/mp4",
+            "res": {
+              "w": 480,
+              "h": 360
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+The format identifier is `mp4`. the source array could contain more than one element, representing the videos available for the different qualities.
+
+- **src:** Absolute URL or relative path to the video manifest file, which indicates the location of the mp4 file corresponding to the source.
+- **mimetype:** the mimetype format. Currently it can only contain `video/mp4`, but it is mandatory to add it in case more formats are supported in the future.
+- **res:** the video resolution. Is an object formed by two attributes: `w`  for width and `h` for height. This attribute is also required.
+
+## Other considerations
+
+The MP4 Multi Quality Video plugin extends the default implementation of the MP4 Video Plugin in `@asicupv/paella-core` package, so the rest of the configuration parameters and behavior are the same as the MP4 Video Plugin. For more information about the configuration parameters, see the [MP4 Video Plugin documentation](/reference/video_plugin_mp4).
