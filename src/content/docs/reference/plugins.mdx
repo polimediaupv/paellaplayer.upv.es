@@ -11,7 +11,7 @@ It is also possible to create extensible plugins via plugins in the same way: by
 
 ## Available plugins
 
-Si estás buscando una lista de plugins ya disponibles, aquí tienes los plugins que exporta cada paquete de Paella Player:
+If you are looking for a list of plugins already available, here are the plugins that each Paella Player package exports:
 
 - [`@asicupv/paella-core`](/reference/plugins_core)
 - [`@asicupv/paella-basic-plugins`](/reference/plugins_basic)
@@ -20,128 +20,108 @@ Si estás buscando una lista de plugins ya disponibles, aquí tienes los plugins
 - [`@asicupv/paella-zoom-plugin`](/reference/plugins_zoom)
 - [`@asicupv/paella-webgl-plugins`](/reference/plugins_webgl)
 
-
 ## Create a plugin
 
-To create a new plugin, you must select a directory to place it in. In this directory you can place one or more plugins. The selection of this directory is done by setting a require context, which is a standard feature of Webpack. This context is resolved at compile time, so the path to the plugin folder must be a static string.
+To create a plugin, you must first know the type of plugin you want to create. Plugins are created by extending a base class, which defines the type of plugin. For example, if we want to create a plugin that adds a button to the user interface, we must extend the `ButtonPlugin` class. The base class of all plugin types is `Plugin`, but it does not make sense to extend it directly because this class does not add any functionality.
 
-The require context is set up in the Paella Player initialization parameters, using the `customPluginContext` attribute:
+The available plugin types are:
 
-```javascript
-const initParams = {
-  customPluginContext: [
-    require.context('./path/to/my/plugins', true, /\.js/)
-    // Add other plugin contexts here
-  ]
-}
-```
+- [ButtonPlugin](/reference/button_plugins): Adds buttons to the player toolbar.
+- [PopUpButtonPlugin](/reference/pop_up_button_plugins): Adds a button that opens a pop up with content defined by the plugin.
+- [MenuButtonPlugin](/reference/menu_button_plugins): Adds a button that opens a menu with options defined by the plugin.
+- [DataPlugin](/reference/data_plugins): Adds a plugin that allows to read and write data using the Paella Player `Data` API (for example, to communicate with a backend).
+- [VideoPlugin](/reference/video_plugins): Adds a plugin that allows to extend the video formats supported by Paella Player.
+- [VideoLayout](/reference/video_layout_plugins): Adds a plugin that allows to define the layout of the video in the player.
+- [CanvasPlugin](/reference/canvas_plugins): Adds a plugin that allows to define the video representation in the player.
+- [EventLogPlugin](/reference/event_log_plugins): Adds a plugin that allows to log events in the player.
 
-All other third-party plugins, which you can install from other npm packages or from other repositories, are also configured using the `customPluginContext` attribute. The developer of each plugin package must provide a function that returns the require context for that package. For example, this is how to add the basic plugins from the [paella-basic-plugins] repository (https://github.com/polimediaupv/paella-basic-plugins):
-
-```javascript
-import getBasicPluginsContext from 'paella-basic-plugins';
-
-const initParams = {
-  customPluginContext: [
-    // Add my plugins
-    require.context('./path/to/my/plugins', true, /\.js/),
-    
-    // Add basic plugins
-    getBasicPluginsContext()
-  ]
-}
-...
-```
-
-
-
-## Plugin files and plugin name
-
-Once we have selected our plugins directory, we can create in it as many plugins as we want. All the files inside this directory will be swallowed as plugins, so if you need to create other support files, you must place them outside the directory.
-
-Each plugin has a unique identifier, which matches the name of the JavaScript file that implements it. The convention is to include some sort of unique identifier in the name, such as your organization's URL. 
-
-The plugin name is resolved from the file name as shown in the following table:
-
-| file name                  | plugin name (identifier)  |
-| -------------------------- | ------------------------- |
-| es.upv.paella.dualVideo.js | "es.upv.paella.dualVideo" |
-
-The plugin name will be used to identify it, for example, in the configuration file:
-
-```json
-{
-  "plugins": {
-    "com.mycompany.paella.myPlugin": { ... plugin configuration ... }
-  }
-}
-```
-
-
-
-## The Plugin base class
-
-In the plugin file, a class extending `Plugin` must be returned by default:
+To create a new plugin, you must create a new file that returns your plugin class by default.
 
 ```javascript
-import { ButtonPlugin } from 'paella-core';
+import { ButtonPlugin } from '@asicupv/paella-core';
 
 export default class MyButtonPlugin extends ButtonPlugin {
 	// Plugin implementation
 }
 ```
 
-The base Plugin class provides the following API:
+### Required Plugin class methods
 
-```javascript
-export default class MyPlugin extends Plugin {
-  // You can overwrite `isEnabled()` if you have to control
-  // some extra loading condition, apart from the plugin
-  // configuration
-  async isEnabled() {
-    return this.config?.enabled;
+To implement a plugin, there are some common methods that must be implemented for all plugin types:
+
+- **`getPluginModuleInstance()`**: Returns the instance of the [plugin module](/reference/plugin_modules) that contains the plugin. You should define your own plugin module to group your plugins, but in the following example we are using the `PaellaCorePlugins` module:
+
+```js
+import {
+  ButtonPlugin,
+  PaellaCorePlugins
+} from '@asicupv/paella-core';
+...
+
+export default class MyPlugin extends ButtonPlugin {
+  getPluginModuleInstance() {
+    return PaellaCorePlugins.Get();
   }
+  ...
+}
+```
 
-  // You can override the `load()` method to initialize your plugin
+- **`get name()`**: Returns the name of the plugin. This name must be unique for each plugin, and it is used to identify the plugin in the configuration file. For example:
+
+```js
+get name() {
+		return "es.upv.paella.myPlugin";
+}
+```
+
+The plugin name is very important, because it is used to identify the plugin in the configuration file. The name must be unique for each plugin, and it is used to identify the plugin in the configuration file. For example:
+
+```json
+{
+  "plugins": {
+    "es.upv.paella.testPopUp": {
+      "enabled": true
+    }
+  }
+}
+```
+
+### Optional Plugin class methods
+
+In addition, you can implement the following methods:
+
+- **`async isEnabled()`**: Returns a boolean indicating whether the plugin is enabled or not. This method is called when the plugin is loaded, and it is used to determine whether the plugin should be loaded or not. By default, it returns the `enabled` property extracted from the plugin configuration. If you override this method, you must call the parent method to get the default behavior:
+
+```js
+async isEnabled() {
+  const enabled = await super.isEnabled();
+  if (!enabled) {
+    return false;
+  }
+  // Add your own logic here
+  return ...
+}
+```
+
+- **`async load()`**: This method is called when the plugin is loaded, and it is used to initialize the plugin. You can use this method to set up the plugin, load resources, etc. This method is usually used to load the plugin's icon:
+
+```js
+import myPluginSvgCode from './myPluginIcon.js';
+
+...
+
+export default class MyButtonPlugin extends ButtonPlugin {
   async load() {
-    this.player;	// The instance of the player that created the plugin
-    this.name;    // The plugin name, used as unique identifier. See "Plugin name" section
-		this.config;  // The configuration object. See "Plugin configuration" section
-		this.order;   // Loading order. See "loading order" section
+    this.icon = myPluginSvgCode;
   }
 }
 ```
 
-**About overriding the `isEnabled()` method:** si necesitas llamar al método padre para extender el comportamiento por defecto, ten en cuenta que `isEnabled()` es un método asíncrono. Es un error muy habitual el no utilizar adecuadamente `await`:
+Within a plugin class, we have available a series of properties that allow us to access certain resources:
 
-```javascript
-async isEnabled() {
-  // This will NOT WORK: isEnabled is asynchronous
-  if (!super.isEnabled()) {
-    return false;
-  }
-  else {
-    // Extend the isEnabled() funcionality
-    ...
-    return condition;
-  }
-}
-```
-
-```javascript
-async isEnabled() {
-  // This is the CORRECT WAY to extend isEnabled() default behavior
-  if (!(await super.isEnabled())) {
-    return false;
-  }
-  else {
-    // Extend the isEnabled() funcionality
-    ...
-    return condition;
-  }
-}
-```
-
+- **`this.player`**: The instance of the player that created the plugin.
+- **`this.config`**: The configuration object. This object contains the configuration of the plugin, and it is used to access the configuration properties defined in the `config.json` file.
+- **`this.order`**: The loading order. This property is defined in the plugin configuration, and it is used to determine the loading order of the plugin. The lower the number, the earlier it will be loaded.
 
 
 ## Plugin configuration
@@ -152,17 +132,14 @@ The configuration of the plugin is defined in the `config.json` file, undet the 
 {
     ...
     "plugins": {
-        "es.upv.paella.mp4VideoFormat": {
+        "es.upv.paella.myPlugin": {
             "enabled": true
-        },
-        "es.upv.paella.hlsVideoFormat": {
-            "enabled": true
-        },
+
+            You can add here other attributes relevant to your plugin
+        }
     }
 }
 ```
-
-
 
 ## Loading order 
 
@@ -210,56 +187,6 @@ paellaInstance.getPlugin("es.upv.paella.mp4VideoFormat")
 }
 ```
 
-
-## Predefinied plugin types
-
-### User interface bar plugins
-
-These are plugins that allow you to add functionality through user interaction.
-
-[UserInterfacePlugin](user_interface_plugin.md): All plugins that add user interaction descend from the base class UserInterfacePlugin.
-
-**[ButtonPlugin](button_plugin.md):** They implement a simple button that performs an action when the user presses it.
-
-**[PopUpButtonPlugin](popup_button_plugin.md):** They implement a button that displays a pop up with a content specified by the plugin itself.
-
-**[MenuButtonPlugin](menu_button_plugin.md):** Implements a button that displays a menu with options.
-
-**[ButtonGroupPlugin](button_group_plugin.md):** Allows to group several button plugins inside a pop up.
-
-**[CanvasButtonPlugin](canvas_button_plugin.md):** Allows to add buttons in the [video canvas](video_canvas_plugin.md).
-
-
-### Progress indicator plugins
-
-They allow content to be drawn on the playback bar using the 2D canvas API. [ProgressIndicatorPlugin](progress_indicator_plugin.md).
-
-### Video format plugins
-
-These are plugins that allow you to extend the video formats supported by Paella Player. [VideoPlugin](video_plugin.md)
-
-
-
-### Video layout plugins
-
-These are plugins that specify the arrangement of videos in the display area. By means of video layouts we enable the playback of one or several streams simultaneously. [VideoLayout](video_layout.md). VideoLayout plugins inherits from [UserInterfacePlugin](user_interface_plugin.md), because a video layout can include buttons to interact with the user.
-
-### Data plugins
-
-Data plugins provide an interface for communication with the backend that can be extended through the use of plugins. [Data plugins](data_plugins.md).
-
-### Video canvas plugins
-
-If the video format plugins are used to decide the video decoding method, the video canvas plugins are responsible for determining how they will be displayed in the video container. The most basic method of representation is a `<video>` tag, and for this the `en.upv.paella.VideoCanvas` plugin is used, which is included inside `paella-core`, but other plugins can be defined to modify the video representation, for example, using a WebGL canvas to represent video in 360º, or implementing a zoom system to the video. [CanvasPlugin](canvas_plugin.md).
-
-### Event log plugins
-
-These are plugins designed to capture events that are triggered in the player, or as a result of user actions. They are very useful for implementing user action tracking systems, for example, to integrate with tools such as Matomo or Google Analytics. See [events](events.md) and [event log plugins](event_log_plugins.md) for more information.
-
-### Keyboard Shortcut plugins
-
-The key shortcut plugins allows to map keys to actions. See [key shortcuts](key_shortcuts.md) for more information.
-
 ## Create a plugin type
 
 You can extend Paella Player creating new plugin types. The most common case is when we need to extend a predefined plugin. For example, if we have a button type plugin, which when pressed we want to display subtitles, we can make this button in turn define a new type of plugin that allows to load subtitles from different sources.
@@ -275,7 +202,7 @@ In this example, the plugin type we define serves to feed the menu of a plugin o
 **es.upv.paella.myExtensibleMenuButtonPlugin.js:**
 
 ```javascript
-import { Plugin, MenuButtonPlugin, loadPluginsOfType } from 'paella-core'
+import { Plugin, MenuButtonPlugin, loadPluginsOfType } from '@asicupv/paella-core'
 
 export class CustomMenuPlugin extends Plugin {
 	get type() { return "custom-menu"; }
@@ -391,67 +318,3 @@ export default class MyCustomMenuPlugin extends CustomMenuPlugin {
   }
 }
 ```
-
-## Define plugin modules
-
-A plugin module is a special type of object used to add annotations in the form of metadata to a set of plugins. For example, it can be used to name and version a set of plugins defined in a folder.
-
-To define a plugin module, we must define a file that exports the plugin module, inside the plugin folder we want to annotate:
-
-```other
-plugins-dir
- |- es.upv.paella.plugin1.js
- |- es.upv.paella.plugin2.js
- |- es.upv.paella.plugin3.js
- |- es.upv.paella.plugin4.js
- |- ...
- |- MyPluginModule.js
-```
-
-**MyPluginModule.js**
-
-```javascript
-import PluginModule from "../core/PluginModule";
-
-export default class MyPluginModule extends PluginModule {
-    get moduleName() {
-        return "my plugin module";
-    }
-
-    get moduleVersion() {
-        return "1.0.0";
-    }
-}
-```
-
-Plugin modules can later be used to obtain version information through the `pluginModules` API of the player's main object:
-
-```javascript
-const player = new PaellaPlayer('player-container', initParams);
-
-...
-player.pluginModules.forEach(m => {
-  console.log(`${ m.moduleName }: v${ m.moduleVersion }`);
-});
-```
-
-**Very important note**
-
-A module definition class can also contain other properties and functions that you want to export for use, but it must NEVER contain an attribute with the name `type`:
-
-```javascript
-export default class MyPluginModule extends PluginModule {
-  // NEVER DO THAT: a module definition must never contain an attribute with the name `type`.
-  get type() {
-    return "A type";
-  }
-}
-```
-
-This attribute is used internally to distinguish a plugin from a module definition. This is done because after using Babel to transpile the code to ES5, the class names are lost, and therefore it is not possible to use the `instanceof` comparison method with transpiled code.
-
-## Next steps: plugin module tutorial
-
-The following document descibes how to create a standalone plugin module from scratch. You can use the resulting code as a template to create your own repository to place your plugins in, and distribute them through [npm](https://www.npmjs.com).
-
-* [Create a plugin module from scratch](plugin_module_tutorial.md)

@@ -1,0 +1,62 @@
+---
+title: Plugin Modules
+description: Plugin modules are a way to group plugins and share code between them.
+---
+
+A plugin module is a special type of object used to add annotations in the form of metadata to a set of plugins. A plugin module allows to group plugins that share a common functionality. For example, it can be used to name and version a set of plugins defined in a folder.
+
+To define a plugin module, we must define a file that exports the plugin module, inside the plugin folder we want to annotate:
+
+```other
+plugins-dir
+ |- es.upv.paella.plugin1.js
+ |- es.upv.paella.plugin2.js
+ |- es.upv.paella.plugin3.js
+ |- es.upv.paella.plugin4.js
+ |- ...
+ |- MyPluginModule.js
+```
+
+**MyPluginModule.js**
+
+```javascript
+import { PluginModule } from "@asicupv/paella-core";
+
+export default class MyPluginModule extends PluginModule {
+    get moduleName() {
+        return "my plugin module";
+    }
+
+    get moduleVersion() {
+        return "1.0.0";
+    }
+}
+```
+
+Plugin modules can later be used to obtain version information through the `pluginModules` API of the player's main object:
+
+```javascript
+const player = new PaellaPlayer('player-container', initParams);
+
+...
+player.pluginModules.forEach(m => {
+  console.log(`${ m.moduleName }: v${ m.moduleVersion }`);
+});
+```
+
+**Very important note**
+
+A module definition class can also contain other properties and functions that you want to export for use, but it must **NEVER** contain an attribute with the name `type`:
+
+```javascript
+export default class MyPluginModule extends PluginModule {
+  // NEVER DO THAT: a module definition must never contain an attribute with the name `type`.
+  get type() {
+    return "A type";
+  }
+}
+```
+
+This attribute is used internally to distinguish a plugin from a module definition.
+
+You can learn much more about plugin modules in the [create a plugin module from scratch](/tutorials/plugin_module_from_scratch) tutorial.
