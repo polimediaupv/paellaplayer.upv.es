@@ -19,9 +19,13 @@ export default defineConfig({
 				dark: './src/assets/dark-logo.webp',
 				replacesTitle: true,
 			},
-			social: {
-				github: 'https://github.com/polimediaupv/paella-player'
-			},
+			social: [
+				{
+					icon: 'github',
+					label: 'GitHub',
+					href: 'https://github.com/polimediaupv/paella-player'
+				}
+			],
 			sidebar: [
 				{
 					label: 'Tutorial',
