@@ -3,4 +3,34 @@ title: User Interface plugins
 description: The user interface plugins are used to create custom user interfaces for the player.
 ---
 
-Work in progress
+It is the base class of all plugins that add functionality through user interaction. 
+
+```js
+import { UserInterfacePlugin } from '@asicupv/paella-core';
+
+export default class MyUIPlugin extends UserInterfacePlugin {
+  async getDictionaries() {
+    return {
+      es: {
+        "Hello": "Hola"
+      },
+      de: {
+        "Hello": "Hallo"
+      }
+    }
+  }
+}
+```
+
+
+
+A plugin of this type is not able to perform any function by itself, they only provide the `getDictionaries()` function that we can use to add dictionaries for translation of text strings used in the plugin. This function can be implemented in any of the classes that extend `UserInterfacePlugin`.
+
+[ButtonPlugin](/reference/button_plugins)
+
+[MenuButtonPlugin](/reference/menu_button_plugins)
+
+[PopUpButtonPlugin](/reference/pop_up_button_plugins)
+
+[VideoLayout](/reference/video_layout)
+
