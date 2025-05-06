@@ -3,12 +3,6 @@ title: HLS Video Plugin
 description: The HLS video plugin allows you to play HLS videos in your app.
 ---
 
-<blockquote>
-    Under review: this document corresponds to version 1.0 of `paella-core` and is under revision.
-</blockquote>
-
-
-
 Adds compatibility to playback [HLS m3u8 streams](https://developer.apple.com/streaming/). This plugin uses the library [hls.js](https://github.com/video-dev/hls.js/) to playback m3u8 streams in browsers that supports [Media Source Extensions](https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API), including those that can play m3u8 streams nativelly. The only exception is those browsers that can play m3u8 and are not compatible with Media Source Extensions, such as the iPhone browsers.
 
 
@@ -41,7 +35,7 @@ The configuration callbacks cannot be specified, but in practice the only callba
 }
 ```
 
-### crossorigin (paella-core >= 1.28)
+### crossorigin
 
 By default, the `crossorigin` attribute of the HTML video is added without content:
 
@@ -113,10 +107,10 @@ The format identifier is `hls`. The array can contain only one element, if it co
 
 ## Multiple audio tracks
 
-Paella can play `hls` files with multiple audio tracks. The easiest way to select which audio track to play is via the `es.upv.paella.audioSelector` plugin, within the `paella-basic-plugins` plugin library ([npm](https://www.npmjs.com/package/paella-basic-plugins), [git](https://github.com/polimediaupv/paella-basic-plugins/)).
+Paella can play `hls` files with multiple audio tracks. The easiest way to select which audio track to play is via the `es.upv.paella.audioSelector` plugin, within the `@asicupv/paella-basic-plugins` plugin library.
 
-- [Using ffmpeg to generate an HLS with multiple audio tracks](ffmpeg_multiple_audio_tracks_hls.md)
-- [Using wowza and SMIL files to generate an HLS with multiple audio tracks](wowza_multiple_audio_tracks_smil.md).
+- [Using ffmpeg to generate an HLS with multiple audio tracks](/guides/ffmpeg_multiple_audio_tracks)
+- [Using wowza and SMIL files to generate an HLS with multiple audio tracks](/guides/wowza_multiple_audio_tracks_smil).
 
 ### About `audioTrackLabel` setting
 
@@ -134,7 +128,7 @@ By default, the data with which the audio track is identified is `"NAME"`. Howev
 - `lang`: corresponds to the `"LANGUAGE"` field in the `m3u8` file.
 - `groupId`: corresponds to the `"GROUP-ID"` field in the `m3u8` file.
 
-To customise this tag we can use the plugin configuration, or the [video manifest](video_manifest.md). The video manifest configuration value will take precedence over the plugin configuration, if both are present.
+To customise this tag we can use the plugin configuration, or the [video manifest](/reference/video_manifest). The video manifest configuration value will take precedence over the plugin configuration, if both are present.
 
 **Video manifest:**
 
@@ -167,7 +161,7 @@ To customise this tag we can use the plugin configuration, or the [video manifes
 }
 ```
 
-If you have generated an m3u8 playlist following the instructions in the previous section ([Using ffmpeg to generate an HLS with multiple audio tracks](ffmpeg_multiple_audio_tracks_hls.md)), you may have encountered the problem that FFMPEG ignores the track names specified on the command line. It is possible to edit the playlist file afterwards to modify the track names, but you can also use the `audioTrackLabel` property to get the track names from another field, such as the language.
+If you have generated an m3u8 playlist following the instructions in the previous section ([Using ffmpeg to generate an HLS with multiple audio tracks](/guides/ffmpeg_multiple_audio_tracks)), you may have encountered the problem that FFMPEG ignores the track names specified on the command line. It is possible to edit the playlist file afterwards to modify the track names, but you can also use the `audioTrackLabel` property to get the track names from another field, such as the language.
 
 
 ```json
@@ -203,7 +197,7 @@ Taking this into account:
 
 * If you have problems in iOS browsers: it doesn't matter in which browser you have problems, since due to App Store policies all browsers use the system's rendering engine and video codecs. So in practice all browsers work the same. In this case, your problem is in the video codec or streaming server configuration. Nothing can be changed change in Paella Player to solve this kind of issues, because HLS is managed by the brower itself.
 * If you have problems in other browsers: check the [hls.js documentation](https://github.com/video-dev/hls.js) to see what features of HLS are supported. Also check the HLS specifications and recommendations for video encoding. Note that not all browsers support all codecs. Some problems may be fixed changing the hls.js configuration.
-* Please note that, although it is theoretically possible to view live video streams using the `hlsVideoFormat` plugin, it is very likely to have problems in some browsers. If you have problems with live streams, or especially low latency streams, be sure to use the `hlsLiveVideoFormat` plugin by replacing the `hls` tag with `hlsLive` in the video manifest (see the documentation of [hls live video plugin here](hls_live_video_plugin.md)).
+* Please note that, although it is theoretically possible to view live video streams using the `hlsVideoFormat` plugin, it is very likely to have problems in some browsers. If you have problems with live streams, or especially low latency streams, be sure to use the `hlsLiveVideoFormat` plugin by replacing the `hls` tag with `hlsLive` in the video manifest (see the documentation of [hls live video plugin here](/reference/video_plugin_hls_live)).
 * If you have problems playing videos using authentication, set the `disableCache` parameter to `false` in the configuration. This mechanism prevents the browser from using the cache with `m3u8` files, and does so by adding a random parameter in the URL of the playlist file. This can cause problems with some streaming servers when getting authenticated videos.
 * If there are lag or freeze issues with videos that have more than one stream, try increasing the maximum desynchronization time of the videos in the video container settings:
 

@@ -12,164 +12,419 @@ In this tutorial you will learn how to create from scratch a plugin module for `
 
 This tutorial code is available at [https://github.com/polimediaupv/plugin-module-tutorial.git](https://github.com/polimediaupv/plugin-module-tutorial.git).
 
-## Project structure and dependencies
+## Example application
+
+A plugin module for Paella Player is a piece of software that depends on `paella-core`, and therefore cannot work on its own. Therefore, in order to create a plugin module and test it conveniently, the first thing we need to do is to create a player based on `paella-core`.
+
+You can use any building system, or even none at all, but in this tutorial we are going to use `vite`. The first thing we will do is create a Vite project. But let's organize things a bit. Instead of working directly with the Vite application directory, let's keep the test application code and the plugin module code separate.
 
 ```sh
-mkdir plugin-module-tutorial
-cd plugin-module-tutorial
-npm init   < setup your project here
-npm install paella-core
-npm install --save-dev webpack webpack-cli webpack-dev-server svg-inline-loader style-loader html-webpack-plugin file-loader css-loader copy-webpack-plugin babel-loader @babel/core @babel/preset-env
+$ mkdir my-plugin-module-project
+$ cd my-plugin-module-project
+$ npm create vite@latest
+Need to install the following packages:
+create-vite@6.5.0
+Ok to proceed? (y) 
+
+
+> npx
+> create-vite
+
+│
+◇  Project name:
+│  example-app
+│
+◇  Select a framework:
+│  Vanilla
+│
+◇  Select a variant:
+│  JavaScript
+│
+◇  Scaffolding project in /Users/fernando/upv/plugin-module-tutorial/example-app...
+│
+└  Done. Now run:
+
+  cd example-app
+  npm install
+  npm run dev
 ```
 
-Be aware of the `webpack` versions. If you have problems, check the version of webpack being used in `paella-core` to know which version to use in your plugin.
+To learn how to create a player from scratch, you can follow the tutorial series on the subject:
 
-**Note:** the minimum development dependencies are just webpack, webpack-cli and babel (including @babel/core and @babel/preset-env), but in the webpack configuration in this tutorial we've added many more resources so we can package SVG graphics, stylesheets and other resources, because it's easier to start from this configuration and remove what you don't need, than to figure out how to add what you need.
+- [Tutorial: quick start](/tutorial/quick_start)
 
+But that is not the purpose of this tutorial, so we will start from the following code for the example application:
 
-### Webpack configuration
-
-We are going to add three files for webpack configuration:
-
-* `webpack.debug.js`: debug configuration file.
-* `webpack.config.js`: distribution configuration file. 
-* `webpack.common.js`: common options for debug and distribution.
-
-**webpack.common.js:**: In this file you can customise your webpack plugin configuration. For example, if you are not going to use SVG graphics or stylesheets, in addition to not installing those packages, you will have to remove the corresponding plugins from this file.
-
-```js
-module.exports = {
-	
-	devtool: 'source-map',
-	
-	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /(node_modules)/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: ['@babel/preset-env']
-					}
-				}
-			},
-			{
-				test: /\.(svg)$/i,
-				exclude: /(node_modules)/,
-				use: [
-					{
-						loader: 'svg-inline-loader'
-					}
-				]
-			},
-			{
-				test: /\.(png|jpe?g|gif)$/i,
-				exclude: /(node_modules)/,
-				use: [
-					{
-						loader: 'file-loader'
-					}
-				]
-			},
-			{
-				test: /\.css$/i,
-				use: ['style-loader', 'css-loader'],
-				exclude: /(node_modules)/
-			}
-		]
-	},
-	
-	plugins: [
-	]
-}
-```
-
-**webpack.config.js:** this is the configuration file for distribution. Here we specify the name of the plugin library, which in general should match the name of the package you want to distribute (in this case, `plugin-module-tutorial`). We also configure the main library file, which, as we will see later, is where we will add the plugin export function.
-
-```js
-const path = require('path');
-const config = require('./webpack.common');
-
-config.entry = './src/index.js',
-config.output = {
-	path: path.join(__dirname, "dist"),
-	filename: 'plugin-module-tutorial.js',
-	library: 'plugin-module-tutorial',
-	libraryTarget: 'umd'
-};
-config.externals = {
-	"paella-core": {
-		commonjs: 'paella-core',
-		commonjs2: 'paella-core',
-		amd: 'paella-core'
-	}
-};
-
-module.exports = config;
-```
-
-**webpack.debug.js:** debug configuration is added to this file. As we will see later, we are going to create a basic player in the `src/debug.js` file, and we will test our plugins in it. In the output configuration we use the generic filename `paella.js`. You don't need to modify this file, because it is only used for debugging. The debug server configuration is also included in this file. For `paella-core` plugins, we use port 8090 by default, so that it does not collide with the debug port of `paella-core` (8000) or the reference player (8080). Finally, some copies of sample manifest files are configured. These manifest files reference public videos, and as we will see, they will be placed in the `repository_test` directory. In that repository you can place the manifest files you find most useful for debugging your plugins.
-
-As you can see, you'll probably be able to use this file as is, without any change, unless you need to customise some parameters for debugging.
-
-```js
-const path = require('path');
-const config = require('./webpack.common');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-config.entry = './src/debug.js';
-config.output = {
-	path: path.join(__dirname, "debug"),
-	filename: 'paella.js',
-	sourceMapFilename: 'paella.js.map'
-}
-config.devtool = "source-map";
-config.devServer = {
-	port: 8090,
-	allowedHosts: 'all',
-	headers: {
-		"Access-Control-Allow-Origin": "*",
-		"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-		"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
-	}
-};
-
-config.plugins.push(new HtmlWebpackPlugin({
-	template: "src/index.html",
-	inject: true
-}));
-
-config.plugins.push(new CopyWebpackPlugin({
-	patterns: [
-		{ from: 'config', to: 'config' },
-		{ from: 'repository_test/repository', to: 'repository' }
-	]
-}));
-
-module.exports = config;
-```
-
-### npm scripts
-
-Add the webpack scripts to the `package.json` to use `npm` for build and debug your plugin. You also need to add the entry point of the library. To do this we use the `module` attribute, which is used to mark which file to import when we use `require` or `import` to include the library. The file we publish here has to match the file we are going to generate with webpack, in this case, `dist/plugin-module-tutorial.js`:
-
-**package.json:**
+**example-app/package.json**
 
 ```json
 {
-    ...
-    "module": "dist/plugin-module-tutorial.js",
-    ...
-    "scripts": {
-        "build": "webpack --mode development --config webpack.config.js",
-        "dev": "webpack serve --mode development --config webpack.debug.js"
+  "name": "example-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "6.3.5"
+  },
+  "dependencies": {
+    "@asicupv/paella-core": "^2.1.9"
+  }
+}
+```
+
+**example-app/main.js**
+
+```js
+import { Paella } from '@asicupv/paella-core';
+
+import "@asicupv/paella-core/paella-core.css";
+
+const player = new Paella('playerContainer');
+
+await player.loadManifest();
+```
+
+**example-app/index.html**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paella Player Tutorial</title>
+    <style>
+      body {
+        margin: 0px;
+        font-family: sans-serif;
+      }
+
+      #playerContainer {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="playerContainer"></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
+```
+
+**example-app/public/config/config.json**
+
+```json
+{
+    "defaultLayout": "presenter-presentation",
+
+    "repositoryUrl": "repo",
+    "manifestFileName": "data.json",
+
+    "plugins": {
+        "es.upv.paella.dualVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter-presentation", "content": ["presenter","presentation"], "icon": "", "title": "Presenter and presentation" }
+            ],
+            
+            "pipContentIds": [
+                "presenter-presentation-pip"
+            ]
+        },
+
+        "es.upv.paella.singleVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter", "content": ["presenter"], "icon": "", "title": "Presenter" },
+                { "id": "presentation", "content": ["presentation"], "icon": "", "title": "Presentation" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.dualVideoPiP": {
+            "enabled": true,
+            "validContent": [
+                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.htmlVideoFormat": {
+            "enabled": true
+        },
+
+        "es.upv.paella.videoCanvas": {
+            "enabled": true
+        },
+
+        "es.upv.paella.playPauseButton": {
+            "enabled": true
+        },
+
+        "es.upv.paella.currentTimeLabel": {
+            "enabled": true,
+            "side": "left",
+            "showTotalTime": true
+        }
+    }
+}
+```
+
+**example-app/public/repo/dual-stream/data.json**
+
+```json
+{
+    "metadata": {
+        "preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/belmar-preview.jpg"
     },
+    "streams": [
+        {
+            "sources": {
+                "html": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presenter.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presenter",
+            "role": "mainAudio"
+        },
+        {
+            "sources": {
+                "html": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presentation.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presentation"
+        }
+    ]
+}
+```
+
+Test the application by running the following command:
+
+```sh
+$ cd example-app
+$ npm install
+$ npm run dev
+```
+
+Now you can open your browser and go to [http://localhost:5173?id=dual-stream](http://localhost:5173?id=dual-stream).
+
+
+## Node workspaces
+
+Worspaces are a way for npm to manage several packages within the local file system, from a single root package. In our case we are going to use it to join the project of the example application and the plugin project.
+
+### Create the plugin package
+
+We have already created the sample application project, now we are going to create the plugin module project. To begin with, we are going to create a new npm package with Vite and to add a very simple example function. Execute the following command in the root directory of the project (the resulting directory will be placed in the same directory as the example application):
+
+```sh
+$ npm create vite@latest my-plugin-module
+
+> npx
+> create-vite my-plugin-module
+
+│
+◇  Select a framework:
+│  Vanilla
+│
+◇  Select a variant:
+│  JavaScript
+│
+◇  Scaffolding project in /Users/fernando/upv/plugin-module-tutorial/my-plugin-module...
+│
+└  Done. Now run:
+
+  cd my-plugin-module
+  npm install
+  npm run dev
+```
+
+Leave only the following files in the `my-plugin-module` folder:
+
+- `src/main.js`
+- `index.html`
+- `package.json`
+
+Let's start by adding two functions to `src/main.js`, which we will call from the sample application:
+
+**src/main.js**
+
+```js
+export function sayHello() {
+  console.log("Hello from my plugin!");
+}
+
+export function sayGoodbye() {
+  console.log("Goodbye from my plugin!");
+}
+```
+
+To create a library with Vite, the first thing we have to do is to indicate what the name of the library file is going to be. By default, Vite generates the output files in the `dist` folder with names based on a hash. This is useful in a web application, since it will automatically load the correct version of the library in the browser: since the file name changes every time it is compiled, the browser cannot use the cached version. However, in our case, we want the file name to be always the same, because what we are doing is a biblitoeca, and it doesn't make sense for the file name to change every time.
+
+To do this, we have to modify the `vite.config.js` file. It is possible that the file does not exist: depending on the Vite template we use, sometimes it is not created. In that case we have to create it ourselves.
+
+Taking advantage of the fact that we are modifying the Vite configuration file, we are also going to avoid the need to use the `index.html` file. Both modifications can be done through the `build` property of the configuration:
+
+```js
+import { defineConfig } from "vite";
+
+export default defineConfig({
+    build: {
+        outDir: 'dist',
+        lib: {
+            entry: 'src/main.js',
+            name: 'my-plugin-module'
+        }
+    }
+});
+```
+
+With these changes, we can delete the `index.html` file.
+
+Compile the library by running the following command in the `my-plugin-module` folder to generate the `my-plugin-module/dist/my-plugin-module.js` file:
+
+```sh
+$ npm run build
+```
+
+To finish with the package definition, modify the `my-plugin-module/package.json` file to indicate which is the input file of the library:
+
+```json
+{
+    "name": "my-plugin-module",
+    "private": false,
+    "version": "0.0.1",
+    "type": "module",
+    "exports": {
+        ".": "./dist/my-plugin-module.js"
+    },
+    "module": "./dist/my-plugin-module.js",
+    "main": "./dist/my-plugin-module.js",
+    "files": [
+        "dist/my-plugin-module.js"
+    ],
     ...
 }
 ```
 
+### Create the workspaces
+
+So far we have a directory containing two packages: the example player and the plugin module. Now let's create a workspace so that npm can manage both packages. In the root of the project, create a `package.json` file with the following content:
+
+```json
+{
+    "private": true,
+    "workspaces": [
+        "example-app",
+        "my-plugin-module"
+    ]
+}
+```
+
+Now go to the `example-app` directory and execute the following command:
+
+```sh
+$ npm install my-plugin-module
+```
+
+If you look at the contents of `example-app/package.json`, you will see that a new dependency has been added to `my-plugin-module` in version `0.0.1`. This information has been extracted from the `my-plugin-module/package.json` file. When creating the workspace, when we run `npm install` on one of the packages belonging to the workspace, requesting a dependency on another package in the workspace, npm will look for it in the workspace and not in the npm registry. The advantage of this is that it is not necessary to publish the package in the npm registry in order to use it. Also, any changes we make to the package will be immediately reflected in the other package.
+
+### Use the plugin module from the example application
+
+Now we can use the plugin module in the example application. To do this, we will modify the `example-app/main.js` file to import the library and call the two functions we have defined:
+
+**example-app/main.js**
+
+```js
+import { Paella } from '@asicupv/paella-core';
+
+import { sayHello, sayGoodbye } from "my-plugin-module";
+
+import "@asicupv/paella-core/paella-core.css";
+
+sayHello();
+sayGoodbye();
+
+...
+```
+
+Now, if you run the example application, you will see the following messages in the console:
+
+```sh
+Hello from my plugin!
+Goodbye from my plugin!
+```
+
+### Setup the debugging environment
+
+With this we can work, but we can still improve the debugging environment a little bit. Add the following script in the `package.json` file **from the root package**, where the workspace is defined:
+
+```json
+{
+    "scripts": {
+        ...
+        "dev": "npm run -w my-plugin-module dev & npm run -w example-app dev",
+    }
+}
+```
+
+To make the above script work, one more thing still needs to be modified. By default, Vite runs the development server outside the filesystem, so running `npm run dev` in the plugin module package will not modify the library distribution file. To fix this, you have to modify the `dev` script in the `package.json` of the plugin module:
+
+**my-plugin-module/package.json**
+
+```json
+{
+    "scripts": {
+        ...
+        "dev": "vite build --watch"
+    }
+}
+```
+
+Now you can run the following command in the root directory of the project:
+
+```sh
+$ npm run dev
+```
+
+Check the navigator console to see the messages from the plugin module. Now, you can modify the plugin module code and see how the changes are reflected in the example application:
+
+**my-plugin-module/src/main.js**
+
+```js
+export function sayHello() {
+  console.log("Hello from my updated plugin!");
+}
+...
+```
+
+When you save the changes, the library will be recompiled, the example application will use the new version of the library, and the browser will automatically reload the page. You will see the following message in the console:
+
+```sh
+Hello from my updated plugin!
+```
+
+
+
+
+Work in progress...  This document is under review. The content may change in the future.
 
 ## Plugin files
 
