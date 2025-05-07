@@ -421,444 +421,201 @@ When you save the changes, the library will be recompiled, the example applicati
 Hello from my updated plugin!
 ```
 
-
-
-
-Work in progress...  This document is under review. The content may change in the future.
-
 ## Plugin files
 
-### Main plugin files
+So far we have created an npm package containing vanilla JavaScript code to test the npm workspaces system. Now we are going to create a module for `paella-core` with an example plugin. We need two things:
 
-Here you must add at least three files:
+- A plugin module file, which is a class that extends the `PluginModule` class. This class is used to group the plugins of the module and to provide some metadata about the module.
+- One or more plugin files.
 
-* `index.js`: is the main plugin file. In this file you'll add a function to export the webpack context that `paella-core` will use to register the plugins and the plugin module.
-* plugin file or files: these are the plugin files, whose name should be in the form `com.yourorganization.paella.yourPlugin.js`. Remember that this name will be used in the `paella-core` configuration to identify the configuration parameters of that plugin. Of course, you can put here as many plugin files as you want.
-* Plugin module file: this file identify the plugin module. It's used to provide some useful metadata to `paella-core` about the plugins. The plugin module file is placed in the same directory as the plugin files.
+To create the plugin, we need to have `@asicupv/paella-core` installed in the plugin package. Run the following command in the `my-plugin-module` directory:
 
-You can use any directory structure with the only restriction that the plugins and the plugin module file must be placed in the same directory. This directory will be exported in the plugin context function, at `index.js`. Anyway, we recommend to use the following directory structure:
-
-```other
-[your-plugin-repo]
-   |- src
-     |- index.js  > main plugin file
-     |- plugins
-       |- com.yourorganization.paella.firstPlugin.js
-       |- com.yourorganization.paella.secondPlugin.js
-       |- ...
-       |- YourPlugins.js   > plugin module file
+```sh
+$ npm install @asicupv/paella-core
 ```
 
+### Plugin module file
 
-**src/index.js:**
+Add an `ExamplePluginModule.js` file in the `src` directory of the plugin package with the following content:
 
-```js
-export default function getTutorialPluginContext() {
-    return require.context("./plugins", true, /\.js/);
-}
-```
-
-**src/plugins/es.upv.paella.myTutorialPlugin.js:** This is an example of the simplest possible plugin for `paella-core`: an event plugin that logs the play and pause actions.
+**my-plugin-module/src/ExamplePluginModule.js**
 
 ```js
-import { Events, EventLogPlugin } from 'paella-core';
+import { PluginModule } from "@asicupv/paella-core";
+import packageData from "../package.json";
 
-export default class MyTutorialPlugin extends EventLogPlugin {
-    get events() {
-        return [
-            Events.PLAY,
-            Events.PAUSE
-        ]
-    }
+let g_pluginModule = null;
 
-    async onEvent(event, params) {
-        switch (event) {
-        case Events.PLAY:
-            console.log("You have pressed the PLAY button");
-            break;
-        case Events.PAUSE:
-            console.log("You have pressed the PAUSE button");
-            break;
+export default class ExamplePluginsModule extends PluginModule {
+    static Get() {
+        if (!g_pluginModule) {
+            g_pluginModule = new ExamplePluginsModule();
         }
+        return g_pluginModule;
     }
-}
-```
 
-**src/plugins/TutorialPlugins.js:**
-
-```js
-import { PluginModule } from 'paella-core';
-import packageData from '../../package.json';
-
-export default class TutorialPlugins extends PluginModule {
     get moduleName() {
-        return 'tutorial-plugins';
+        return "example-plugin-module";
     }
 
     get moduleVersion() {
         return packageData.version;
     }
-
-    // paella-core >= 1.23
-    async getDictionaries() {
-        // Optional: you can configure here the dictionaries
-        // used by the plugins in this module
-        return null;
-    }
 }
 ```
 
-These files are enough to create a plugin library for `paella-core`, but it doesn't make much sense to release a package that we haven't tested. For that reason, if you try to run the build script you will get several errors: the webpack configuration is set up to generate the debug files as well. In the next section we will add these files.
+The `moduleName` and `moduleVersion` properties are mandatory. To get the version, we load the `package.json` file of the plugin and read the `version` property.
 
-```sh
-$ npm run build
-> plugin-module-tutorial@1.0.0 build /home/fernando/desarrollo/paella/plugin-module-tutorial
-> webpack --mode development --config webpack.debug.js
+There are more properties that can be implemented, for more information see the documentation on [plugin modules](/reference/plugin_modules).
 
-asset index.html 3.34 KiB [emitted]
-asset paella.js 99 bytes [emitted] (name: main)
+### Plugin file
 
-ERROR in main
-Module not found: Error: Can't resolve './src/debug.js' in '/home/fernando/desarrollo/paella/plugin-module-tutorial'
-...
-```
+We are going to create a single button plugin that will be added to the player toolbar. Add the following file in the `src` directory of the plugin package:
 
-### Debug files
-
-First, we going to add a basic player to load our plugin. To do it, we going to add the `index.html` and `debug.js` files:
-
-**index.html:**
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<style>
-		#player-container {
-			width: 90vw;
-			height: 90vh;
-			left: 5vw;
-			top: 5vh;
-			position: relative;
-			font-family: helvetica, arial, sans-serif;
-		}
-	</style>
-</head>
-<body>
-	<div id="player-container"></div>
-</body>
-</html>
-```
-
-**debug.js:**
+**my-plugin-module/src/es.upv.paella.exampleButtonPlugin.js**
 
 ```js
-import { Paella } from 'paella-core';
-import getTutorialPluginContext from './index';
+import {
+    ButtonPlugin
+} from '@asicupv/paella-core';
+import ExamplePluginModule from "./ExamplePluginModule";
 
-const initParams = {
-	customPluginContext: [
-		getTutorialPluginContext()
-	]
-};
+const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" stroke-width="2" style="fill: none;">
+  <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"></path>
+  <path d="M12 8v3"></path>
+  <path d="M12 14v.01"></path>
+</svg>`;
 
-let paella = new Paella('player-container', initParams);
+export default class ExampleButtonPlugin extends ButtonPlugin {
+    getPluginModuleInstance() {
+        return ExamplePluginModule.Get();
+    }
 
-paella.loadManifest()
-	.then(() => console.log("done"))
-	.catch(e => console.error(e));
-```
+    get name() {
+        return "es.upv.paella.exampleButtonPlugin";
+    }
 
-For our player to work, we need two more things: a configuration file for the basic plugins included in `paella-core`, and also for our new plugin, and a repository with test manifest files:
+    async load() {
+        this.icon = icon;
+    }
 
-**config/config.json:** Notice that the last attribute in the `plugins` section corresponds to the new plugin we have created. The attribute name is obtained by removing the `js` extension to its filename, in our example, `"en.upv.paella.myTutorialPlugin"`. 
-
-```json
-{
-    "repositoryUrl": "repository",
-    "manifestFileName": "data.json",
-
-    "defaultLayout": "presenter-presentation",
-    
-    "plugins": {
-        "es.upv.paella.singleVideo": {
-            "enabled": true,
-            "validContent": [
-                { "id": "presenter", "content": ["presenter"], "icon": "present-mode-2.svg", "title": "Presenter" },
-                { "id": "presentation", "content": ["presentation"], "icon": "present-mode-1.svg", "title": "Presentation" },
-                { "id": "presenter-2", "content": ["presenter-2"], "icon": "present-mode-1.svg", "title": "Presentation" }
-            ]
-        },
-        "es.upv.paella.dualVideo": {
-            "enabled": true,
-            "validContent": [
-                { "id": "presenter-presentation", "content": ["presenter","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
-                { "id": "presenter-2-presentation", "content": ["presenter-2","presentation"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" },
-                { "id": "presenter-presenter-2", "content": ["presenter","presenter-2"], "icon": "present-mode-3.svg", "title": "Presenter and presentation" }
-            ]
-        },
-        "es.upv.paella.tripleVideo": {
-            "enabled": true,
-            "validContent": [
-                { "id": "presenter-presenter-2-presentation", "content": ["presenter","presenter-2","presentation"], "icon": "present-mode-4.svg", "title": "Presenter and presentation" },
-                { "id": "presenter-2-presenter-3-presentation", "content": ["presenter-2","presenter-3","presentation"], "icon": "present-mode-4.svg", "title": "Presenter and presentation" }
-            ]
-        },
-
-        "es.upv.paella.hlsVideoFormat": {
-            "enabled": true,
-            "order": 0,
-            "hlsConfig": {
-                "maxBufferLength": 40
-            },
-            "corsConfig": {
-                "withCredentials": false,
-                "requestHeaders": {
-                    "Access-Control-Allow-Credentials": false
-                }
-            }
-        },
-        "es.upv.paella.mp4VideoFormat": {
-            "enabled": true,
-            "order": 1
-        },
-
-        "es.upv.paella.videoCanvas": {
-            "enabled": true,
-            "order": 1
-        },
-        
-        "es.upv.paella.playPauseButton": {
-            "enabled": true,
-            "order": 0
-        },
-
-        "es.upv.paella.vttManifestCaptionsPlugin": {
-            "enabled": true
-        },
-
-        "es.upv.paella.defaultShortcuts": {
-            "enabled": true
-        },
-
-        "es.upv.paella.myTutorialPlugin": {
-            "enabled": true
-        }
+    async action() {
+        alert("Hello from the example button plugin!");
     }
 }
 ```
 
-**repository_test/repository/test-video/data.json:**
+As you can see, the instance of `ExamplePluginModule` is a singleton. This is done so that if we add more plugins to the module, all of them share the same instance of `ExamplePluginModule`. It is very important that the `getPluginModuleInstance()` function of all plugins in the same module return the same instance. The implementation can be done by a singleton, as in the example you see, or you can do it with any other method, as long as all plugins of the same module return the same instance.
 
-```json
-{
-	"metadata": {
-		"duration": 909.13,
-		"title": "Belmar 15 minutes (multiresolution)",
-		"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/belmar-preview.jpg"
-	},
-	"streams": [
-		{
-			"sources": {
-				"mp4": [
-					{
-						"src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presentation.mp4",
-						"mimetype": "video/mp4",
-						"res": {
-							"w": "1442",
-							"h": "1080"
-						}
-					}
-				]
-			},
-			"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/presentation_cut.jpg",
-			"content":"presentation"
-		},
-		{
-			"sources": {
-				"mp4": [
-					{
-						"src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presenter.mp4",
-						"mimetype": "video/mp4",
-						"res": {
-							"w": "1920",
-							"h": "1080"
-						}
-					}
-				]
-			},
-			"preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/presenter_cut.jpg",
-			"content":"presenter",
-			"audioTag":"es"
-		}
-	],
-	"frameList": []
-}
+### Export the plugin
+
+To finish our plugin module we only need to export it in the main file of the library. By convention, plugins are exported in two ways:
+
+- The class of each plugin is exported.
+- An array is exported with all the plugins of the module with a default configuration.
+
+When adding the plugin to the player, we can choose to add a single plugin, or add all the plugins of the module. In the first case, the plugin is added by importing the plugin class, and in the second case, the array with all the plugins of the module is added.
+
+**my-plugin-module/src/main.js**
+
+```js
+
+import ExampleButtonPlugin from "./es.upv.paella.exampleButtonPlugin";
+
+export { ExampleButtonPlugin };
+
+export const examplePlugins = [
+  {
+    plugin: ExampleButtonPlugin,
+    config: {
+      enabled: true,
+      side: "right"
+    }
+  }
+]
 ```
 
-## Build and debug
+## Update the example application
 
-Now you can use the following command to generate the `dist` directory, with your new plugin library code:
+Now we can import the plugin in our example application:
 
-```sh
-npm run build
+**example-app/main.js**
+
+```js
+import { Paella } from '@asicupv/paella-core';
+
+import { examplePlugins } from "my-plugin-module";
+
+import "@asicupv/paella-core/paella-core.css";
+
+const player = new Paella('playerContainer', {
+    plugins: [
+        ...examplePlugins
+    ]
+});
+
+await player.loadManifest();
 ```
 
-To debug your plugin, use the `dev` package script:
+We have added the plugin using the `examplePlugins` array that we have exported in the plugin module. In this case, a default configuration is included for the plugin that we have left activated by default. In the player we will have a new button to the right of the playback bar with the plugin we just created.
 
-```sh
-npm run dev
+We can also add the plugin by importing the class directly, but in that case we have to configure the plugin manually:
+
+**example-app/main.js**
+
+```js
+import { Paella } from '@asicupv/paella-core';
+
+import { ExampleButtonPlugin } from "my-plugin-module";
+
+import "@asicupv/paella-core/paella-core.css";
+
+const player = new Paella('playerContainer', {
+    plugins: [
+        ExampleButtonPlugin
+    ]
+});
+
+await player.loadManifest();
 ```
 
-Now, open a browser and enter [http://localhost:8090/?id=test-video](http://localhost:8090/?id=test-video) in the address bar. If you open the developer tools console, you will see that your plugin is logging the play and pause events.
-
-## Setup git
-
-To set up a `git` repository you can refer to the following `.gitignore` file. We only remove the `node_modules` folder, as the compiled library files will be left for publishing the package to npm.
-
-**.gitignore:**
-
-```gitignore
-node_modules
-```
-
-## Test package
-
-The last step is to publish the package at `npm`. To publish the plugin you can directly use the full repository structure as is, but you could also create a separate directory structure for publishing, if you only leave the `dist` directory and the `package.json` file. In our case, we published the entire repository, including the source code, in `npm`.
-
-Before publishing the package, note that you can test it by creating a basic external player, adding to its `package.json` the relative path to your plugin repository, and running `npm install`. You can download our [reference player](https://github.com/polimediaupv/paella-player.git) next to your plugin library folder, and edit its `package.json` file:
-
-**my-test-player/package.json:**
+**example-app/public/config/config.json**
 
 ```json
 {
     ...
-    "dependencies": {
-        "paella-core": "^1.0.36",
-		"paella-basic-plugins": "^1.0.12",
-		"paella-slide-plugins": "^1.0.10",
-		"paella-user-tracking": "^1.0.11",
-		"paella-zoom-plugin": "^1.0.10",
-        "plugin-module-tutorial": "../plugin-module-tutorial"
-    }
-}
-```
 
-Now, execute `npm install` and you will see a reference to your library inside the `node_modules` folder, at `paella-player`.
-
-```sh
-$ ls -l node_modules/plugin-module-tutorial
-lrwxrwxrwx 1 user user 28 Apr  1 09:38 node_modules/plugin-module-tutorial -> ../../plugin-module-tutorial
-```
-
-Modify the `src/index.js` file in `paella-player` repository to include your plugin, and add your plugin configuration to the `paella-player`'s `config.json` file.
-
-**paella-player/src/index.js:**
-
-```js
-import { Paella, utils } from 'paella-core';
-import getBasicPluginContext from 'paella-basic-plugins';
-import getSlidePluginContext from 'paella-slide-plugins';
-import getZoomPluginContext from 'paella-zoom-plugin';
-import getUserTrackingPluginContext from 'paella-user-tracking';
-
-// Import the plugin context function
-import getTutorialPluginContext from 'plugin-module-tutorial';
-
-import packageData from "../package.json";
-
-window.onload = async () => {
-    const initParams = {
-        customPluginContext: [
-            require.context("./plugins", true, /\.js/),
-            getBasicPluginContext(),
-            getSlidePluginContext(),
-            getZoomPluginContext(),
-            getUserTrackingPluginContext(),
-
-            // Add the plugin context
-            getTutorialPluginContext()
-        ]
-    };
-    
-    class PaellaPlayer extends Paella {
-    
-```
-
-**paella-player/config/config.json:**
-
-```json
-{
-    ...
     "plugins": {
         ...
-        "es.upv.paella.myTutorialPlugin": {
-            "enabled": true
+        "es.upv.paella.exampleButtonPlugin": {
+            "enabled": true,
+            "side": "right"
         }
     }
 }
 ```
 
-Build and run the player with `npm run dev`. You can debug a demo in `paella-player` using the URL [http://localhost:8080/?id=belmar-multiresolution-remote](http://localhost:8080/?id=belmar-multiresolution-remote).
+## Publish the plugin module
 
-```sh
-paella-player$ npm run dev
-```
+To publish the plugin module, you have to use the npm CLI command. You'll need to have an npm account, and you must to choose a name for your package that is not already taken. In this case, we have used the name `my-plugin-module`, but you probably want to use a different name. The package name is configured in the `name` property of the `package.json` file in the plugin module.
 
-Open the developer console to see your plugin loggin the PLAY and PAUSE events.
-
-## Publish package
-
-Once you have your plugin library, you may want to publish it to [npm](https://www.npmjs.com) to make it available to all developers using `paella-core`. First of all, note that you must choose a name that is available in `npm`. This name will correspond to the name you set in the `package.json` file, in its `name` attribute. You can use an absolute package name (as we do with `paella-core`) or a package name relative to your npm account, which would take the form `@user/package-name`.
-
-To publish your package, you will first need to create an account at [https://www.npmjs.com](https://www.npmjs.com). With your account details, use the `npm login` command in the terminal to log in. In addition to entering your username and password, you will also need to enter an email address which will be public. Keep this in mind if you don't want to publish your personal email address. In addition to this, you will also be prompted for a one-time password. This password is sent to the email address of your npm account, and serves as a two-factor authentication.
+To login to your npm account, run the following command:
 
 ```sh
 $ npm login
-Username: yourusername
-Password: 
-Email: (this IS public) yourpublicemail@email.com
-npm notice Please check your email for a one-time password (OTP)
-Enter one-time password from your authenticator app: [see your inbox to get the OTP]
-Logged in as yourusername on https://registry.npmjs.org/.
 ```
 
-You are now ready to publish your library. Go into your plugin library directory and publish it using the `npm publish` command. The data that will be used to catalogue your library is the data you set in the `package.json` file, so before publishing it would be a good time to review this information.
+You'll be redirected to the npm website in your browser, and after that you will be redirected to the command line.
 
-## Automatic publish using github actions
+Once you are logged in, you can publish the package by running the following command:
 
-Note that you can use Github Actions to automatically publish your library. At the Universidad Politécnica de Valencia we have configured an action that publishes the `paella-core` libraries and their plugin libraries whenever we create a tag for a new version.
-
-It is not the goal of this tutorial to learn how to use Github Actions, but as a hint, you should set up an access token in npm, register it in your github account and then add the github actions script. For reference, this is the script template we use:
-
-**.github/workflows/npm-publish.yml**
-
-```yml
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
-
-name: Publish release
-
-on:
-  create:
-    tags:
-      - '*'
-
-jobs:
-  publish-npm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+```sh
+$ npm publish
 ```
+
+You can also use a scope for your package. In this case, the package will be published under the name `@your-scope/my-plugin-module`, and by default will be available only for you and the users you give access to. Note that to publish a private package you need to have a paid npm account. If you want to publish a public package, you can do it without a paid account adding the `--access public` option when publishing the package.
+
+For more information about how to publish a package:
+
+- [Publishing npm unscoped packages](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages)
+- [Publishing npm scoped packages](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages)
