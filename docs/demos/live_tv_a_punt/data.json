@@ -8,7 +8,7 @@
             "sources": {
                 "hlsLive": [
                     {
-                        "src": "https://bcovlive-a.akamaihd.net/469e448f034b4d46afa4bcac53297d60/eu-central-1/6057955885001/playlist_dvr.m3u8",
+                        "src": "https://bcovlive-a.akamaihd.net/8499d938ef904e39b58a4adec2ddeada/eu-west-1/6057955885001/playlist_dvr.m3u8",
                         "mimetype": "video/mp4"
                     }
                 ]
