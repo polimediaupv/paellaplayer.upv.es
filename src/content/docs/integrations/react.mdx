@@ -1,0 +1,196 @@
+---
+title: React Integration
+description: A guide to integrating Paella with React using Vite and TypeScript SWC.
+---
+
+In this document, we will explore how to implement a video player using the paella-core library within a React application created with Vite. Vite is a modern web application build tool that focuses on providing a 
+fast and efficient development experience, thanks to its ability to compile and load modules instantly. On the other hand, React is a popular JavaScript library for building user interfaces, known for its flexibility and ease of use.
+
+## Creating a Vite Project with React and TypeScript SWC
+
+To get started, it is essential to have Node.js 20, or a newer LTS version, installed on your system. Once you have Node.js 20 installed, you can proceed to create a new Vite project.
+
+1. Open your terminal and run the following command to create a new Vite project:
+
+```bash
+npm create vite@latest
+```
+
+2. Follow the setup assistant's instructions. When prompted to select a template, choose `React` as the framework and `TypeScript SWC` as the variant. This will allow you to create a Vite project with React and TypeScript.
+
+3. Once you have selected the template, Vite will prompt you to enter a name for your project. Enter the desired name and press Enter.
+
+4. Now, navigate to the directory of your newly created project:
+
+```bash
+cd your-project-name
+```
+
+5. Finally, install the required dependencies by running:
+   
+```bash
+npm install
+```
+
+With these steps, you will have successfully set up a Vite project using the React template with TypeScript SWC. You are now ready to start developing your application and adding features like implementing a video player using paella-core, which will be covered in 
+subsequent chapters.
+
+## Installing paella-core
+
+To use the paella-core library in your React application, you need to install it as a dependency. You can do this by running the following command in your project directory. In this example, we will use two libraies: the main Paella Player core library and a complementary liblrary with a set of useful paella plugins.
+
+```bash
+npm install @asicupv/paella-core @asicupv/paella-basic-plugins
+```
+
+## Adding the player configuration and video manifest files
+
+In this tutorial we dont going to explain how to create a player. To do it, you can check the following tutorials:
+
+- [quick start tutorial](/tutorial/quick_start): create a basic player and play a video file.
+- [Two streams](/tutorial/two_streams): use a video manifest file to play a video with two streams.
+- [Plugins](/tutorial/plugins): add plugins to the player.
+
+So in this step we are simply going to add the files we need for the player to work. These files should be placed in the public folder of the application, as they are not compiled (they are loaded directly from the server at runtime).
+
+Create the following folders and files in the public folder:
+
+**public/config/config.json**
+
+```json
+{
+    "defaultLayout": "presenter-presentation",
+    "repositoryUrl": "repo",
+    "manifestFileName": "data.json",
+
+    "plugins": {
+        "es.upv.paella.dualVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter-presentation", "content": ["presenter","presentation"], "icon": "presenter-presentation.svg", "title": "Presenter and presentation" }
+            ],
+            
+            "pipContentIds": [
+                "presenter-presentation-pip"
+            ]
+        },
+
+        "es.upv.paella.singleVideoDynamic": {
+            "enabled": "true",
+            "validContent": [
+                { "id": "presenter", "content": ["presenter"], "icon": "presenter.svg", "title": "Presenter" },
+                { "id": "presentation", "content": ["presentation"], "icon": "presentation.svg", "title": "Presentation" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.dualVideoPiP": {
+            "enabled": true,
+            "validContent": [
+                { "id": "presenter-presentation-pip", "content": ["presenter","presentation"], "icon": "pip.svg", "title": "PiP mode" }
+            ],
+            "dualVideoContentIds": [
+                "presenter-presentation"
+            ]
+        },
+
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": true
+        },
+
+        "es.upv.paella.videoCanvas": {
+            "enabled": true
+        },
+
+        "es.upv.paella.playPauseButton": {
+            "enabled": true,
+            "side": "left",
+            "order": 0
+        },
+
+        "es.upv.paella.volumeButtonPlugin": {
+            "enabled": true,
+            "side": "left",
+            "order": 1
+        },
+
+        "es.upv.paella.currentTimeLabel": {
+            "enabled": true,
+            "side": "left",
+            "showTotalTime": true,
+            "order": 2
+        },
+
+        "es.upv.paella.layoutSelector": {
+            "enabled": true,
+            "side": "right",
+            "order": 2,
+            "showIcons": true,
+            "description": "Select different layout"
+        },
+
+        "es.upv.paella.fullscreenButton": {
+            "enabled": true,
+            "side": "right",
+            "order": 3,
+            "description": "Toggle fullscreen"
+        }
+    }
+}
+```
+
+**public/config/pip.svg**
+
+![pip icon](react/pip.svg)
+
+**public/config/presentation.svg**
+
+![presentation icon](react/presentation.svg)
+
+**public/config/presenter-presentation.svg**
+
+![presenter-presentation icon](react/presenter-presentation.svg)
+
+**public/config/presenter.svg**
+
+![presenter icon](react/presenter.svg)
+
+**public/repo/dual-stream/data.json**
+
+```json
+{
+    "metadata": {
+    },
+    "streams": [
+        {
+            "sources": {
+                "mp4": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presenter.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presenter",
+            "role": "mainAudio"
+        },
+        {
+            "sources": {
+                "mp4": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presentation.mp4",
+                        "mimetype": "video/mp4"
+                    }
+                ]
+            },
+            "content": "presentation"
+        }
+    ]
+}
+```
+
+
+
+
