@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: dark --prefersdark, light --default;
+}
+
+[data-theme="dark"] {
+    .header-logo-light {
+        display: none;
+    }
+
+}
+
+[data-theme="light"] {
+    .header-logo-dark {
+        display: none;
+    }
+}

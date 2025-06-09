@@ -15,10 +15,13 @@
     "@asicupv/paella-slide-plugins": "^2.0.2",
     "@asicupv/paella-video-plugins": "^2.0.3",
     "@asicupv/paella-zoom-plugin": "^2.0.0",
-    "@astrojs/starlight": "^0.34.1",
+    "@astrojs/starlight": "^0.34.3",
     "@fontsource-variable/fredoka": "^5.2.6",
     "@fontsource-variable/lexend": "^5.2.6",
-    "astro": "^5.7.9",
-    "sharp": "^0.34.1"
+    "@tailwindcss/vite": "^4.1.8",
+    "astro": "^5.9.1",
+    "daisyui": "^5.0.43",
+    "sharp": "^0.34.1",
+    "tailwindcss": "^4.1.8"
   }
 }
