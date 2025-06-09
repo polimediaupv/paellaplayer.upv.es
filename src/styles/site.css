@@ -5,6 +5,10 @@
 }
 
 [data-theme="dark"] {
+    --color-primary: #e0ab1b;
+    --color-secondary: #bd9015;
+    --color-accent: #624802;
+
     .header-logo-light {
         display: none;
     }
@@ -31,6 +35,11 @@
 }
 
 [data-theme="light"] {
+    --color-primary: #e0ab1b;
+    --color-secondary: #bd9015;
+    --color-accent: #624802;
+
+    
     .header-logo-dark {
         display: none;
     }
