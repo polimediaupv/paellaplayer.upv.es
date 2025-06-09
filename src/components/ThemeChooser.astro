@@ -1,5 +1,4 @@
 ---
-
 ---
 
 <div>
@@ -38,18 +37,18 @@
 </div>
 
 <script>
+    import { setCookie, getCookie } from '../services/browser/cookies';
+
     document.addEventListener("DOMContentLoaded", () => {
-        const isDarkMode = localStorage.getItem("theme") === "dark"
-        document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light");
-        const themeToggle = document.querySelector('#mainThemeToggle') as HTMLInputElement;
-        if (themeToggle) {
-            themeToggle.checked = isDarkMode;
-        }
+        const theme = document.documentElement.getAttribute("data-theme") || "light";
+        const isDarkMode = theme === "dark";
+        (document.querySelector('#mainThemeToggle') as HTMLInputElement).checked = isDarkMode;
+        document.documentElement.setAttribute("data-theme", theme);
     });
 
     document.querySelector('#mainThemeToggle')?.addEventListener("change", (event) => {
         const isDarkMode = (event.target as HTMLInputElement)?.checked;
         document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light");
-        localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+        setCookie("theme", isDarkMode ? "dark" : "light", Number.MAX_SAFE_INTEGER);
     });
 </script>
