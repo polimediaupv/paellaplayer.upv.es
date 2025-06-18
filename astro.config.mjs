@@ -7,7 +7,7 @@ import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://paellaplayer.upv.es',
+  site: 'https://paellaplayer.webs.upv.es',
 
   security: {
       checkOrigin: false
@@ -35,6 +35,7 @@ export default defineConfig({
                   href: 'https://github.com/polimediaupv/paella-player'
               }
           ],
+          prerender: false,
           sidebar: [
               {
                   label: 'Tutorial',
