@@ -130,6 +130,36 @@ The menus have two texts: on one side is the title of the menu, and on the other
 - `--popup-title-font-size`
 - `--popup-menu-item-font-size`
 
+## Video canvas buttons
+
+Video canvas buttons are those buttons that are displayed at the top of each of the video stream containers. These buttons can only be placed on top of the containers, so that they do not interfere with the playback bar. Each button decides whether it should be placed aligned to the left, centre or right of its container. All other properties are configurable.
+
+![video canvas buttons](styling_css_variables/video-canvas-buttons.webp)
+
+The video canvas button container is a flex container which in turn contains three other flex containers: one for left-aligned buttons, one for centre-aligned buttons and one for right-aligned buttons. This main container controls its padding via the `--canvas-button-container-padding` variable. To indicate the spacing between the buttons, the `--canvas-button-gap` variable is used as the value of the `gap` property of the three flex containers for each of the button groups.
+
+### Button size
+
+The height of the buttons is controlled indirectly, through the height of the main container. The buttons have a fixed height of 100% defined, and the following variables are used to control the size of the container:
+
+- `--canvas-button-height`: height of the button container. By default, a measurement relative to the height of the video canvas (`15%`) is used. A relative measurement is used because the size of the video canvas is highly variable, and this ensures that the size of the button adapts to the size of the canvas in an optimal way.
+- `--canvas-button-button-min-height` and `--canvas-button-max-hegiht`: These two variables allow us to improve the control we have over the maximum and minimum size of the buttons, allowing us to indicate fixed sizes that adapt to a good visualisation of the icons, and at the same time allowing the buttons not to occupy too much space on the screen when the video canvas is very large.
+
+### Button appearance
+
+- `--canvas-button-aspect-ratio`: as we control the height of the buttons by the height of the container, to control the width we indirectly use the `aspect-ratio` property.
+- `--canvas-button-padding`: is the padding of the buttons. It is used as the value of the `padding` property of the buttons, so you can set a general padding, a vertical and a horizontal padding or a separate padding for each side. It's recommended to use a percentage value, so that the padding adapts to the size of the button.
+- `--canvas-button-border-radius`: is the border radius of the buttons. It is used as the value of the `border-radius` property of the buttons, so you can set the same value for all corners or set a different value for each corner.
+- `--canvas-button-background`: is the background color of the buttons. By default it uses the `--main-bg-color` variable, but through this variable we can specify a custom colour different from the colours of the playbar buttons. It is not possible to modify the background colour for the `hover` or `active` state, as these colours are defined by the global highlight colour variables to preserve the visual style of the interface.
+
+### Opacity
+
+The video canvas buttons have three states of opacity:
+
+- Minimum opacity** (`--canvas-button-opacity-out`): occurs when the user interface is visible, but the mouse cursor is not outside the container of the video canvas containing the button.
+- Normal opacity** (`--canvas-button-opacity`): occurs when the mouse cursor is over the video canvas container containing the button, but is not over the button itself.
+- Maximum opacity** (`--canvas-button-opacity-hover`): occurs when the mouse cursor is over the button.
+
 ## Colors
 
 The colors of interface elements can be defined in a granular way (e.g. the background colour of a button) or in a global way. In the default `paella-core` styles there are a number of generic colors, which are then used as defaults in the other variables that control the colors in a granular way. Generally, it will be enough to modify the global colors, but if you need to modify a specific variable you can do that too.
@@ -242,6 +272,21 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--button-background`
 - `--button-background-hover`
 - `--button-background-active`
+
+### Video canvas buttons
+
+- `--canvas-button-height`: Fixed height of the buttons container.It is advisable to use percentage measurements, and to control the maximum and minimum button size with the following two variables.
+- `--canvas-button-min-height`: Minimum height of the buttons container. It isn't recommended to use a value lower than 28px.
+- `--canvas-button-max-height`: Maximum height of the buttons container.
+- `--canvas-button-aspect-ratio`: Aspect ratio of the buttons container.
+- `--canvas-button-gap`: Gap between buttons.
+- `--canvas-button-padding`: Padding of a button.It is recommended to use percentage measurements, as the size of the button can be variable..
+- `--canvas-button-border-radius` Border radius of a button.
+- `--canvas-button-opacity`: Opacity of a button when the mouse pointer is over the video canvas.
+- `--canvas-button-opacity-hover`: Opacity of a button when the mouse pointer is over the button.
+- `--canvas-button-opacity-out`: Opacity of a button when the mouse pointer is not over the video canvas.
+- `--canvas-button-border`: Border of a button.
+- `--canvas-button-background`: background of a button.
 
 ### Fonts
 
