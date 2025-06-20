@@ -1,13 +1,16 @@
 ---
+import "@/styles/site.css";
 import "@fontsource-variable/fredoka";
 import "@fontsource-variable/lexend";
 import Header from "@/components/Header.astro"
 import UpvLogo from "@/assets/upvlogo.png";
 
+const theme = Astro.cookies.get("theme")?.value || "light";
+
 const { title } = Astro.props;
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme={theme}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,103 +18,12 @@ const { title } = Astro.props;
 </head>
 <body>
     <Header></Header>
-    <main>
+    <main class="mx-auto max-w-6xl px-4">
         <slot/>
     </main>
-    <footer>
+    <footer class="mx-auto max-w-6xl text-center p-4 mt-8">
         Supported by:
-        <img src={UpvLogo.src} alt="upv logo" />
+        <img src={UpvLogo.src} alt="upv logo" class="mx-auto mt-4"/>
     </footer>
 </body>
 </html>
-
-<style is:global={true}>
-
-    :root {
-        --color-dark: #343434;
-        --color-darker: #262626;
-        --color-darkest: #1d1d1d;
-        --color-mid: #5c5c5c;
-        --color-light: #e5e8e3;
-        --color-lighter: #f4f7f3;
-        --color-lightest: #f5f5f5;
-        --color-main: #e0ab1b;
-        --color-secondary: #624802;
-        --color-main-comp: #00a310;
-        --color-secondary-comp: #01860a;
-        --color-background: #f4f7f3;
-    }
-
-    body {
-        font-family: "Lexend Variable", sans-serif;
-        margin: 0;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: 80px 1fr 70px;
-        grid-template-areas:
-            "header"
-            "main"
-            "footer";
-        justify-items: center;
-        background: var(--color-light);
-        box-sizing: border-box;
-
-        & > header {
-            grid-area: header;
-            box-sizing: border-box;
-            width: 100%;
-        }
-
-        & > main {
-            grid-area: main;
-            width: 90vw;
-            max-width: 1200px;
-            min-height: 90vh;
-            background-color: white;
-            box-sizing: border-box;
-            padding: 1ch 4ch;
-        }
-
-        & > footer {
-            grid-area: footer;
-            background-color: white;
-            width: 90vw;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 2ch;
-            padding: 2ch;
-            box-sizing: border-box;
-            border-top: 3px solid var(--color-main-comp);
-
-            & > img {
-                height: 3ch;
-                margin-left: 1ch;
-            }
-        }
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        font-family: "Fredoka Variable", sans-serif;
-        margin: 1ch 0 0.4ch 0;
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    h2 {
-        font-size: 1.5em;
-    }
-
-    h3, h4, h5, h6 {
-        font-size: 1em;
-    }
-
-    @media (max-width: 850px) {
-        body > main {
-            width: 100vw;
-        }
-    }
-</style>

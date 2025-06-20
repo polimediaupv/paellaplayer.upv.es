@@ -5,7 +5,7 @@ import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
 import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
 ---
 
-<article>
+<article class="border-2 border-gray-300 rounded-lg shadow-md w-[100%] aspect-video overflow-hidden box-border p-0">
     <div class="player-container" id={id}></div>
 </article>
 
@@ -94,20 +94,14 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
     }
 </style>
 <style>
-
-    article {
-        display: grid;
-        place-items: center;
-    }
-
     .player-container {
-        width: 90%;
-        aspect-ratio: 16 / 9;
-        background-color: rgb(237, 237, 237);
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
     }
-
     :root {
         --progress-indicator-padding: 6px 15px;
-        --playback-bar-buttons-padding: 0 10px;
+        --playback-bar-buttons-padding: 5px 10px;
+        --button-fixed-size: 30px;
     }
 </style>

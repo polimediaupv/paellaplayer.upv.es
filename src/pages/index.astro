@@ -1,11 +1,12 @@
 ---
 import MainTemplate from "@/templates/Main.astro";
 import Player from "@/components/Player.astro";
+export const prerender = false;
 ---
 
 <MainTemplate title="Paella Player - Multi stream video player for the Web">
     <article>
-        <header>
+        <header class="">
             <h1>Paella Player</h1>
             <h2>The multi stream player for lectures</h2>
         </header>
@@ -31,4 +32,3 @@ import Player from "@/components/Player.astro";
         </section>
     </article>
 </MainTemplate>
-

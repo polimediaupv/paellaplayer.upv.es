@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: dark --prefersdark, light --default;
+}
+
+[data-theme="dark"] {
+    --color-primary: #e0ab1b;
+    --color-secondary: #bd9015;
+    --color-accent: #624802;
+
+    .header-logo-light {
+        display: none;
+    }
+
+    h1, h2, h3, h4, h5 {
+        @apply mt-3 mb-3;
+    }
+
+    h1 {
+        @apply text-4xl font-bold;
+    }
+
+    h2 {
+        @apply text-3xl font-semibold;
+    }
+
+    h3 {
+        @apply text-2xl font-medium;
+    }
+
+    p {
+        @apply mb-4;
+    }
+}
+
+[data-theme="light"] {
+    --color-primary: #e0ab1b;
+    --color-secondary: #bd9015;
+    --color-accent: #624802;
+
+    
+    .header-logo-dark {
+        display: none;
+    }
+
+    h1, h2, h3, h4, h5 {
+        @apply mt-3 mb-3;
+    }
+
+    h1 {
+        @apply text-4xl font-bold;
+    }
+
+    h2 {
+        @apply text-3xl font-semibold;
+    }
+
+    h3 {
+        @apply text-2xl font-medium;
+    }
+
+    p {
+        @apply mb-4;
+    }
+}

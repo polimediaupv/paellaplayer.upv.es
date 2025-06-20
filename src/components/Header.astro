@@ -1,53 +1,22 @@
 ---
 import lightLogo from "@/assets/light-logo.webp";
+import darkLogo from "@/assets/dark-logo.webp";
+import ThemeChooser from "@/components/ThemeChooser.astro";
 const currentPath = Astro.url.pathname;
 ---
 
-<header>
-    <a href="/"><img src={lightLogo.src} alt="Logo" /></a>
-
-    <menu>
-        <li><a href="/examples" class={/examples/i.test(currentPath) ? "active" : ""}>Examples</a></li>
-        <li><a href="/documentation" class={/documentation/i.test(currentPath) ? "active" : ""}>Documentation</a></li>
-    </menu>
+<header class="navbar bg-base-100 shadow-sm">
+    <div class="flex-1">
+        <a class="btn-ghost text-xl" href="/">
+            <img class="h-10 header-logo-dark" src={darkLogo.src} alt="Logo" />
+            <img class="h-10 header-logo-light" src={lightLogo.src} alt="Logo" />
+        </a>
+    </div>
+    <nav class="flex-none">
+        <menu class="menu menu-horizontal px-1">
+            <li><a href="/examples" class={/examples/i.test(currentPath) ? "active" : ""}>Examples</a></li>
+            <li><a href="/documentation" class={/documentation/i.test(currentPath) ? "active" : ""}>Documentation</a></li>
+        </menu>
+    </nav>
+    <ThemeChooser class="flex-none" />
 </header>
-
-<style>
-    header {
-        background-color: var(--color-background);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1ch;
-        box-sizing: border-box;
-
-        & > a > img {
-            height: 4ch;
-        }
-
-        menu {
-            display: flex;
-            gap: 4ch;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-
-            & > li > a {
-                text-decoration: none;
-                color: var(--color-main-comp);
-                font-weight: bold;
-                font-size: 1.2em;
-
-                &:hover {
-                    color: var(--color-secondary-comp);
-                }
-
-                &.active {
-                    color: var(--color-main);
-                    text-decoration: underline;
-                }
-            }
-        }
-    }
-</style>
