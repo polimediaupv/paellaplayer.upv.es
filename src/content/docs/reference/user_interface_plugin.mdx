@@ -19,10 +19,26 @@ export default class MyUIPlugin extends UserInterfacePlugin {
       }
     }
   }
+
+  async getHelp() {
+    return {
+      title: "My Plugin Help",
+      description: "This is a description of my plugin's functionality."
+    };
+  }
+
+  async getTranslatedHelp() {
+    const help = await this.getHelp();
+    if (help) {
+      return {
+        title: this.player.translate(help.title),
+        description: this.player.translate(help.description)
+      };
+    }
+    return null;
+  }
 }
 ```
-
-
 
 A plugin of this type is not able to perform any function by itself, they only provide the `getDictionaries()` function that we can use to add dictionaries for translation of text strings used in the plugin. This function can be implemented in any of the classes that extend `UserInterfacePlugin`.
 
