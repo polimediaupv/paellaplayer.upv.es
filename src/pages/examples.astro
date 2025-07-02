@@ -1,13 +1,16 @@
 ---
-import MainTemplate from '@/templates/Main.astro'
-import Player from '@/components/Player.astro'
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+
+// Import any other components you want to use in your custom page.
+import AnchorHeading from '@astrojs/starlight/components/AnchorHeading.astro';
 import PlayerExample from '@/components/PlayerExample.astro'
 import examples from '@/data/examples.json'
-export const prerender = false;
 ---
-<MainTemplate title="Paella Player">
-    <h1>Examples</h1>
 
+<StarlightPage frontmatter={{ title: 'My custom page', template: "splash" }}>
+    <p>This is a custom page with a custom component:</p>
+
+    <AnchorHeading level="2" id="learn-more">Demos</AnchorHeading>
     {examples.map(example => (
         <PlayerExample
             title={example.title}
@@ -15,6 +18,7 @@ export const prerender = false;
             manifest={example.manifest}
             id={example.title.replace(/\s+/g, '-').toLowerCase()}
         />
-    ))}
-    
-</MainTemplate>
+    ))} 
+</StarlightPage>
+
+
