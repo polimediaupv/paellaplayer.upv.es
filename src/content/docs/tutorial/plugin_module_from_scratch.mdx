@@ -8,7 +8,7 @@ description: In this tutorial we will learn how to create a plugin module contai
 </blockquote>
 
 
-In this tutorial you will learn how to create from scratch a plugin module for `paella-core`, and publish it via [npm](https://www.npmjs.com). Before continuing, remember to consult the documentation on [paella-core plugins](/reference/plugins). This tutorial is purely practical, and will not address any theoretical concepts about the `paella-core` plugin APIs, if you have any questions, you have all the information about plugins in the document above, and in the other documents about the types of plugins in `paella-core`.
+In this tutorial you will learn how to create from scratch a plugin module for `paella-core`, and publish it via [npm](https://www.npmjs.com). Before continuing, remember to consult the documentation on [paella-core plugins](/plugins/plugins). This tutorial is purely practical, and will not address any theoretical concepts about the `paella-core` plugin APIs, if you have any questions, you have all the information about plugins in the document above, and in the other documents about the types of plugins in `paella-core`.
 
 This tutorial code is available at [https://github.com/polimediaupv/plugin-module-tutorial.git](https://github.com/polimediaupv/plugin-module-tutorial.git).
 
@@ -466,7 +466,7 @@ export default class ExamplePluginsModule extends PluginModule {
 
 The `moduleName` and `moduleVersion` properties are mandatory. To get the version, we load the `package.json` file of the plugin and read the `version` property.
 
-There are more properties that can be implemented, for more information see the documentation on [plugin modules](/reference/plugin_modules).
+There are more properties that can be implemented, for more information see the documentation on [plugin modules](/plugins/plugin_modules).
 
 ### Plugin file
 

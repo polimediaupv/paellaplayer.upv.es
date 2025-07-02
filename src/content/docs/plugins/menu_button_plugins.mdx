@@ -3,7 +3,7 @@ title: Menu Button Plugins
 description: The menu button plugins are used to add buttons to the menu bar of the player.
 ---
 
-It is a special type of [PopUpButtonPlugin](/reference/pop_up_button_plugins) that implements a menu. The menu options are specified by overriding the `async getMenu()` method.
+It is a special type of [PopUpButtonPlugin](/plugins/pop_up_button_plugins) that implements a menu. The menu options are specified by overriding the `async getMenu()` method.
 
 ```javascript
 import {
@@ -34,7 +34,7 @@ export default class MyMenuButtonPlugin extends MenuButtonPlugin {
 ```
 
 <blockquote>
-    NOTE: consider to implement your own [PluginModule](/reference/plugin_modules) to group your plugins.
+    NOTE: consider to implement your own [PluginModule](/plugins/plugin_modules) to group your plugins.
 </blockquote>
 
 Each menu item returned in the `async getMenu()` method can contain the following elements:

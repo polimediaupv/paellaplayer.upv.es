@@ -100,7 +100,7 @@ Note that, as "video" is the default canvas type, it's not mandatory that the st
 
 ## Included plugins
 
-### Zoom plugin
+### es.upv.paella.zoomPlugin
 
 This is a canvas plugin, which will work on videos whose canvas is set to "video" in the video manifest. Note that for the zoom to work, you must disable the default canvas in the configuration file, or set a higher priority:
 
@@ -128,7 +128,7 @@ Zooming works with the mouse scroll wheel by holding down the `alt` key.
 
 **Exported as** `ZoomCanvasPlugin`.
 
-###  Zoom menu plugin
+### es.upv.paella.zoomMenuButtonPlugin
 
 Displays the options to zoom in or zoom out the video using a drop-down menu. This plugin works on a specific target, which matches the `content` attribute of the video manifest:
 
@@ -175,7 +175,7 @@ Displays the options to zoom in or zoom out the video using a drop-down menu. Th
     * `zoomOutIcon`
 
 
-### Zoom in and zoom out buttons
+### es.upv.paella.zoomInButtonPlugin and es.upv.paella.zoomOutButtonPlugin
 
 These are two button plugins that allow you to zoom in and zoom out the video independently, instead of being grouped in a menu as with the `zoomMenuPlugin` plugin.
 
@@ -213,7 +213,7 @@ These are two button plugins that allow you to zoom in and zoom out the video in
     * `zoomOutIcon`
 
 
-### Zoom in and zoom out canvas buttons
+### es.upv.paella.canvasZoomInButtonPlugin and es.upv.paella.canvasZoomOutButtonPlugin
 
 These plugins are equivalent to the two previous plugins (`zoomOutButtonPlugin` and `zoomInButtonPlugin`), but are intended to be included in the video canvas.
 

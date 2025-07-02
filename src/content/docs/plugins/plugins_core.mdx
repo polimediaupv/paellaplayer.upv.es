@@ -3,19 +3,19 @@ title: Plugins of the Core package
 description: This document describes the plugins that are included in the core package of Paella Player. These plugins are used to implement the basic functionality of the player, and are required for the player to work properly.
 ---
 
-## [Data plugins](/reference/data_plugins)
+## [Data plugins](/plugins/data_plugins)
 
-### `es.upv.paella.cookieDataPlugin`
+### es.upv.paella.cookieDataPlugin
 
 Load and store data from cookies.
 
-### `es.upv.paella.localStorageDataPlugin`
+### es.upv.paella.localStorageDataPlugin
 
 Load and store data from the browser local storage
 
-## [Layout plugins](/reference/video_layout)
+## [Layout plugins](/plugins/video_layout)
 
-### `es.upv.paella.singleVideo`
+### es.upv.paella.singleVideo
 
 Static layout for videos with one or more streams. This plugin contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams.
 
@@ -25,7 +25,7 @@ The button icons that can be configured:
 - icon names:
     + `iconSideBySide`: change to a dual stream video.
 
-### `es.upv.paella.singleVideoDynamic`
+### es.upv.paella.singleVideoDynamic
 
 Dynamic layout for videos with one or more streams. This plugin contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams.
 
@@ -53,7 +53,7 @@ To use the dual stream icon it's necessary to configure the `dualVideoContentIds
 }
 ```
 
-### `es.upv.paella.dualVideo`
+### es.upv.paella.dualVideo
 
 Layout for videos with two or more streams. This layout contains buttons that allow you to switch to the layout of a single video. This plugin contains icons that can be configured:
 
@@ -66,7 +66,7 @@ Layout for videos with two or more streams. This layout contains buttons that al
     + `iconMinimize`: minimize a video.
     + `iconSideBySide`: set the video in side-by-side mode.
     
-### `es.upv.paella.dualVideoDynamic`
+### es.upv.paella.dualVideoDynamic
 
 Dynamimc layout for videos with two or more streams. This layout contains buttons that allow you to switch to the layout of a single video. This plugin contains icons that can be configured:
 
@@ -108,7 +108,7 @@ The `allowSwitchSide` property in the configuration allows to enable or disable 
 }
 ```
 
-### `es.upv.paella.dualVideoPiP`
+### es.upv.paella.dualVideoPiP
 
 Static layout for videos with two or more streams in picture-in-picture mode. This layout contains buttons that allow you to switch to single video and side-by-side dual video.
 
@@ -142,7 +142,7 @@ To use de side-by-side button, it's necessary to configure the `dualVideoContent
 }
 ```
 
-### `es.upv.paella.tripleVideo`
+### es.upv.paella.tripleVideo
 
 Static layout for videos with three or more streams.
 
@@ -150,7 +150,7 @@ Static layout for videos with three or more streams.
 
 This layout contains a button that allows you to switch to a dual video layout, which is activated when the video manifest contains two or more streams. It is important to define which layout we want to use to switch back to a two-stream configuration so that the plugin will be able to find it.
 
-At this point, you should check the [documentation on video layouts](/reference/video_layout), but in short, each applicable layout is identified through a valid unique content identifier. This information is defined in the plugin configuration:
+At this point, you should check the [documentation on video layouts](/plugins/video_layout), but in short, each applicable layout is identified through a valid unique content identifier. This information is defined in the plugin configuration:
 
 **config.json**:
 
@@ -257,39 +257,39 @@ For example: in the following configuration two different dual stream plugins ar
 }
 ```
 
-## [Video format plugins](/reference/video_plugins)
+## [Video format plugins](/plugins/video_plugins)
 
-Plugins to implement support for new video formats. Check the documentation about [video format plugins in this document](video_plugin.md).
+Plugins to implement support for new video formats. Check the documentation about [video format plugins in this document](/plugins/video_plugins).
 
-### `es.upv.paella.imageVideoFormat.js` ###
+### es.upv.paella.imageVideoFormat.js
 
-Support for virtual video composed by a list of images. You can check the documentation about this special video type in [this document](/reference/video_plugin_images).
+Support for virtual video composed by a list of images. You can check the documentation about this special video type in [this document](/plugins/video_plugin_images).
 
-### `es.upv.paella.mp4VideoFormat.js`
+### es.upv.paella.mp4VideoFormat.js
 
-Support for progressive download video. Check the documentation about this format [here](/reference/video_plugin_mp4).
+Support for progressive download video. Check the documentation about this format [here](/plugins/video_plugin_mp4).
 
-### `es.upv.paella.HtmlVideoFormat.js`
+### es.upv.paella.HtmlVideoFormat.js
 
-Support for multiformat progressive download video. Check the documentation about this format [here](/reference/video_plugin_html).
+Support for multiformat progressive download video. Check the documentation about this format [here](/plugins/video_plugin_html).
 
-### `es.upv.paella.audioVideoFormat.js`
+### es.upv.paella.audioVideoFormat.js
 
-Support for audio-only streams. To use this plugin it's important to enable the `es.upv.paella.audioCanvas` plugin. You can get more information about audio-only format in [this document](/reference/video_plugin_audio).
+Support for audio-only streams. To use this plugin it's important to enable the `es.upv.paella.audioCanvas` plugin. You can get more information about audio-only format in [this document](/plugins/video_plugin_audio).
 
-## [Canvas plugins](/reference/canvas_plugins)
+## [Canvas plugins](/plugins/canvas_plugins)
 
-### `es.upv.paella.videoCanvas.js`
+### es.upv.paella.videoCanvas.js
 
-Canvas to display HTML-compliant video formats, i.e. those that use the `<video>` element to display multimedia content. [video canvas plugin documentation](/reference/video_canvas_plugin).
+Canvas to display HTML-compliant video formats, i.e. those that use the `<video>` element to display multimedia content. [video canvas plugin documentation](/plugins/video_canvas_plugin).
 
-### `es.upv.paella.audioCanvas.js`
+### es.upv.paella.audioCanvas.js
 
-Canvas to display audio-only streams. This canvas fills the space of the video with an image. The source of the image will depend on the video format used. [audio canvas plugin documentation](/reference/audio_canvas_plugin).
+Canvas to display audio-only streams. This canvas fills the space of the video with an image. The source of the image will depend on the video format used. [audio canvas plugin documentation](/plugins/audio_canvas_plugin).
 
 ## Other plugins
 
-### `es.upv.paella.playPauseButton.js`
+### es.upv.paella.playPauseButton.js
 
 Play and pause button for the tool bar. This button has icons that can be configured:
 
@@ -299,7 +299,7 @@ Play and pause button for the tool bar. This button has icons that can be config
     + `pause`: pause button icon.
     + `replay`: replay button icon.
 
-### `es.upv.paella.vttManifestCaptionsPlugin.js`
+### es.upv.paella.vttManifestCaptionsPlugin.js
 
 Allows to load subtitles in `VTT` format statically defined in the [video manifest](/reference/video_manifest) file.
 

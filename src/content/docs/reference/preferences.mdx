@@ -3,7 +3,7 @@ title: Preferences API
 description: The preferences API is used to manage the preferences and settings of the user, such as the last known time of a video, the last volume level setting, etc.
 ---
 
-The preferences API allows you to manage key/value type data, globally for the website or specific to the current video. Preference data can be stored in a cookie, via the [cookie consent API](/reference/cookie_consent), or using [data plugins](/reference/data_plugins).
+The preferences API allows you to manage key/value type data, globally for the website or specific to the current video. Preference data can be stored in a cookie, via the [cookie consent API](/reference/cookie_consent), or using [data plugins](/plugins/data_plugins).
 
 ## Configuration
 
@@ -29,7 +29,7 @@ The preference settings are set in the configuration file, in the `preferences` 
 
 - `sources`: sets the configuration of the different data sources to save the preferences. There are two different data sources:
     + `cookie`: cookie consent API preferences. Here you can configure the consent type to use. Note that if you store preferences that can identify the user (e.g., a unique user ID or email), you must use a consentType that can be disabled to comply with data protection regulations.
-    + `dataPlugin`: configuration of the data source that uses data plugins. In this section you can configure the context that will be used to resolve the data plugin. For more information, see the documentation on [data plugins](/reference/data_plugins).
+    + `dataPlugin`: configuration of the data source that uses data plugins. In this section you can configure the context that will be used to resolve the data plugin. For more information, see the documentation on [data plugins](/plugins/data_plugins).
 - `currentSource`: sets which data source is to be used. The possible values are those defined in `sources`.
 
 ## Using the API

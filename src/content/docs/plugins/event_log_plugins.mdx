@@ -52,7 +52,7 @@ export default class TestEventLogPlugin extends EventLogPlugin {
 
 ## Track user actions
 
-It is possible to use an event plugin together with a [data plugin](/reference/data_plugins) to implement user tracking. The procedure consists of writing data to a context that we predefine for this purpose, for example `userTracking`:
+It is possible to use an event plugin together with a [data plugin](/plugins/data_plugins) to implement user tracking. The procedure consists of writing data to a context that we predefine for this purpose, for example `userTracking`:
 
 ```javascript
 export default class MyUserTrackerEventLogPlugin extends EventLogPlugin {

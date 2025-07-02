@@ -5,7 +5,7 @@ description: The video contianer is responsible for managing the video layout an
 
 The VideoContainer component performs three tasks:
 
-- **Obtain compatible video layouts:** from the [video manifest](/reference/video_manifest), and taking into account the configuration of the [video layout plugins](/reference/video_layout), a list of layouts that are compatible with the current video configuration will be generated. It also provides the necessary API to retrieving the supported layouts and activate them.
+- **Obtain compatible video layouts:** from the [video manifest](/reference/video_manifest), and taking into account the configuration of the [video layout plugins](/plugins/video_layout), a list of layouts that are compatible with the current video configuration will be generated. It also provides the necessary API to retrieving the supported layouts and activate them.
 - **Access playback controls:** provides the API needed to access the video playback controls.
 - **Access soft trimming settings:** provides the API to enable, disable and configure video soft trimming.
 
@@ -26,7 +26,7 @@ const { videoContainer } = player;
 
 ## Content identifiers
 
-Content identifiers, hereafter contentId, identify a video layout configuration. They are configured in the `config.json` file, in the configuration options of the layout plugins, as indicated in [this document](/reference/video_layout). The `validContent` array contains the different layout settings that can be applied, depending on the `content` section of the [video manifest](/reference/video_manifest#content):
+Content identifiers, hereafter contentId, identify a video layout configuration. They are configured in the `config.json` file, in the configuration options of the layout plugins, as indicated in [this document](/plugins/video_layout). The `validContent` array contains the different layout settings that can be applied, depending on the `content` section of the [video manifest](/reference/video_manifest#content):
 
 **config.json:**
 
@@ -105,7 +105,7 @@ Each video stream in the video manifest is tagged with this attribute. The video
 	],
 ```
 
-For more information, see [the documentation about video layouts](/reference/video_layout).
+For more information, see [the documentation about video layouts](/plugins/video_layout).
 
 
 ## Layout API
@@ -158,7 +158,7 @@ if (firstContentId) {
 
 ### Example: layout selector plugin
 
-This code is extracted from the `en.upv.paella.layoutSelector` plugin, which is one of the plugins available in the `@asicupv/paella-basic-plugins` package. We have left only the parts of the code relevant to list the available layouts and activate it. For more information, you can check the documentation about [menu button plugins](/reference/menu_button_plugins).
+This code is extracted from the `en.upv.paella.layoutSelector` plugin, which is one of the plugins available in the `@asicupv/paella-basic-plugins` package. We have left only the parts of the code relevant to list the available layouts and activate it. For more information, you can check the documentation about [menu button plugins](/plugins/menu_button_plugins).
 
 ```javascript
 export default class LayoutSelectorPlugin extends MenuButtonPlugin {
@@ -334,7 +334,7 @@ Check the documentation about [styling Paella Player](/reference/stiling_css_var
 
 ### Dynamic layouts
 
-In dynamic layouts, the alignment of the video streams is configured via the configuration file, with the `landscapeVerticalAlignment` and `portraitHorizontalAlignment` properties. For more information, see the section on [dynamic layouts](/reference/video_layout).
+In dynamic layouts, the alignment of the video streams is configured via the configuration file, with the `landscapeVerticalAlignment` and `portraitHorizontalAlignment` properties. For more information, see the section on [dynamic layouts](/plugins/video_layout).
 
 ```json
 {

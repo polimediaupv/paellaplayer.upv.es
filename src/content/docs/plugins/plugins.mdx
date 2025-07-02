@@ -13,12 +13,12 @@ It is also possible to create extensible plugins via plugins in the same way: by
 
 If you are looking for a list of plugins already available, here are the plugins that each Paella Player package exports:
 
-- [`@asicupv/paella-core`](/reference/plugins_core)
-- [`@asicupv/paella-basic-plugins`](/reference/plugins_basic)
-- [`@asicupv/paella-video-plugins`](/reference/plugins_video)
-- [`@asicupv/paella-slide-plugins`](/reference/plugins_slides)
-- [`@asicupv/paella-zoom-plugin`](/reference/plugins_zoom)
-- [`@asicupv/paella-webgl-plugins`](/reference/plugins_webgl)
+- [`@asicupv/paella-core`](/plugins/plugins_core)
+- [`@asicupv/paella-basic-plugins`](/plugins/plugins_basic)
+- [`@asicupv/paella-video-plugins`](/plugins/plugins_video)
+- [`@asicupv/paella-slide-plugins`](/plugins/plugins_slides)
+- [`@asicupv/paella-zoom-plugin`](/plugins/plugins_zoom)
+- [`@asicupv/paella-webgl-plugins`](/plugins/plugins_webgl)
 
 ## Create a plugin
 
@@ -26,14 +26,14 @@ To create a plugin, you must first know the type of plugin you want to create. P
 
 The available plugin types are:
 
-- [ButtonPlugin](/reference/button_plugins): Adds buttons to the player toolbar.
-- [PopUpButtonPlugin](/reference/pop_up_button_plugins): Adds a button that opens a pop up with content defined by the plugin.
-- [MenuButtonPlugin](/reference/menu_button_plugins): Adds a button that opens a menu with options defined by the plugin.
-- [DataPlugin](/reference/data_plugins): Adds a plugin that allows to read and write data using the Paella Player `Data` API (for example, to communicate with a backend).
-- [VideoPlugin](/reference/video_plugins): Adds a plugin that allows to extend the video formats supported by Paella Player.
-- [VideoLayout](/reference/video_layout): Adds a plugin that allows to define the layout of the video in the player.
-- [CanvasPlugin](/reference/canvas_plugins): Adds a plugin that allows to define the video representation in the player.
-- [EventLogPlugin](/reference/event_log_plugins): Adds a plugin that allows to log events in the player.
+- [ButtonPlugin](/plugins/button_plugins): Adds buttons to the player toolbar.
+- [PopUpButtonPlugin](/plugins/pop_up_button_plugins): Adds a button that opens a pop up with content defined by the plugin.
+- [MenuButtonPlugin](/plugins/menu_button_plugins): Adds a button that opens a menu with options defined by the plugin.
+- [DataPlugin](/plugins/data_plugins): Adds a plugin that allows to read and write data using the Paella Player `Data` API (for example, to communicate with a backend).
+- [VideoPlugin](/plugins/video_plugins): Adds a plugin that allows to extend the video formats supported by Paella Player.
+- [VideoLayout](/plugins/video_layout): Adds a plugin that allows to define the layout of the video in the player.
+- [CanvasPlugin](/plugins/canvas_plugins): Adds a plugin that allows to define the video representation in the player.
+- [EventLogPlugin](/plugins/event_log_plugins): Adds a plugin that allows to log events in the player.
 
 To create a new plugin, you must create a new file that returns your plugin class by default.
 
@@ -49,7 +49,7 @@ export default class MyButtonPlugin extends ButtonPlugin {
 
 To implement a plugin, there are some common methods that must be implemented for all plugin types:
 
-- **`getPluginModuleInstance()`**: Returns the instance of the [plugin module](/reference/plugin_modules) that contains the plugin. You should define your own plugin module to group your plugins, but in the following example we are using the `PaellaCorePlugins` module:
+- **`getPluginModuleInstance()`**: Returns the instance of the [plugin module](/plugins/plugin_modules) that contains the plugin. You should define your own plugin module to group your plugins, but in the following example we are using the `PaellaCorePlugins` module:
 
 ```js
 import {

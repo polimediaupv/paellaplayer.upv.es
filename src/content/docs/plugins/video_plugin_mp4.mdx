@@ -5,7 +5,7 @@ description: The MP4 video plugin allows you to play MP4 videos in your player.
 
 It allows to play video in mp4 format obtained by progressive download. This format is the most compatible, both on the browser and server side, since the video files can be supplied by any HTTP server. This plugin is included in the `@asicupv/paella-core` package, so you don't need to add it explicitly at the player initialization.
 
-The default implementation of the mp4 plugin in `paella-core` does not support multi quality streams. To implement this functionality, it is recommended to use the [HLS video plugin](/reference/video_plugin_hls) included in `@asicupv/paella-video-plugins`. But if you want to use mp4 videos with multi quality streams, you can use the [MP4 multi quality plugin](/reference/video_plugin_mp4_multi_quality), also available in `@asicupv/paella-video-plugins`.
+The default implementation of the mp4 plugin in `paella-core` does not support multi quality streams. To implement this functionality, it is recommended to use the [HLS video plugin](/plugins/video_plugin_hls) included in `@asicupv/paella-video-plugins`. But if you want to use mp4 videos with multi quality streams, you can use the [MP4 multi quality plugin](/plugins/video_plugin_mp4_multi_quality), also available in `@asicupv/paella-video-plugins`.
 
 ## Configuration
 
@@ -24,7 +24,7 @@ Despite of beeing included in `paella-core`, the mp4 plugin is not enabled by de
 }
 ```
 
-If there is more than one stream type in a stream within the video manifest that is compatible with the current configuration, the plugin whose value in the `order` attribute is lower will be used. For more information, see the [video format plugins](/reference/video_plugins) documentation.
+If there is more than one stream type in a stream within the video manifest that is compatible with the current configuration, the plugin whose value in the `order` attribute is lower will be used. For more information, see the [video format plugins](/plugins/video_plugins) documentation.
 
 ### crossorigin
 
@@ -117,4 +117,4 @@ await player.loadManifest();
 
 The `enable/disable` video API allows to stop playing the video when it's hidden. This is a feature of the base video plugin class that must be implemented by the video plugin.
 
-The use of `enable/disable` video API has been removed due to a very unstable behaviour. For this reason, mp4 streams are always played even if they are hidden. The malfunction is reproducible in almost all browsers. Problems occur when trying to remove and re-add the video tag to the DOM tree. We recommend using the [HLS video plugin](/reference/video_plugin_hls), which although it does not have these functions implemented, will save bandwidth if variable bitrate streams are configured.
+The use of `enable/disable` video API has been removed due to a very unstable behaviour. For this reason, mp4 streams are always played even if they are hidden. The malfunction is reproducible in almost all browsers. Problems occur when trying to remove and re-add the video tag to the DOM tree. We recommend using the [HLS video plugin](/plugins/video_plugin_hls), which although it does not have these functions implemented, will save bandwidth if variable bitrate streams are configured.

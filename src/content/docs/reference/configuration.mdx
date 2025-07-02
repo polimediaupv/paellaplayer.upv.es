@@ -36,7 +36,7 @@ For more information, please refer to the documentation on [button groups](/refe
 
 **`defaultLanguage`**: Defines a default language to use, if the browser language does not match any of the dictionary languages.
 
-**`defaultLayout`**: Indicates the default layout for videos. This is where you set the `content` value. For more information, see the documentation on [video layouts](/reference/video_layout).
+**`defaultLayout`**: Indicates the default layout for videos. This is where you set the `content` value. For more information, see the documentation on [video layouts](/plugins/video_layout).
 
 **`defaultVideoPreview`** and **`defaultVideoPreviewPortrait`**: Indicates the preview image in landscape or portrait mode, respectively. Both attributes are paths to images, relative to the location of the configuration file. Whenever one of these two images is specified, the `preview` attribute of the [video manifest](/reference/video_manifest) becomes optional.
 
@@ -60,7 +60,7 @@ For more information, please refer to the documentation on [button groups](/refe
 - `sources`: Stores the configuration of each data source for the preferences. The keys are the name of the data source, and the value are the settings for that data source.
     +  `cookie`: Preference settings for using cookies as a data source.
         * `consentType`: This is the type of cookie that will be used to store preferences via the cookie consent API.
-    + `dataPlugin`: Preferences for using data plugins as data source for preferences. For more information, see the [documentation on data plugins](/reference/data_plugins).
+    + `dataPlugin`: Preferences for using data plugins as data source for preferences. For more information, see the [documentation on data plugins](/plugins/data_plugins).
         * `context`: Data context for use with data plugins.
 - `currentSource`: Sets the data source for storing preferences. The possible values of this attribute are the keys defined in the `sources` object.
 
@@ -104,5 +104,5 @@ The common attributes for all plugins are:
 
 **`order`**: Indicates the order in which the plugin will be loaded within that plugin type. The order is incremental. If there are two plugins with the same order and they are of the same type, the order in which they will be loaded is not defined, so this situation should be avoided.
 
-There are many other configuration options specific to each plugin type. For all of them, please refer to the [documentation for the specific plugin type](/reference/plugins).
+There are many other configuration options specific to each plugin type. For all of them, please refer to the [documentation for the specific plugin type](/plugins/plugins).
 

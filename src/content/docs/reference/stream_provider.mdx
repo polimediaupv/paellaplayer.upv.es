@@ -18,7 +18,7 @@ myPlayerInstance.videoContainer.streamProvider
 
 ## Media players
 
-At load time, StreamProvider uses the information from the video manifest regarding video streams, and takes care of creating the video players, taking into account the stream type, the installed and activated plugins, and the order in which they are loaded, in the configuration file. For more information about the configuration of the video plugins, see [this document](/reference/video_plugins).
+At load time, StreamProvider uses the information from the video manifest regarding video streams, and takes care of creating the video players, taking into account the stream type, the installed and activated plugins, and the order in which they are loaded, in the configuration file. For more information about the configuration of the video plugins, see [this document](/plugins/video_plugins).
 
 ## APIs
 
@@ -115,7 +115,7 @@ It is important to note that for the quality change mechanism to work predictabl
 
 ## Multi audio functions
 
-The multiple audio control functions allow you to change the audio track of the main audio stream, provided that the [video plug-in](/reference/video_plugins) supports it. All multi audio functions work with instances of objects of the `AudioTrackData` class. More information on videos with multiple audio tracks can be found in [this document](/reference/multiaudio).
+The multiple audio control functions allow you to change the audio track of the main audio stream, provided that the [video plug-in](/plugins/video_plugins) supports it. All multi audio functions work with instances of objects of the `AudioTrackData` class. More information on videos with multiple audio tracks can be found in [this document](/reference/multiaudio).
 
 `async supportsMultiaudio()`: returns true if the main audio source supports multiple audio tracks.
 
