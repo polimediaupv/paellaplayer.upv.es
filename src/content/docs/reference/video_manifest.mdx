@@ -13,6 +13,8 @@ It consists of four attributes, one of which, streams, is mandatory:
 
 - **frameList:** Is the list of thumbnails extracted from the video frames.
 
+- **chapters:** (paella-core>=2.4.0) Contains the chapter information of the video.
+
 - **captions:** Contains the subtitle information.
 
 - **trimming:** (paella-core>=1.16) Contains the video trimming information.
@@ -38,6 +40,7 @@ Metadata fields may be used by plugins that display information and are loaded b
     "title": "Belmar 15 minutes (multiresolution)",
     "preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview.jpg",
     "previewPortrait": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview_portrait.jpg",
+    "timelineMarks": "frameList",
     "related": [
       {
         "title": "HLS video stream",
@@ -57,6 +60,11 @@ Metadata fields may be used by plugins that display information and are loaded b
 **preview:** It is a preview image that identifies the video. 
 
 **previewPortrait:** It is a preview image in portrait mode, to be displayed when the player area is taller than wide.
+
+**timelineMarks:** (paella-core >= 2.4.0) Indicates the data source for the timeline timestamps. It can be one of the following values:
+
+- **frameList:** The timeline marks will be extracted from the `frameList` attribute of the video manifest.
+- **chapters:** The timeline marks will be extracted from the `chapters` attribute of the video manifest.
 
 **related:** It is information about related videos. This information is not used from `paella-core`, but can be used by plugins. This is an array with objects containing the access information for each related video. Each element of the array must contain the following fields (they are all mandatory):
 
@@ -228,7 +236,110 @@ The internal format of each frame object is as follows:
 - **url:** the URL of the full sized image.
 - **thumb:** the URL of the thumbnail image. Its mimetype must be the same as the full sized image mimetype.
 
+### Timeline Integration
 
+To display the frame list thumbnails on the timeline, you need to configure the `timelineMarks` attribute in the video metadata to `frameList`. When this is set, the timeline will show marks corresponding to each frame, and hovering over the timeline will display the appropriate thumbnail image:
+
+```json
+{
+  "metadata": {
+    "timelineMarks": "frameList",
+    ...
+  },
+  "frameList": {
+    "targetContent": "presenter",
+    "frames": [...]
+  }
+}
+```
+
+If no `timelineMarks` value is specified in the metadata, and both `frameList` and `chapters` are present in the manifest, chapters will take precedence for timeline navigation (see the following section).
+
+## Chapters (paella-core >= 2.4.0)
+ 
+Contains the chapter information of the video. It is similar to slides, but chapters are not necessarily related to presentation images. The chapters object contains a chapterList attribute that is an array containing objects with the information of each chapter.
+
+Chapter information can be displayed on the timeline if the `timelineMarks` attribute of the video's `metadata` object is set to `chapters`. In this case, the timeline marks will be extracted from the `chapters` attribute of the video manifest. Additionally, in the preview image that appears when hovering the mouse cursor over the progress bar, the title of the chapter corresponding to that moment will be displayed. If the chapter contains a preview image, then that image will be shown instead of the frame image corresponding to that instant.
+
+The internal format of each chapter object follows this TypeScript interface:
+
+```ts
+interface Chapter {
+  id: string; // Unique identifier of the chapter
+  title: string; // Chapter title
+  description?: string; // Chapter description (optional)
+  time: number; // Chapter start time, in seconds
+  thumb?: string; // URL of the chapter image (optional)
+}
+```
+
+**Basic chapter structure:**
+
+```json
+{
+  "chapters": {
+    "chapterList": [
+      {
+        "id": "chapter_1",
+        "title": "Introduction",
+        "description": "Description of the introduction",
+        "time": 0,
+        "thumb": "chapter_1_thumb.jpg"
+      },
+      {
+        "id": "chapter_2",
+        "title": "Development",
+        "description": "Description of the development",
+        "time": 60,
+        "thumb": "chapter_2_thumb.jpg"
+      },
+      {
+        "id": "chapter_3",
+        "title": "Conclusion",
+        "description": "Final remarks and summary",
+        "time": 150
+      }
+    ]
+  }
+}
+```
+
+### Chapter Properties
+
+- **id:** unique identifier of the chapter. This must be unique within the video manifest.
+- **title:** the title of the chapter that will be displayed in the user interface.
+- **description:** optional description that provides additional context about the chapter content.
+- **time:** the start time of the chapter, in seconds. If the video has soft trimming configured, the time instant refers to the total time of the video without taking the trimming into account.
+- **thumb:** optional URL of the chapter thumbnail image. This image will be displayed in the timeline preview when hovering over the chapter mark.
+
+### Timeline Integration
+
+If no value is specified for `timelineMarks` in the video metadata, chapters will take precedence over the frame list for displaying timeline marks. This means that if both chapters and frameList are present in the manifest, and no explicit `timelineMarks` value is set, the chapter information will be used for timeline navigation.
+
+To access the chapters information programmatically, you can use the video manifest API:
+
+```javascript
+const player = new Paella('player-container', initParams);
+await player.loadManifest();
+
+const chapters = player.videoManifest.chapters;
+if (chapters && chapters.chapterList) {
+  chapters.chapterList.forEach(chapter => {
+    console.log(`Chapter: ${chapter.title} at ${chapter.time}s`);
+  });
+}
+```
+
+### Chapter Navigation
+
+Chapters provide enhanced navigation capabilities for long-form content. When properly configured, they allow users to:
+
+- See chapter markers on the timeline
+- Jump directly to specific chapters
+- Preview chapter content through thumbnail images
+- Understand video structure through descriptive titles
+
+For optimal user experience, it's recommended to include both `title` and `thumb` properties for each chapter, especially in educational or presentation videos where visual context is important.
 
 ## Captions
 
