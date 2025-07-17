@@ -48,7 +48,12 @@ Metadata fields may be used by plugins that display information and are loaded b
         "thumb": "https://repository.paellaplayer.upv.es/hls/preview.jpg",
         "id": "hls"
       }
-    ]
+    ],
+    "timeline": {
+      "url": "timeline.jpg",
+      "rows": 10,
+      "cols": 10
+    }
   }
 }
 ```
@@ -72,6 +77,14 @@ Metadata fields may be used by plugins that display information and are loaded b
 - **url:** The URL to access the video. It can be absolute or relative to the URL of the current video player.
 - **thumb:** The video thumbnail.
 - **id:** The video identifier.
+
+**timeline:** (paella-core >= 1.5) Contains the information to display the timeline image. It is an object with the following attributes:
+
+  - **url:** The URL of the timeline image.
+  - **rows:** The number of rows in the timeline.
+  - **cols:** The number of columns in the timeline.
+
+You can get more information about the timeline in the [timeline image documentation](/reference/timeline_settings).
 
 It is possible to set only one version of the image in preview, landscape or portrait format, but it is recommended to set both images.
 
@@ -131,7 +144,7 @@ If the video manifest contains more than one video stream, it is mandatory to ma
 - Specifying the `role: "mainAudio"` in the video manifest file, as described above.
 - By defining which stream type contains the default main audio stream, in the configuration file. Streams whose `content` attribute matches the `defaultAudioStream` attribute of the configuration, will be marked by default as `mainAudio`.:
 
-```config.json
+```json
 {
   // The default `mainAudio` stream will be the streams with `content=presenter`
   "defaultAudioStream": "presenter",
@@ -164,33 +177,6 @@ Similarly, for a canvas type there can be more than one compatible canvas. The c
 It is a list of representative frames of the video, associated to an instant of time. For example, in a class supported by a slideshow, you could use the list of slides corresponding to the slideshow.
 
 The frame list is used to bring up a thumbnail on the timeline when hovering over it, but it can also be used by other plugins. This attribute is optional, but it is highly recommended to include it for easy navigation through the video.
-
-**`paella-core < 1.40`:** In versions prior to 1.40, the frame list is stored directly in an array:
-
-```json
-{
-  ...
-  "frameList": [
-    {
-      "id": "frame_854",
-      "mimetype": "image/jpeg",
-      "time": 854,
-      "url": "image_854.jpg",
-      "thumb": "image_854_thumb.jpg"
-    },
-    {
-      "id": "frame_0",
-      "mimetype": "image/jpeg",
-      "time": 0,
-      "url": "image_0.jpg",
-      "thumb": "image_0_thumb.jpg"
-    },
-    ...
-  ]
-}
-```
-
-**`paella-core >= 1.40`:** As of version 1.40 the `frameList` array is replaced by an object:
 
 ```json
 {
@@ -235,6 +221,7 @@ The internal format of each frame object is as follows:
 - **time:** the time instant to which the image corresponds, in seconds. If the video have soft trimming, the time instant is referred to the total time of the video without taking the trimming into account.
 - **url:** the URL of the full sized image.
 - **thumb:** the URL of the thumbnail image. Its mimetype must be the same as the full sized image mimetype.
+
 
 ### Timeline Integration
 

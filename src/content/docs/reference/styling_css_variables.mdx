@@ -106,10 +106,18 @@ Other sizes that we can control are:
 
 - <code>`--popup-item-height`</code>: This is the height of the menu items. You can specify the `auto` value to make the height fit the menu content, or you can specify a fixed value. If the value is fixed, the menu text will be adjusted to the size of the item.
 - <code>`--popup-item-border-radius`</code>: This is the `border-radius` property of the menu items. You can specify a value for each corner or a general value for all corners.
+- <code>`--popup-menu-item-icon-size`</code>: Is the size of the icons in the menu items.
 
 To modify the rest of the sizes of the fonts, see the next section.
 
 The rest of the size properties of the menu items are extracted from the buttons (background colors for states, text and icon colors, icon sizes, etc).
+
+Menu items can also have a status. The status of a menu item consists of text and an icon. The status icon is also automatically used to indicate that the menu item is a submenu. Whan a menu item has a status, there are also the following variables to control the appearance of these elements:
+
+- <code>`--popup-menu-item-state-text-size`</code>: is the size of the text of the status of the menu item.
+- <code>`--popup-menu-item-text-to-state-spacing`</code>: is the space between the text of the menu item and the status area (text and/or icon).
+
+![Menu item with status](styling_css_variables/menu-item-with-status.webp)
 
 ### Font sizes
 
