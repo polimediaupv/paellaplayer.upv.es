@@ -90,6 +90,14 @@ The plugin name is very important, because it is used to identify the plugin in 
 
 In addition, you can implement the following methods:
 
+- **`preload()`**: This method is called when the plugin instance is created, just after loading the plugin configuration. This is a synchronous method, because whatever we do within this function must be lightweight tasks: all plugins added to the player's initParams object will call this function, regardless of whether the plugin is ultimately enabled or not.
+
+```js
+preload() {
+  console.log("Preloading plugin");
+}
+```
+
 - **`async isEnabled()`**: Returns a boolean indicating whether the plugin is enabled or not. This method is called when the plugin is loaded, and it is used to determine whether the plugin should be loaded or not. By default, it returns the `enabled` property extracted from the plugin configuration. If you override this method, you must call the parent method to get the default behavior:
 
 ```js
