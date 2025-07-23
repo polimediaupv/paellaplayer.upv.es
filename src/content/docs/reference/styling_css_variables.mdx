@@ -192,8 +192,6 @@ The colors of interface elements can be defined in a granular way (e.g. the back
 
 - `--button-color`: It is the foreground color of the buttons. It is used in the icon and in the button text. By default this variable is initialized with `--main-fg-color`.
 - `--icon-color`: This is the color of the button icon. By default it is `--button-color`.
-- `--icon-fill-color`: Button icons using `paella-core` work by adding the `SVG` code to the DOM tree, and therefore it is possible to modify their fill and stroke color. The fill color is set with this variable. The default is `--icon-color`.
-- `--icon-stroke-color`: This is the stroke color of the button icons, which is initialized by default to `--icon-color`.
 - `--button-background`: This is the background color of the buttons. By default it is transparent, so that it does not interfere with the background color of your container.
 - `--button-background-hover`: Is the background color of the buttons in the `hover` state. By default it is `--highlight-bg-color`.
 - `--button-background-active`: Is the background color of the buttons in the `active` state. By default it is `--highlight-bg-color-hover`.
@@ -266,8 +264,6 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--main-outline-color`
 - `--button-color`
 - `--icon-color`
-- `--icon-fill-color`
-- `--icon-stroke-color`
 - `--player-font-family`
 
 ### Buttons
@@ -473,5 +469,5 @@ Therefore, you can specify the properties for a specific button using the follow
 }
 ```
 
-Note that when specifying properties for a specific button, you cannot simply modify the values of CSS variables. In this case you will have to directly change the properties you want to modify. The properties that affect the colour of the buttons are the ones you saw in the example above: `color` and `background-color` on the button, and `fill` and `stroke` on the SVG it contains.
+Note that when specifying properties for a specific button, you cannot simply modify the values of CSS variables. In this case you will have to directly change the properties you want to modify. The properties that affect the colour of the buttons are the ones you saw in the example above: `color` and `background-color` on the button, and `fill` and `stroke` on the SVG it contains.For these changes to be reflected in the icon, the SVG code for the button must be prepared for this. For example, if the internal elements of the SVG icon have inline properties for the fill colour or background, they cannot be modified from the CSS code.
 
