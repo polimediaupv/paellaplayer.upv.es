@@ -249,6 +249,82 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--handler-shadow-active`: It is the value of the `box-shadow` property for the progress indicator controller in the `active` state.
 - `--timeline-preview-box-shadow`: It is the value of the `box-shadow` property for the timeline preview area. This area is the container that displays the preview image and the time instant when we hover the mouse cursor over the timeline.
 
+
+## Video container messages
+
+These variables control the appearance of messages displayed through the [video message API](/reference/video_container_messages):
+
+![Video container messages examples](styling_css_variables/video_container_messages.webp)
+
+Messages about the video container can be displayed in nine different positions, and the base style used for this is a grid. Within the grid, we can customise the messages: background colour, foreground colour and overall appearance of the message boxes.
+
+In addition, messages are displayed in three different sizes, depending on the current size of the video container:
+
+- **small (`sm`):** up to `700px` wide.
+- **medium (`md`):** from `701px` to `1300px` wide.
+- **large (`ld`):** from `1301px` wide.
+
+The CSS variables to control the general appearance of the messages are:
+
+- `--video-container-message-bkg`: background color of the message box.
+- `--video-container-message-color`: foreground color of the message box, used in texts and icons.
+- `--video-container-message-padding`: padding of the message box.
+- `--video-container-message-border-radius`: border radius of the message box.
+
+To control the sizes of the message box icon and text, the player follows two different approaches. For the text, we can control the font size for each of the three sizes with the following variables:
+
+- `--video-container-message-font-size-sm`
+- `--video-container-message-font-size-md`
+- `--video-container-message-font-size-lg`
+
+For the icons, we can specify a general width for the icon using an absolute value, and then we can control the maximum width of the icon for each of the three sizes with the following variables:
+
+- `--video-container-message-icon-width`: the CSS variables for the video container message icon size depends on whether the value of this variable is defined in relative units.
+- `--video-container-message-icon-max-width-sm`
+- `--video-container-message-icon-max-width-md`
+- `--video-container-message-icon-max-width-lg`
+
+## About SVG icons
+
+Paella Player loads the SVG icons as text strings to insert them directly into the DOM tree. This allows us to control the color of the icons using CSS variables, and also to apply styles to the icons.
+
+For this system to work correctly, the SVG code for the icons must not force the fill and stroke colours. A de facto standard on the web is for icons to use the `fill` and `stroke` attributes with the value `currentColor`, so that the colour of the icon matches the colour of the text. If the icon does not use these attributes, then the colour of the icon cannot be modified with CSS.
+
+Let's look at three examples below.
+
+### Example 1: Stroke based icon
+
+If we have an SVG icon that uses only paths, we can include the following attributes in the root of the SVG:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+    <path d="..."></path>
+    <path d="..."></path>
+</svg>
+```
+
+### Example 2: Fill based icon
+
+If we have an SVG icon that uses only fills, we can include the following attributes in the root of the SVG:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="none" fill="currentColor">
+    <path d="..."></path>
+    <path d="..."></path>
+</svg>
+```
+
+### Example 3: Some elements with fill and others with stroke
+
+If the SVG icon uses both fills and strokes in different elements, we can include a general rule in the root of the SVG, and then specify the fill and stroke for each element:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="currentColor">
+    <path d="..." stroke="none"></path>
+    <path d="..." fill="none"></path>
+</svg>
+```
+
 ## All CSS variables
 
 ### General variables
@@ -370,8 +446,20 @@ There are several elements that can have a shadow effect. In the default `paella
 - `--video-container-gap`
 - `--video-container-background-color`
 - `--base-video-rect-background-color`
+
+### Video container messages
+
 - `--video-container-message-bkg`
 - `--video-container-message-color`
+- `--video-container-message-padding`
+- `--video-container-message-border-radius`
+- `--video-container-message-icon-width`
+- `--video-container-message-icon-max-width-sm`
+- `--video-container-message-icon-max-width-md`
+- `--video-container-message-icon-max-width-lg`
+- `--video-container-message-font-size-sm`
+- `--video-container-message-font-size-md`
+- `--video-container-message-font-size-lg`
 
 ### Pop up/Menus
 
