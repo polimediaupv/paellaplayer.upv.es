@@ -294,5 +294,17 @@ getAriaLabel() {
 }
 ```
 
+## Anchors (paella-core >= 2.8)
 
+If the `async getAnchorUrl()` function returns a value other than `null`, then the button will become a link and be treated as such, although visually it will share the same visual styles as buttons. When a button is implemented as a link, the `async action()` function will still be executed to provide flexibility in implementation, but keep in mind that if the link is set to open in the same tab, the button action will not be executed, as the browser will redirect to the link URL. If you want the action to be executed, you need to specify a different target.
 
+The link API functions for button-type plugins that we can override to determine the behavior of the plugin are as follows:
+
+- `getAnchorUrl(): Promise<string | null>`: Returns the link URL or null if it is not a link.
+- `get anchorTarget(): string | null`: Returns the target attribute of the link or null if we do not want to add that attribute. Its default value is `_self`.
+- `get anchorDownloadFilename(): string | null`: Tells the browser if we want the link to be treated as a file download. If `null` is returned, then the link will be treated as a normal link. If a file name is returned, the browser will download the resource instead of opening it, and the file name will be the one returned in this function. If an empty string is returned, then the download name will be determined by the browser implementation.
+- `get anchorReferrerPolicy(): string | null`: Returns the referrer policy of the link or null if you do not want to use this attribute. The default value is `no-referrer`.
+
+The following function is used to determine if the button is a link. It should not be overwritten, as its behavior is determined by the return value of the `getAnchorUrl()` function:
+
+- `get isAnchor(): boolean`: Returns true if the button is a link.
