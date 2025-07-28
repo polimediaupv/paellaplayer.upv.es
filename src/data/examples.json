@@ -1,8 +1,8 @@
 [
     {
         "title": "Dual Stream",
-        "manifest": "dual-stream",
-        "description": "This example shows a dual stream video, where the primary video is the whiteboard camera and the secondary video is the screen capture from the teacher's PC. This example includes a frame list extracted from the presentation video. Both streams are in MP4 format."
+        "manifest": "dual-stream-f-t-c",
+        "description": "This example shows a dual stream video, where the primary video is the whiteboard camera and the secondary video is the screen capture from the teacher's PC. This example includes a frame list extracted from the presentation video. Both streams are in MP4 format. This example includes also frame images extracted from the presentation video, the video timeline and chapters."
     },
     {
         "title": "HLS Dual Stream",

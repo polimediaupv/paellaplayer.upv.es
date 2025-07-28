@@ -102,6 +102,14 @@ import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
 </style>
 ```
 
+> Note: if you want to integrate Paella Player with [Starlight](https://starlight.astro.build), you can use the `not-content` class to prevent the player styles from being applied to the player container.
+
+```html
+<article>
+    <div class="player-container not-content" id={id}></div>
+</article>
+```
+
 ## Explanation of the code
 
 First, in the Astro header, we import the necessary CSS files for the player. This code will be generated statically in the server side. The `paella-core` and `paella-basic-plugins` packages are imported in the `<script>` section, because we want to load them in the client side.
