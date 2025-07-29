@@ -63,6 +63,7 @@ export default defineConfig({
                         { label: 'Button Plugins', slug: 'plugins/button_plugins' },
                         { label: 'Pop Up Plugins', slug: 'plugins/pop_up_button_plugins' },
                         { label: 'Menu Button Plugins', slug: 'plugins/menu_button_plugins' },
+                        { label: 'Table Info Pop Up Plugins', slug: 'plugins/table_info_pop_up_plugins' },
                         { label: 'Canvas Button Plugins', slug: 'plugins/canvas_button_plugins' },
                         { label: 'Canvas Plugins', slug: 'plugins/canvas_plugins' },
                         { label: 'Video Plugins', slug: 'plugins/video_plugins' },
