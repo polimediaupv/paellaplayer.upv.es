@@ -3,17 +3,36 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 
 import PlayerExample from '@/components/PlayerExample.astro'
 import examples from '@/data/examples.json'
+import featuredExamples from '@/data/featured-examples.json'
 ---
 
 <StarlightPage frontmatter={{ title: 'Paella Player 8 Demos', template: "splash" }}>
-    {examples.map(example => (
-        <PlayerExample
-            title={example.title}
-            description={example.description}
-            manifest={example.manifest}
-            id={example.title.replace(/\s+/g, '-').toLowerCase()}
-        />
-    ))} 
+    <article>
+        <h2>Featured examples</h2>
+
+        {featuredExamples.map(example => (
+            <PlayerExample
+                title={example.title}
+                description={example.description}
+                manifest={example.manifest}
+                id={example.title.replace(/\s+/g, '-').toLowerCase()}
+            />
+        ))}
+    </article>
+
+    <article>
+        <h2>Other examples</h2>
+
+        <ul>
+            {examples.map(example => (
+                <li>
+                    <a href={`/player/${example.manifest}`}>{example.title}</a>
+                    <p>{example.description}</p>
+                </li>
+            ))}
+        </ul>
+    </article>
 </StarlightPage>
+
 
 

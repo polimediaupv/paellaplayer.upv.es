@@ -1,0 +1,18 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+
+import PlayerExample from '@/components/PlayerExample.astro'
+import examples from '@/data/examples.json'
+import featuredExamples from '@/data/featured-examples.json'
+
+export const prerender = false;
+
+const { manifestId } = Astro.params;
+const data = [...featuredExamples, ...examples].find(example => example.manifest === manifestId)
+---
+<StarlightPage frontmatter={{ title: data?.title || 'Paella Player 8', template: "splash" }}>
+    <PlayerExample
+        manifest={manifestId}
+        id='player-container'
+    />
+</StarlightPage>

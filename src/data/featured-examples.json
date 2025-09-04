@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Dual Stream",
+        "manifest": "dual-stream-f-t-c",
+        "description": "This example shows a dual stream video, where the primary video is the whiteboard camera and the secondary video is the screen capture from the teacher's PC. This example includes a frame list extracted from the presentation video. Both streams are in MP4 format. This example includes also frame images extracted from the presentation video, the video timeline and chapters."
+    },
+    {
+        "title": "HLS Dual Stream",
+        "manifest": "hls-multiquality",
+        "description": "This example is the same video as the Dual Stream example, but served through HLS. In this case, the video supports several quality levels, which by default are automatically selected, but can be forced through the quality selection plugin found within the configuration options. This video does not include the slide list. Note that the behavior and appearance of the progress bar changes slightly when there is no slide list."
+    }
+]
