@@ -97,10 +97,21 @@
             ]
         },
 
-        "es.upv.paella.mp4VideoFormat": {
-            "enabled": true
+        "es.upv.paella.imageVideoFormat": {
+            "enabled": true,
+            "order": 3
         },
-
+        "es.upv.paella.htmlVideoFormat": {
+            "enabled": true,
+            "order": 1
+        },
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": false
+        },
+        "es.upv.paella.mp4MultiQualityVideoFormat": {
+            "enabled": true,
+            "order": 2
+        },
         "es.upv.paella.hlsVideoFormat": {
             "enabled": true,
             "order": 0,
@@ -116,7 +127,6 @@
                 }
             }
         },
-        
         "es.upv.paella.hlsLiveVideoFormat": {
             "enabled": true,
             "order": 0,
@@ -130,9 +140,24 @@
                 }
             }
         },
+        "es.upv.paella.audioVideoFormat": {
+            "enabled": true
+        },
 
         "es.upv.paella.videoCanvas": {
-            "enabled": true
+            "enabled": false,
+            "order": 1
+        },
+
+        "es.upv.paella.zoomPlugin": {
+            "enabled": true,
+            "order": 0,
+            "maxZoom": 800
+        },
+
+        "es.upv.paella.audioCanvas": {
+            "enabled": true,
+            "order": 1
         },
 
         "es.upv.paella.playPauseButton": {

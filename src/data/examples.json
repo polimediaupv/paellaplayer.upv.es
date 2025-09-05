@@ -8,5 +8,25 @@
         "title": "HLS Dual Stream",
         "manifest": "hls-multiquality",
         "description": "This example is the same video as the Dual Stream example, but served through HLS. In this case, the video supports several quality levels, which by default are automatically selected, but can be forced through the quality selection plugin found within the configuration options. This video does not include the slide list. Note that the behavior and appearance of the progress bar changes slightly when there is no slide list."
+    },
+    {
+        "title": "Dual Stream with Chapters",
+        "manifest": "dual-stream-c",
+        "description": "This example is the same video as the Dual Stream example with chapters only. Chapters are a way to segment the video into sections, which can be used for navigation and to provide context about the content of the video. The chapters are shown in the timeline preview pop up."
+    },
+    {
+        "title": "Dual Stream with Frame List and Chapters",
+        "manifest": "dual-stream-f-c",
+        "description": "This example is the same video as the Dual Stream example with frame list and chapters. The frame list is a preview of the slides in the presentation video, which can be used for navigation."
+    },
+    {
+        "title": "Dual Stream with Frame List and Thumbnails",
+        "manifest": "dual-stream-f-t",
+        "description": "This example is the same video as the Dual Stream example with frame list and thumbnails. The thumbnails are small images extracted from the presenter video, which can be used for navigation. If the manifest includes thumbnails and frame list, the thumbnails are shown when hovering over the frame list."
+    },
+    {
+        "title": "Dual Stream with Frame List, Thumbnails and Chapters",
+        "manifest": "dual-stream-f-t-c",
+        "description": "This example is the same video as the Dual Stream example with frame list, thumbnails and chapters."
     }
 ]

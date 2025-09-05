@@ -12,9 +12,10 @@
   "dependencies": {
     "@asicupv/paella-basic-plugins": "^2.5.0",
     "@asicupv/paella-core": "^2.8.3",
-    "@asicupv/paella-slide-plugins": "^2.5.0",
+    "@asicupv/paella-slide-plugins": "^2.5.1",
     "@asicupv/paella-video-plugins": "^2.3.0",
-    "@asicupv/paella-zoom-plugin": "^2.4.0",
+    "@asicupv/paella-webgl-plugins": "^2.3.0",
+    "@asicupv/paella-zoom-plugin": "^2.4.3",
     "@astrojs/node": "^9.2.2",
     "@astrojs/starlight": "^0.35.1",
     "@fontsource-variable/fredoka": "^5.2.6",
