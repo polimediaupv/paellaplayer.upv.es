@@ -1,0 +1,73 @@
+---
+title: Use Native Player
+description: This document describes how to use the browser's native video player instead of loading Paella Player.
+---
+
+Paella Player is a powerful and flexible video player that can handle a wide range of video formats and streaming protocols. However, in some cases, it may be possible to use the browser's native video player instead of loading Paella Player. This can help to reduce the load on the client browser and improve performance, when the video content is simple enough to be handled by the native player.
+
+## When to use the native player
+
+The native player can be used when the video content meets the following criteria:
+
+- The video is a single file that can be played natively by the browser (e.g., MP4, WebM).
+- The video is not part of a complex streaming protocol that requires Paella Player's capabilities (e.g., HLS, DASH).
+
+In addition, we recommend using the native player when:
+
+- The video does not require advanced features such as multiple audio tracks, subtitles, or interactive elements.
+- The video does not require specific customizations or plugins that are only available in Paella Player.
+
+Strictly speaking, only the first two requirements must be met in order to use the native player. However, the other two requirements are recommendations to ensure an optimal user experience.
+
+## How to use the native player
+
+Paella Player will never decide on its own whether to use a native player; this is left to the discretion of the developer who integrates the player into their application. However, there are specific APIs that will help us determine whether the manifest content is compatible with a native player, which we can use in our application to decide whether to load Paella Player or a native player. In addition, there is also a function that returns a DOM node with the native player already configured, in case we want to use it.
+
+As the video manifest will be the main source of information to determine whether we can use a native player, we will use the [`ManifestParser` API](/reference/manifest_parser) to extract the necessary information.
+
+The following functions are what we will need to create a native player:
+
+- **`manifestParser.streams.isAudioOnly`:** Returns `true` if the video manifest file only contains an `audio` stream. Note that this attribute will always return `false` if there are more than one stream, even if one of them contains only images.
+- **`manifestParser.streams.audioOnlySource`:** If the video manifest contains only an audio stream, this function returns the URL of the audio resource, or `null` in other case.
+- **`manifestParser.stream.isNativelyPlayable`:** Returns `true` if the video manifest contains one an only one stream that can be played natively.
+- **`manifestParser.stream.nativeSource`:** Returns the URL of the native source, if the video manifest can be played natively, or `null` in other case.
+- **`manifestParser.stream.nativeType`:** Returns `audio` or `video` if the video manifest contains a source that can be played natively, or `null` in other case.
+- **`manifestParser.stream.nativePlayer`:** Returns a DOM element configured with the native source, if the video manifest can be played natively, or `null` in other case. The DOM element can be a `<video>` or a `<audio>` element.
+
+The following code snippet shows how to use these functions to decide whether to load Paella Player or a native player.
+
+```js
+// ...
+
+const container = document.getElementById(containerId);
+const paella = new Paella(container, {
+    // Setup your init parameters here
+});
+
+// Load the video manifest before using the manifestParser APIs
+await paella.loadManifest(manifestUrl);
+
+let nativePlayer = null;
+if (paella.streams.isNativelyPlayable && paella.streams.isAudioOnly) {
+     nativePlayer = paella.streams.nativePlayer;
+     nativePlayer.setAttribute("controls","controls");
+
+     // Here you can customize the player container to indicate that a native player is being used
+     container.classList.add("native-player");
+     // Remove any existing content in the container, if any
+     container.innerHTML = "";
+     container.appendChild(nativePlayer);
+
+     // Unload Paella Player to free resources
+     await paella.unload();
+}
+else {
+    container.classList.remove("native-player");
+    if (nativePlayer) {
+        container.removeChild(nativePlayer);
+        nativePlayer = null;
+    }
+}
+```
+
+> NOTE: In this example, we only want to use the native player if the video manifest contains only an audio stream, but note that this is not a requirement to use the native player: the `nativePlayer` attribute will return a valid native video player if the video manifest contains a single video stream that can be played natively.

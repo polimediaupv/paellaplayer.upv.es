@@ -28,11 +28,22 @@ import featuredExamples from '@/data/featured-examples.json'
                 <li>
                     <a href={`/player/${example.manifest}`}>{example.title}</a>
                     <p>{example.description}</p>
+                    { example.docLinks && <ul>
+                        {example.docLinks.map(docLink => {
+                            return <p>
+                                <a href={docLink.link}>{docLink.text}</a>{ docLink.description ? `: ${docLink.description}` : '' }
+                            </p> 
+                        })}
+                    </ul>
+                    }
                 </li>
             ))}
         </ul>
     </article>
 </StarlightPage>
+
+<style>
+</style>
 
 
 

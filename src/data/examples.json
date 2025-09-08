@@ -28,5 +28,18 @@
         "title": "Dual Stream with Frame List, Thumbnails and Chapters",
         "manifest": "dual-stream-f-t-c",
         "description": "This example is the same video as the Dual Stream example with frame list, thumbnails and chapters."
+    },
+    {
+        "title": "Audio and images",
+        "manifest": "audio-and-images",
+        "description": "This example shows a video with an audio track and a set of presentation images. This example emulates a video, but in reality it only contains images and audio."
+    },
+    {
+        "title": "Audio no frames",
+        "manifest": "audio-no-frames",
+        "description": "This example shows a video with an audio track and no presentation images.We can determine whether it is possible to lighten the load by using the browser's native components instead of loading Paella Player. Please refer to the documentation for more information.",
+        "docLinks": [
+            { "text": "Use Native Player", "link": "/guides/native_player", "description": "How to determine if the manifest is compatible with a native player" }
+        ]
     }
 ]
