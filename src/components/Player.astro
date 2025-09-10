@@ -69,6 +69,19 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
         });
 
         await player.loadManifest();
+
+        let nativePlayer = null;
+        if (player.streams.isNativelyPlayable && player.streams.isAudioOnly) {
+            nativePlayer = player.streams.nativePlayer;
+            nativePlayer.setAttribute("controls", "true");
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = "";
+                container.appendChild(nativePlayer);
+                container.classList.add("native-player");
+                player.unload();
+            }
+        }
     }
 
     class PlayerLoader extends HTMLElement {
@@ -93,6 +106,14 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
     :root {
         --highlight-bg-color: #e0ab1b;
         --highlight-bg-color-hover: #624802;
+    }
+
+    .native-player {
+        width: 100%;
+
+        & > audio,video {
+            width: 100%;
+        }
     }
 </style>
 <style>
