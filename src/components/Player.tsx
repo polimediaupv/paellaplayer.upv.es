@@ -1,0 +1,66 @@
+
+import {
+    Paella,
+    type Manifest,
+    type Config
+} from '@asicupv/paella-core'
+import { basicPlugins } from "@asicupv/paella-basic-plugins";
+import { slidePlugins } from "@asicupv/paella-slide-plugins";
+import { videoPlugins } from "@asicupv/paella-video-plugins";
+import { webglPlugins } from "@asicupv/paella-webgl-plugins";
+import { zoomPlugins } from "@asicupv/paella-zoom-plugin";
+import "@asicupv/paella-core/paella-core.css";
+
+import { useEffect, useRef } from 'react';
+import "./Player.css";
+
+type Props = {
+    config: Config
+    manifest: Manifest
+};
+
+export default function Player({ config, manifest }: Props) {
+    const playerContainer = useRef<HTMLDivElement>(null);
+    const playerInstance = useRef<Paella | null>(null);
+
+    useEffect(() => {
+        if (playerContainer.current) {
+            const paella = new Paella(playerContainer.current, {
+                plugins: [
+                    ...basicPlugins,
+                    ...slidePlugins,
+                    ...videoPlugins,
+                    ...webglPlugins,
+                    ...zoomPlugins
+                ],
+                async loadConfig() {
+                    return config;
+                },
+
+                async getVideoId() {
+                    return "playgroundVideo"
+                },
+
+                async loadVideoManifest() {
+                    return manifest;
+                }
+            });
+            paella.loadManifest()
+                .then(() => {
+
+                })
+                .catch(error => {
+                    console.error("Error loading manifest:", error);
+                });
+            playerInstance.current = paella;
+        }
+        return () => {
+            if (playerInstance.current) {
+                playerInstance.current.unload();
+                playerInstance.current = null;
+            }
+        }
+    }, [config, manifest]);
+
+    return <div className="player-container" ref={playerContainer}></div>;
+}
