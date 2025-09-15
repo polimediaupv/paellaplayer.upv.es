@@ -1,0 +1,38 @@
+{
+    "metadata": {
+        "preview": "https://repository.paellaplayer.upv.es/belmar-multiresolution/preview/belmar-preview.jpg"
+    },
+    "streams": [
+        {
+            "sources": {
+                "html": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presentation.mp4",
+                        "mimetype": "video/mp4",
+                        "res": {
+                            "w": 1442,
+                            "h": 1080
+                        }
+                    }
+                ]
+            },
+            "content": "presentation"
+        },
+        {
+            "sources": {
+                "html": [
+                    {
+                        "src": "https://repository.paellaplayer.upv.es/belmar-multiresolution/media/720-presenter.mp4",
+                        "mimetype": "video/mp4",
+                        "res": {
+                            "w": 1920,
+                            "h": 1080
+                        }
+                    }
+                ]
+            },
+            "content": "presenter",
+            "role": "mainAudio"
+        }
+    ]
+}
