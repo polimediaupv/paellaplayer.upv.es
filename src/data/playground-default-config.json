@@ -1,5 +1,5 @@
 {
-    "defaultLayout": "presenter-presentation",
+    "defaultLayout": "presenter-presentation-dynamic",
     "plugins": {
         "es.upv.paella.singleVideoDynamic": {
             "enabled": true,
@@ -117,7 +117,7 @@
             "order": 1
         },
         "es.upv.paella.playPauseButton": {
-            "enabled": true,
+            "enabled": false,
             "order": 0,
             "container": "playbackBar",
             "side": "left",

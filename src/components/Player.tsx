@@ -25,6 +25,13 @@ export default function Player({ config, manifest }: Props) {
 
     useEffect(() => {
         if (playerContainer.current) {
+            if (playerInstance.current) {
+                playerInstance.current.unload();
+                playerInstance.current = null;
+            }
+
+            console.log(basicPlugins);
+
             const paella = new Paella(playerContainer.current, {
                 plugins: [
                     ...basicPlugins,
@@ -54,13 +61,16 @@ export default function Player({ config, manifest }: Props) {
                 });
             playerInstance.current = paella;
         }
+    }, [config, manifest]);
+
+    useEffect(() => {
         return () => {
             if (playerInstance.current) {
                 playerInstance.current.unload();
                 playerInstance.current = null;
             }
         }
-    }, [config, manifest]);
+    }, []);
 
     return <div className="player-container" ref={playerContainer}></div>;
 }

@@ -1,14 +1,15 @@
 import useDebounce from "@/hooks/useDebounce"
 import { useEffect, useState } from "react"
+import ReactCodeMirror from "@uiw/react-codemirror"
+import { json } from "@codemirror/lang-json"
+
 
 export default function JsonEditor<T>({
-    title,
     defaultData,
     onChange,
     onError,
     debounceMs = 2000
 }: {
-    title: string
     defaultData: T
     onChange: (data: T) => void
     onError: (error: string) => void
@@ -18,20 +19,34 @@ export default function JsonEditor<T>({
     const debouncedValue = useDebounce(value, debounceMs);
 
     useEffect(() => {
+        setValue(defaultData);
+    }, [defaultData]);
+    
+    useEffect(() => {
         onChange(debouncedValue);
     }, [debouncedValue]);
 
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    useEffect(() => {
+        return () => {
+            // Here we ensure that the latest value is sent when the component unmounts
+            onChange(value);
+        }
+    }, []);
+
+    const handleChange = (value: string) => {
         try {
-            const newData = JSON.parse(event.target.value) as T;
+            const newData = JSON.parse(value) as T;
+            // Only save if parsing is successful
             setValue(newData);
         } catch (error: any) {
             onError(error.message);
         }
     }
 
-    return <details>
-        <summary>{title}</summary>
-        <textarea onChange={handleChange}>{JSON.stringify(value, null, 2)}</textarea>
-    </details>
+    return <ReactCodeMirror
+        className="json-editor"
+        value={JSON.stringify(value, null, 2)}
+        onChange={handleChange}
+        extensions={[json()]}
+    />
 }
