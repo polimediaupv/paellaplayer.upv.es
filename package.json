@@ -12,7 +12,7 @@
   "dependencies": {
     "@asicupv/paella-ai-plugins": "^2.5.1",
     "@asicupv/paella-basic-plugins": "^2.5.2",
-    "@asicupv/paella-core": "^2.9.9",
+    "@asicupv/paella-core": "^2.10.0",
     "@asicupv/paella-extra-plugins": "^2.8.2",
     "@asicupv/paella-slide-plugins": "^2.5.2",
     "@asicupv/paella-video-plugins": "^2.3.1",

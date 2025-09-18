@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import "./Playground.css";
 import defaultConfig from "@/data/playground-default-config.json";
 import JsonEditor from "@/components/JsonEditor";
-import { getAvailablePlayerPlugins } from "@/services/browser/player";
+import { getAvailablePlayerPlugins, getAvailableExamples, loadManifest } from "@/services/browser/player";
 import usePlayground from "@/stores/usePlayground";
 
 export default function Playground() {
@@ -16,6 +16,8 @@ export default function Playground() {
     const manifestEndRef = useRef<HTMLDivElement>(null);
     
     const availablePlugins = getAvailablePlayerPlugins();
+    const availableExamples = getAvailableExamples();
+    console.log(availableExamples);
 
     useEffect(() => {
         //console.log(config)
@@ -27,6 +29,12 @@ export default function Playground() {
 
     const handleError = (error: string) => {
         console.error("Config JSON Error:", error);
+    }
+
+    const handleLoadManifest = async (evt: React.ChangeEvent<HTMLSelectElement>) => {
+        const exampleId: string = evt.target.value;
+        const manifest = await loadManifest(exampleId);
+        setManifest(manifest);
     }
 
     const handleAddPlugin = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -97,7 +105,13 @@ export default function Playground() {
                         <div ref={manifestEndRef}></div>
                     </div>
                     <menu className="editor-menu">
-                        <li><button onClick={() => setManifest(manifest)}>Reset to default</button></li>
+                        <li>Load Example: 
+                            <select title="Available Plugins" onChange={handleLoadManifest}>
+                                { availableExamples.map((example,i) => (
+                                    <option key={`${example.manifest}-${i}`} value={example.manifest}>{example.title}</option>
+                                )) }
+                            </select>
+                        </li>
                     </menu>
                 </section>
             )}
