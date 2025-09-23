@@ -12,8 +12,6 @@ import { zoomPlugins } from "@asicupv/paella-zoom-plugin";
 import "@asicupv/paella-core/paella-core.css";
 import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
 import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
-import "@asicupv/paella-video-plugins/paella-video-plugins.css";
-import "@asicupv/paella-webgl-plugins/paella-webgl-plugins.css";
 import "@asicupv/paella-zoom-plugin/paella-zoom-plugin.css";
 
 import { useEffect, useRef } from 'react';
