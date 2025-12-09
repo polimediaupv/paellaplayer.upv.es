@@ -73,6 +73,11 @@
 		location.reload();
 	};
 
+	let bannerDialog = null;
+	const closePaella8Modal = () => {
+		bannerDialog.close();
+	}
+
 	onMount(() => {
 		// Find google analytics cookie
 		const cookieConsent = getCookieConsentData();
@@ -96,6 +101,27 @@
 		<Router {routes}/>
 	</section>
 	<Footer onUpdateCookies={updateCookies}/>
+
+	<dialog open bind:this={bannerDialog}>
+		<header>
+			<h2>Paella Player 7 – Legacy Documentation</h2>
+		</header>
+
+		<p>
+			This website contains the documentation for <strong>Paella Player 7</strong>.
+			Please note that this version is no longer under active development and no new
+			features will be implemented.  
+			The current version is <strong>Paella Player 8</strong>, available at
+			<a href="https://paellaplayer.webs.upv.es" target="_blank">
+			paellaplayer.webs.upv.es
+			</a>.  
+			We highly recommend upgrading to Paella Player 8.
+		</p>
+
+		<footer>
+			<button on:click={closePaella8Modal}>Close</button>
+		</footer>
+	</dialog>
 </main>
 
 {#if cookiesMessage}
@@ -139,4 +165,42 @@
 		z-index: 1000;
 	}
 
+	dialog {
+		position: fixed;
+		top: 20px;
+		left: 0px;
+		width: 420px;
+		max-width: 90%;
+		border: solid 1px #d0c48d;
+		padding: 1.5rem;
+		border-radius: 8px;
+		background: #f7f3d4;
+		font-family: Arial, sans-serif;
+	}
+
+	dialog header h2 {
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+		font-size: 1.25rem;
+	}
+
+	dialog p {
+		margin-bottom: 1.25rem;
+		line-height: 1.4em;
+	}
+
+	dialog footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		}
+
+	dialog button {
+		padding: 0.4rem 0.9rem;
+		cursor: pointer;
+	}
+
+	dialog::backdrop {
+		background: rgba(0, 0, 0, 0.4);
+	}
 </style>
