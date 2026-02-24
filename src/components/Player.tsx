@@ -55,7 +55,9 @@ export default function Player({ config, manifest }: Props) {
                     return manifest;
                 }
             });
-            paella.loadManifest()
+
+            paella.skin.loadSkin("/skin/skin_1.json")
+                .then(() => paella.loadManifest())
                 .then(() => {
 
                 })
