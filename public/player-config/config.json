@@ -1,7 +1,56 @@
 {
-    "defaultLayout": "presenter-presentation",
+    "fallbackId": "belmar-multiresolution-remote",
+
     "repositoryUrl": "/repo",
     "manifestFileName": "data.json",
+
+    "defaultLayout": "presenter-presentation",
+
+    "defaultLanguage": "en",
+
+    "defaultAudioStream": "presenter",
+
+    "defaultVideoPreview": "/config/default_preview_landscape.jpg",
+    "defaultVideoPreviewPortrait": "/config/default_preview_portrait.jpg",
+
+    "logLevel": "INFO",
+
+    "ui": {
+        "hideUITimer": 2000,
+        "hideOnMouseLeave": true
+    },
+
+    "preferences": {
+        "currentSource": "dataPlugin",
+        "sources": {
+            "cookie": {
+                "consentType": "necessary"
+            },
+            "dataPlugin": {
+                "context": "preferences"
+            }
+        }
+    },
+
+    "videoContainer": {
+        "overPlaybackBar": false,
+
+        "restorePlaybackRate": true,
+        "restoreVolume": true,
+        "restoreVideoLayout": {
+            "enabled": true,
+            "global": true
+        },
+        "restoreLastTime": {
+            "enabled": true,
+            "remainingSeconds": 5
+        },
+
+        "dynamicLayout": {
+            "landscapeVerticalAlignment": "align-bottom",
+            "portraitHorizontalAlignment": "align-center"
+        }
+    },
 
     "buttonGroups": [
         {
@@ -16,7 +65,43 @@
         }
     ],
 
+    "cookieConsent": [
+        {
+            "type": "necessary",
+            "title": "Necessary",
+            "description": "Cookies required for proper operation.",
+            "required": true
+        },
+        {
+            "type": "preferences",
+            "title": "Preferences",
+            "description": "Cookies used to store user preferences that can be configured in the application. If disabled, some of these features may not work properly.",
+            "required": false
+        },
+        {
+            "type": "analytical",
+            "title": "Analytical",
+            "description": "Cookies used to analyze user behavior and thus provide clues about future improvements in the application.",
+            "required": false
+        },
+        {
+            "type": "marketing",
+            "title": "Marketing",
+            "description": "Cookies used to better tailor ads to user preferences.",
+            "required": false
+        }
+    ],
+
     "plugins": {
+        "es.upv.paella.testPlugin": {
+            "enabled": true,
+            "side": "left",
+            "order": 3
+        },
+        "es.upv.paella.testPlugin2": {
+            "enabled": true,
+            "side": "right"
+        },
         "es.upv.paella.singleVideo": {
             "enabled": false,
             "dualVideoContentIds": [
@@ -96,7 +181,6 @@
                 { "id": "presenter-2-presenter-3-presentation", "content": ["presenter-2","presenter-3","presentation"], "icon": "present-mode-4.svg", "title": "Presenter and presentation" }
             ]
         },
-
         "es.upv.paella.imageVideoFormat": {
             "enabled": true,
             "order": 3
@@ -110,11 +194,11 @@
         },
         "es.upv.paella.mp4MultiQualityVideoFormat": {
             "enabled": true,
-            "order": 2
+            "order": 0
         },
         "es.upv.paella.hlsVideoFormat": {
             "enabled": true,
-            "order": 0,
+            "order": 1,
             "audioTrackLabel": "name",
             "enableCache": true,
             "forceNative": false,
@@ -129,7 +213,7 @@
         },
         "es.upv.paella.hlsLiveVideoFormat": {
             "enabled": true,
-            "order": 0,
+            "order": 1,
             "enableCache": true,
             "hlsConfig": {
             },
@@ -149,6 +233,11 @@
             "order": 1
         },
 
+        "es.upv.paella.video360Canvas": {
+            "enabled": true,
+            "order": 0
+        },
+
         "es.upv.paella.zoomPlugin": {
             "enabled": true,
             "order": 0,
@@ -160,62 +249,212 @@
             "order": 1
         },
 
+        "es.upv.paella.cookieDataPlugin": {
+            "enabled": false,
+            "order": 0,
+            "context": ["default","trimming","preferences"]
+        },
+
+        "es.upv.paella.localStorageDataPlugin": {
+            "enabled": true,
+            "order": 0,
+            "context": ["default","trimming","preferences"]
+        },
+
+
+        "es.upv.paella.vttManifestCaptionsPlugin": {
+            "enabled": true
+        },
+
+        "es.upv.paella.dfxpManifestCaptionsPlugin": {
+            "enabled": true
+        },
+
         "es.upv.paella.playPauseButton": {
             "enabled": true,
+            "order": 0,
+            "container": "playbackBar",
             "side": "left",
-            "order": 0
+            "id": "playPauseButton"
+        },
+    
+        "es.upv.paella.backwardButtonPlugin": {
+            "enabled": true,
+            "side": "left",
+            "order": 1,
+            "minContainerSize": 700
+        },
+
+        "es.upv.paella.forwardButtonPlugin": {
+            "enabled": true,
+            "side": "left",
+            "order": 2,
+            "minContainerSize": 700
         },
 
         "es.upv.paella.volumeButtonPlugin": {
             "enabled": true,
             "side": "left",
-            "order": 1
+            "order": 3,
+            "minContainerSize": 600
         },
 
         "es.upv.paella.currentTimeLabel": {
             "enabled": true,
             "side": "left",
+            "order": 4,
             "showTotalTime": true,
-            "order": 2
+            "totalTimeMinContainerSize": 600
         },
 
-        "es.upv.paella.layoutSelector": {
+        "es.upv.paella.playbackRateButton": {
             "enabled": true,
             "side": "right",
-            "order": 2,
-            "showIcons": true,
-            "description": "Select different layout"
-        },
-
-        "es.upv.paella.fullscreenButton": {
-            "enabled": true,
-            "side": "right",
-            "order": 3,
-            "description": "Toggle fullscreen"
+            "order": 5
         },
 
         "es.upv.paella.frameControlButtonPlugin": {
             "enabled": true,
             "side": "right",
-            "order": 4
+            "order": 6,
+            "menuTitle": "Video Slides",
+            "description": "Display the slides from the video"
         },
 
-        "es.upv.paella.nextSlideNavigatorButton": {
+        "es.upv.paella.layoutSelector": {
             "enabled": true,
-            "content": [
-                "presentation"
-            ],
-            "side": "left",
-            "order": 1
+            "side": "right",
+            "order": 7
+        },
+        "es.upv.paella.cookieconsent": {
+            "enabled": true,
+            "side": "right",
+            "order": 8
+        },
+        "es.upv.paella.ai.chat": {
+            "enabled": true,
+            "side": "right"
+        },
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "side": "right",
+            "order": 9,
+            "mode": "dialog"
+        },
+        "es.upv.paella.relatedVideos": {
+            "enabled": true,
+            "side": "right",
+            "order": 10
         },
 
-        "es.upv.paella.prevSlideNavigatorButton": {
+        "es.upv.paella.fullscreenButton": {
             "enabled": true,
-            "content": [
-                "presentation"
-            ],
-            "side": "left",
-            "order": 0
+            "side": "right",
+            "order": 11
+        },
+
+        "es.upv.paella.qualitySelector": {
+            "enabled": true,
+            "side": "right",
+            "parentContainer": "options"
+        },
+        "es.upv.paella.keyboardShortcuts": {
+            "enabled": true,
+            "order": 80,
+            "side": "right",
+            "parentContainer": "options",
+            "installKeyboardManager": true,
+            "validPlaybackRates": [0.75, 1, 1.25, 1.5, 2]
+        },
+        
+
+        "es.upv.paella.captionsSelectorPlugin": {
+            "enabled": true,
+            "side": "right",
+            "order": 12,
+            "_parentContainer": "options"
+        },
+
+        "es.upv.paella.findCaptionsPlugin": {
+            "enabled": true,
+            "side": "right",
+            "order": 11,
+            "_parentContainer": "options"
+        },
+
+        "es.upv.paella.onboarding": {
+            "enabled": true
+        },        
+
+        "es.upv.paella.version": {
+            "enabled": true,
+            "side": "right",
+            "minContainerSize": 700
+        },
+        "es.upv.paella.relatedDocuments": {
+            "enabled": true,
+            "dataContext": "related.documents",
+            "minContainerSize": 700
+        },
+        "es.upv.paella.hlsCaptionsSelectorPlugin": {
+            "enabled": true,
+            "side": "right",
+            "order": 13,
+            "allowMultipleSelection": false
+        },
+        "es.upv.paella.relatedDocuments.dataTest": {
+            "enabled": true,
+            "context": ["related.documents"],
+            "docs": [
+                {
+                    "title": "Summary",
+                    "content": {
+                        "url": "aitools/summary.txt",
+                        "mimeType": "text/markdown"
+                    }                    
+                },
+                {
+                    "title": "FAQ",
+                    "content": {
+                        "url": "aitools/faq.md",
+                        "mimeType": "text/markdown"
+                    }
+                },
+                {
+                    "title": "Study plan",
+                    "content": {
+                        "url": "aitools/study_plan.md",
+                        "mimeType": "text/markdown"
+                    }
+                },
+                {
+                    "title": "Timeline",
+                    "content": {
+                        "url": "aitools/timeline.md",
+                        "mimeType": "text/markdown"
+                    }
+                },
+                {
+                    "title": "Podcast Script",
+                    "content": {
+                        "url": "aitools/podcast_script.md",
+                        "mimeType": "text/markdown"
+                    },
+                    "media": {
+                        "url": "aitools/podcast_audio.mp3",
+                        "mimeType": "audio/mpeg"
+                    }
+                }
+            ]                
         }
-    }
+    },
+
+    "dictionaries": {
+        "es": {
+            "Options": "Opciones",
+            "Configuration options": "Opciones de configuración",
+            "Video Slides": "Diapositivas del vídeo",
+            "Display the slides from the video": "Mostrar las diapositivas del vídeo"
+        }
+    } 
 }
