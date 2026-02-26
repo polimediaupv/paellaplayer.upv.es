@@ -284,6 +284,20 @@ For the icons, we can specify a general width for the icon using an absolute val
 - `--video-container-message-icon-max-width-md`
 - `--video-container-message-icon-max-width-lg`
 
+## Responsive design
+
+The default styles of `paella-core` are designed to be responsive, so that the player adapts to different screen sizes and orientations. The elements that are more sensitive to the size of the screen are the pop up and menu buttons, which are designed to be presented in the full player container when the screen is small, and to be presented in the playback bar area when the screen is large. All the sizes of the elements are designed to adapt to the size of the screen, so that the player is always usable and visually appealing. But there are some new properties that you can control when the pop up style changes to the small screen style:
+
+![Browser window size](styling_css_variables/browser.webp)
+
+![Smartphone window size](styling_css_variables/phone.webp)
+
+- `--mobile-popup-backdrop-filter`: is the backdrop filter of the pop up windows in the small screen style. This style is needed because in small screens the pop up windows are displayed in the whole player container, so the backdrop filter is applied to the whole video area, because the pop up window is presented as a modal window.
+- `--mobile-popup-background`: is the background color of the backdrop of the pop up windows in the small screen style. It is recommended to use a color with some transparency, so that the video can be seen in the background, but it is not too distracting.
+- `--mobile-popup-header-btn-width`: pop up header button width. The header area of the pop up windows may contain the back button, if the pup up is a submenu, and will always contain the close button. This value is set by default to the value of `--mobile-popup-header-btn-size`, you can change it if you don't want the header buttons to be square.
+- `--mobile-popup-header-btn-height`: pop up header menu height. As with the previous variable, this value is initialized with the value of the `--mobile-popup-header-btn-size` variable so that the header buttons are square, but you can change it if you want the buttons to be rectangular.
+- `--mobile-popup-header-btn-size`: pop up header button size. This variable is used as the default value for the width and height of the pop up header buttons, so if you want to set the same size for both dimensions, you can use this variable.
+
 ## About SVG icons
 
 Paella Player loads the SVG icons as text strings to insert them directly into the DOM tree. This allows us to control the color of the icons using CSS variables, and also to apply styles to the icons.

@@ -10,14 +10,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@asicupv/paella-ai-plugins": "^2.6.0",
+    "@asicupv/paella-ai-plugins": "^2.7.0",
     "@asicupv/paella-basic-plugins": "^2.6.0",
-    "@asicupv/paella-core": "^2.12.0",
+    "@asicupv/paella-core": "^2.12.1",
     "@asicupv/paella-extra-plugins": "^2.9.0",
     "@asicupv/paella-slide-plugins": "^2.6.0",
     "@asicupv/paella-video-plugins": "^2.5.0",
     "@asicupv/paella-webgl-plugins": "^2.4.0",
-    "@asicupv/paella-zoom-plugin": "^2.5.0",
+    "@asicupv/paella-zoom-plugin": "^2.5.1",
     "@astrojs/node": "^9.2.2",
     "@astrojs/react": "^4.3.1",
     "@astrojs/starlight": "^0.35.1",
