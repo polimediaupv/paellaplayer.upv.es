@@ -3,6 +3,7 @@ const { id, manifestId } = Astro.props;
 import "@asicupv/paella-core/paella-core.css";
 import "@asicupv/paella-basic-plugins/paella-basic-plugins.css";
 import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
+import "@asicupv/paella-zoom-plugin/paella-zoom-plugin.css";
 ---
 
 <article>
@@ -126,6 +127,13 @@ import "@asicupv/paella-slide-plugins/paella-slide-plugins.css";
         box-sizing: border-box;
         aspect-ratio: 16/9;
     }
+
+    @media (max-width: 600px) {
+        .player-container {
+            aspect-ratio: calc(100vw / 80vh);
+        }
+    }
+
     :root {
         --progress-indicator-padding: 6px 15px;
         --playback-bar-buttons-padding: 5px 10px;

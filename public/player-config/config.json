@@ -10,8 +10,8 @@
 
     "defaultAudioStream": "presenter",
 
-    "defaultVideoPreview": "/config/default_preview_landscape.jpg",
-    "defaultVideoPreviewPortrait": "/config/default_preview_portrait.jpg",
+    "defaultVideoPreview": "/player-config/default_preview_landscape.jpg",
+    "defaultVideoPreviewPortrait": "/player-config/default_preview_portrait.webp",
 
     "logLevel": "INFO",
 
