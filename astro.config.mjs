@@ -78,7 +78,8 @@ export default defineConfig({
                         { label: 'Zoom Plugin', slug: 'plugins/plugins_zoom' },
                         { label: 'User Tracking Plugins', slug: 'plugins/plugins_user_tracking' },
                         { label: 'Video Plugins', slug: 'plugins/plugins_video' },
-                        { label: 'WebGL Plugins', slug: 'plugins/plugins_webgl' }
+                        { label: 'WebGL Plugins', slug: 'plugins/plugins_webgl' },
+                        { label: 'AI Plugins', slug: 'plugins/plugins_ai' }
                     ]}
                 ]
             },

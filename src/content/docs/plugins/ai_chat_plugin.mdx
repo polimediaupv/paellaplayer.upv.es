@@ -1,0 +1,51 @@
+---
+title: "AIChatPlugin"
+description: "Interactive chat with language models in Paella Player."
+---
+
+## es.upv.paella.ai.chat
+
+**ID:** `es.upv.paella.ai.chat`
+
+Provides an interactive chat that allows the user to ask questions about the video content. Uses the video captions as RAG context for the model responses.
+
+### Technologies
+
+- **WebLLM** (`@mlc-ai/web-llm`) — Runs language models directly in the browser via WebGPU.
+- **LangChain** (`@langchain/community`, `@langchain/openai`) — Abstraction layer for language models. Supports two backends:
+    - `webllm`: local model running in the browser (default: `Qwen2.5-3B-Instruct-q4f16_1-MLC`).
+    - `openai`: OpenAI-compatible API (requires URL and API key).
+- **Preact** — Chat UI.
+- **Paella Captions API** — Builds a RAG from the video captions to provide context to the model.
+
+### Configuration
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.chat": {
+            "enabled": true,
+            "chat": {
+                "enabled": true
+            }
+        },
+        ...
+    }
+}
+```
+
+### Model settings (user-configurable in the UI)
+
+| Setting | Default value | Description |
+|---------|---------------|-------------|
+| `modelType` | `"webllm"` | Backend: `"webllm"` or `"openai"` |
+| `model` | `"Qwen2.5-3B-Instruct-q4f16_1-MLC"` | Model name |
+| `openAIURL` | `"https://api.openai.com/v1"` | Base URL for OpenAI API |
+| `openAIPasswd` | `""` | API key for OpenAI |
+| `temperature` | `1.0` | Generation temperature |
+| `maxTokens` | `4000` | Maximum response tokens |
+| `systemPrompt` | *(default prompt)* | System instruction |
+
+Settings are stored in `localStorage` per user.
+
+**Exported as** `AIChatPlugin`.

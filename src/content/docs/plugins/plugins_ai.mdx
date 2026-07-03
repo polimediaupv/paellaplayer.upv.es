@@ -1,0 +1,129 @@
+---
+title: "AI plugins"
+description: "This document describes the @asicupv/paella-ai-plugins package."
+---
+
+**Step 1:** Import the plugin:
+
+```javascript
+...
+import {
+    aiToolsPlugins, // All plugins
+    AIContentPlugin,        // Independent plugin
+    AIChatPlugin,           // Independent plugin
+    AIToolsDataTestPlugin,  // Independent plugin
+    RealTimeCaptionsPlugin  // Independent plugin
+} from '@asicupv/paella-ai-plugins';
+import '@asicupv/paella-ai-plugins/paella-ai-plugins.css';
+
+let paella = new Paella('playerContainer', {
+    plugins: [
+        ...aiToolsPlugins,    // All plugins
+        { // One plugin
+            plugin: AIContentPlugin,
+            config: {
+                enabled: true
+            }
+        }
+    ]
+});
+...
+```
+
+**Step 2:** Configure the plugins you want to use in the paella player configuration.
+
+```json
+{
+    "plugins": {
+        ...
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "mode": "dialog"
+        }
+        ... other plugin settings
+    }
+}
+```
+
+## Included plugins
+
+### [es.upv.paella.ai.content](/plugins/ai_content_plugin)
+
+Muestra un panel con pestañas que contiene contenido generado por IA asociado al vídeo (resumen, FAQ, plan de estudio, línea de tiempo, pódcast).
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "mode": "dialog"
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIContentPlugin`.
+
+### [es.upv.paella.ai.chat](/plugins/ai_chat_plugin)
+
+Proporciona un chat interactivo que permite al usuario hacer preguntas sobre el contenido del vídeo. Utiliza los subtítulos como contexto RAG para las respuestas del modelo.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.chat": {
+            "enabled": true,
+            "chat": {
+                "enabled": true
+            }
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIChatPlugin`.
+
+### [es.upv.paella.ai.content.data-test](/plugins/ai_data_test_plugin)
+
+Plugin de datos que carga contenido de IA desde archivos estáticos alojados en el repositorio del vídeo. Sirve como proveedor de datos de ejemplo o desarrollo para `AIContentPlugin`.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content.data-test": {
+            "enabled": true,
+            "files": {
+                "summary": { "file": "ai-summary.md" },
+                "faq": { "file": "ai-faq.md" },
+                "study_plan": { "file": "ai-study-plan.md" },
+                "timeline": { "file": "ai-timeline.md" },
+                "podcast": { "file": "ai-podcast.json", "media": "ai-podcast.mp3" }
+            }
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIToolsDataTestPlugin`.
+
+### [es.upv.paella.ai.realTimeCaptions](/plugins/ai_realtime_captions_plugin)
+
+Genera subtítulos en tiempo real transcribiendo el audio del vídeo usando un modelo de reconocimiento de voz que se ejecuta localmente en el navegador.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.realTimeCaptions": {
+            "enabled": true
+        },
+        ...
+    }
+}
+```
+
+> **Note:** Requiere que el plugin `es.upv.paella.transcriptInteractiveAreaPlugin` esté habilitado en la configuración del reproductor para mostrar los subtítulos generados.
+
+**Exported as** `RealTimeCaptionsPlugin`.

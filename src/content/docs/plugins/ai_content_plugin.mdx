@@ -1,0 +1,52 @@
+---
+title: "AIContentPlugin"
+description: "Displays AI-generated content associated with the video in Paella Player."
+---
+
+## es.upv.paella.ai.content
+
+**ID:** `es.upv.paella.ai.content`
+
+Displays a tabbed panel containing AI-generated content associated with the video. Each tab is shown only if data is available for it.
+
+### Available tabs
+
+- **Summary** — Summary of the video content.
+- **FAQ** — Frequently asked questions about the content.
+- **Study plan** — Suggested study plan.
+- **Timeline** — Video timeline.
+- **Podcast** — Generated podcast-style audio with content analysis.
+
+### Technologies
+
+- **Preact** — UI rendered as a Preact component.
+- **Paella Data API** — Data is read via `player.data.read("ai.content", <scope>)`.
+
+### Configuration
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "mode": "dialog"
+        },
+        ...
+    }
+}
+```
+
+- `mode`: `"dialog"` (default) or `"popup"` — panel display mode.
+
+### Data structure
+
+Data is provided through a data plugin (see `AIToolsDataTestPlugin`) with the following type:
+
+```typescript
+type AIContentData = {
+    content: string | null;
+    mediaUrl?: string | null;
+};
+```
+
+**Exported as** `AIContentPlugin`.

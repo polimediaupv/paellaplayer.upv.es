@@ -1,0 +1,52 @@
+---
+title: "AIToolsDataTestPlugin"
+description: "Test data provider for AIContentPlugin in Paella Player."
+---
+
+## es.upv.paella.ai.content.data-test
+
+**ID:** `es.upv.paella.ai.content.data-test`
+
+Data plugin that loads AI content from static files hosted in the video repository. Serves as a sample or development data provider for `AIContentPlugin`.
+
+### Technologies
+
+- **Paella DataPlugin API** — Implements the `DataPlugin` interface for the `"ai.content"` scope.
+- **Fetch API** — Downloads content files from the video repository.
+
+### Configuration
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content.data-test": {
+            "enabled": true,
+            "files": {
+                "summary": {
+                    "file": "ai-summary.md"
+                },
+                "faq": {
+                    "file": "ai-faq.md"
+                },
+                "study_plan": {
+                    "file": "ai-study-plan.md"
+                },
+                "timeline": {
+                    "file": "ai-timeline.md"
+                },
+                "podcast": {
+                    "file": "ai-podcast.json",
+                    "media": "ai-podcast.mp3"
+                }
+            }
+        },
+        ...
+    }
+}
+```
+
+- `files`: map of scopes to files. Each entry has:
+    - `file`: path relative to the video directory (`<repositoryUrl>/<videoId>/<file>`).
+    - `media` *(optional)*: path to an associated media file (e.g. podcast audio).
+
+**Exported as** `AIToolsDataTestPlugin`.

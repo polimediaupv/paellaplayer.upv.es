@@ -404,3 +404,22 @@ Displays a `live streaming` text above the timeline bar, when the video is a liv
 ```
 
 **Exported as** `LiveStreamingProgressIndicatorPlugin`
+
+### es.upv.paella.audioEnhancement & es.upv.paella.audioEnhancementButton
+
+These two plugins are designed to work together:
+
+- audioEnhancement: an AudioProcessor-type plugin that enhances the audio by adding a compressor filter and a gain filter. It is designed to enhance the audio in videos where the sound levels are too low.
+- audioEnhancementButton: a Button-type plugin that controls the activation of audioEnhancement.
+
+```json
+{
+    "es.upv.paella.audioEnhancement": {
+        "enabled": true
+    },
+    "es.upv.paella.audioEnhancementButton": {
+        "enabled": true,
+        "side": "right"
+    }
+}
+```

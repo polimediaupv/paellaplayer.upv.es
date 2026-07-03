@@ -1,0 +1,46 @@
+---
+title: "RealTimeCaptionsPlugin"
+description: "Real-time AI-generated captions in Paella Player."
+---
+
+## es.upv.paella.ai.realTimeCaptions
+
+**ID:** `es.upv.paella.ai.realTimeCaptions`
+
+Generates real-time captions by transcribing the video audio using a speech recognition model that runs locally in the browser.
+
+### Technologies
+
+- **Voxtral Mini 4B** (`onnx-community/Voxtral-Mini-4B-Realtime-2602-ONNX`) — Multimodal speech recognition model by Mistral, running in ONNX format.
+- **Hugging Face Transformers.js** (`@huggingface/transformers`) — Runtime for ONNX model inference in the browser with **WebGPU** support.
+- **Web Audio API** — Audio capture from the player via `AudioWorkletNode` with:
+    - Mono conversion.
+    - Anti-aliasing filter (8th-order Butterworth).
+    - Linear resampling to 16 kHz.
+- **Preact** — Control UI (load model, start/stop transcription).
+- **Paella Transcript API** — Generated captions are inserted into the interactive transcript panel of the player (`es.upv.paella.transcriptInteractiveAreaPlugin`).
+
+### Workflow
+
+1. The user opens the panel and clicks "Load Model".
+2. The ONNX model is downloaded (~`q4f16` files) and initialized in WebGPU.
+3. When transcription starts, video audio is captured via `AudioWorklet`.
+4. The model processes audio in ~6-second chunks and generates streaming text.
+5. Text fragments are inserted as transcript entries synchronized with the video time.
+
+### Configuration
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.realTimeCaptions": {
+            "enabled": true
+        },
+        ...
+    }
+}
+```
+
+> **Note:** Requires the `es.upv.paella.transcriptInteractiveAreaPlugin` plugin to be enabled in the player configuration to display the generated captions.
+
+**Exported as** `RealTimeCaptionsPlugin`.

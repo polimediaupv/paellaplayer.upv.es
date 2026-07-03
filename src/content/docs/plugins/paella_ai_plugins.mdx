@@ -1,0 +1,129 @@
+---
+title: "AI plugins"
+description: "This document describes the @asicupv/paella-ai-plugins package."
+---
+
+**Step 1:** Import the plugin:
+
+```javascript
+...
+import {
+    aiToolsPlugins, // All plugins
+    AIContentPlugin,        // Independent plugin
+    AIChatPlugin,           // Independent plugin
+    AIToolsDataTestPlugin,  // Independent plugin
+    RealTimeCaptionsPlugin  // Independent plugin
+} from '@asicupv/paella-ai-plugins';
+import '@asicupv/paella-ai-plugins/paella-ai-plugins.css';
+
+let paella = new Paella('playerContainer', {
+    plugins: [
+        ...aiToolsPlugins,    // All plugins
+        { // One plugin
+            plugin: AIContentPlugin,
+            config: {
+                enabled: true
+            }
+        }
+    ]
+});
+...
+```
+
+**Step 2:** Configure the plugins you want to use in the paella player configuration.
+
+```json
+{
+    "plugins": {
+        ...
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "mode": "dialog"
+        }
+        ... other plugin settings
+    }
+}
+```
+
+## Included plugins
+
+### [es.upv.paella.ai.content](/plugins/ai_content_plugin)
+
+Displays a tabbed panel containing AI-generated content associated with the video (summary, FAQ, study plan, timeline, podcast).
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content": {
+            "enabled": true,
+            "mode": "dialog"
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIContentPlugin`.
+
+### [es.upv.paella.ai.chat](/plugins/ai_chat_plugin)
+
+Provides an interactive chat that allows the user to ask questions about the video content. Uses captions as RAG context for model responses.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.chat": {
+            "enabled": true,
+            "chat": {
+                "enabled": true
+            }
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIChatPlugin`.
+
+### [es.upv.paella.ai.content.data-test](/plugins/ai_data_test_plugin)
+
+Data plugin that loads AI content from static files hosted in the video repository. Serves as a sample or development data provider for `AIContentPlugin`.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.content.data-test": {
+            "enabled": true,
+            "files": {
+                "summary": { "file": "ai-summary.md" },
+                "faq": { "file": "ai-faq.md" },
+                "study_plan": { "file": "ai-study-plan.md" },
+                "timeline": { "file": "ai-timeline.md" },
+                "podcast": { "file": "ai-podcast.json", "media": "ai-podcast.mp3" }
+            }
+        },
+        ...
+    }
+}
+```
+
+**Exported as** `AIToolsDataTestPlugin`.
+
+### [es.upv.paella.ai.realTimeCaptions](/plugins/ai_realtime_captions_plugin)
+
+Generates real-time captions by transcribing the video audio using a speech recognition model that runs locally in the browser.
+
+```json
+{
+    "plugins": {
+        "es.upv.paella.ai.realTimeCaptions": {
+            "enabled": true
+        },
+        ...
+    }
+}
+```
+
+> **Note:** Requires the `es.upv.paella.transcriptInteractiveAreaPlugin` plugin to be enabled in the player configuration to display the generated captions.
+
+**Exported as** `RealTimeCaptionsPlugin`.
