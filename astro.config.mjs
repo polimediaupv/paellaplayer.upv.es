@@ -71,6 +71,7 @@ export default defineConfig({
                     { label: 'Video Layout Plugins', slug: 'plugins/video_layout' },
                     { label: 'Data Plugins', slug: 'plugins/data_plugins' },
                     { label: 'Event Log Plugins', slug: 'plugins/event_log_plugins' },
+                    { label: 'Interactive Area Plugins', slug: 'plugins/interactive_area_plugins' },
                     { label: 'Plugin pacakges', items: [
                         { label: 'Core Plugins', slug: 'plugins/plugins_core' },
                         { label: 'Basic Plugins', slug: 'plugins/plugins_basic' },

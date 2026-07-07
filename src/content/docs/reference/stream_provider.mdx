@@ -126,6 +126,18 @@ The multiple audio control functions allow you to change the audio track of the 
 `get currentAudioTrack()`: returns the current active audio track.
 
 
+## Web Audio API access
+
+These functions provide managed access to the input and output nodes for the Web Audio API. For further information, see the documentation on [Web Audio API](/reference/stream_provider_web_audio_api)
+
+`get audioContext(): AudioContext`: Returns the Web Audio API context, associated with the main audio stream.
+
+`get audioSourceNode(): MediaElementAudioSourceNode`: Returns the Web Audio API source node.
+
+`get audioDestinationNode()`: Returns the Web Audio API destination node.
+
+`async reloadAudioProcessors()`: Reload the Web Audio API graph.
+
 ## About multi stream synchronization
 
 In multi stream videos, the Stream Provider class is in charge of ensuring that a correct synchronization is maintained at the time instant of all video streams. This synchronization is not perfect, and depends heavily on the characteristics of each video stream. To obtain an optimal synchronization, video streams should be encoded with characteristics as similar as possible in terms of bit rate and, above all, in terms of keyframes.

@@ -1,0 +1,91 @@
+---
+title: Transcription Interactive Area Plugin
+description: A plugin designed to display video transcripts in the interactive area. This plugin does not manage the transcripts; it simply provides an API to display them.
+---
+
+Built-in plugin (`es.upv.paella.transcriptInteractiveAreaPlugin`) that manages a scrollable transcript in the interactive area. This is an **infrastructure plugin** — it is not meant to be displayed directly via a button click. Instead, other plugins use its API to add/update/remove transcript entries, and then optionally show the panel via `showInteractiveAreaPlugin()`.
+
+
+### Methods
+
+### `addTranscription({ text, state }): Promise<number>`
+
+Adds a new transcript entry at the current playback time. Returns the entry's ID (which is `Math.round(currentTime)`), or `-1` if text is empty.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `text` | `string` | The transcript text |
+| `state` | `TranscriptEntryState` | Initial state of the entry |
+
+### `updateTranscription({ id, text, state }): Promise<void>`
+
+Updates an existing transcript entry by its ID. Any omitted field (`text`, `state`) is left unchanged.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | `number` | The entry ID (usually the rounded playback time) |
+| `text` | `string` (optional) | New text for the entry |
+| `state` | `TranscriptEntryState` (optional) | New state for the entry |
+
+### `removeTranscription(params: number \| { id: number }): void`
+
+Removes a transcript entry by its ID.
+
+### `clearTranscriptions(): void`
+
+Removes all transcript entries and clears the container.
+
+### `scrollToCurrent(): Promise<void>`
+
+Scrolls the panel to the current transcript entry (the one whose ID is closest to but not greater than the current playback time).
+
+---
+
+## TranscriptEntry Type
+
+```typescript
+interface TranscriptEntry {
+    id: number;        // Unique identifier (rounded playback time in seconds)
+    text: string;      // Displayed text content
+    state: TranscriptEntryState;  // Current state
+}
+```
+
+---
+
+## TranscriptEntryState Values
+
+| Value | Description |
+|-------|-------------|
+| `"past"` | Entry is far enough in the past (> 8s before current time) |
+| `"current"` | Entry matches the current playback position |
+| `"live"` | Entry represents live content at the current time |
+| `"future"` | Entry is in the future (not yet reached) |
+| `"error"` | An error occurred for this entry |
+| `"warning"` | A warning condition for this entry |
+| `"info"` | Informational state for this entry |
+
+---
+
+### Transcript Entry Styling
+
+Transcript entries receive a class `state-{state}` that you can target for styling:
+
+```css
+.state-current {
+    background: rgba(255, 255, 255, 0.15);
+    font-weight: bold;
+}
+
+.state-past {
+    opacity: 0.6;
+}
+
+.state-future {
+    opacity: 0.4;
+}
+
+.state-error {
+    color: #ff4444;
+}
+```
