@@ -366,6 +366,8 @@ The decision to remove keyboard shortcut management from `paella-core` stems fro
 
 In contrast, managing keyboard shortcuts directly through the player's APIs provides a more straightforward and efficient approach. By doing so, developers can tailor keyboard control to their specific use case, ensuring a seamless user experience. This change allows for greater flexibility and customization, as developers can now handle keyboard events in a way that best suits their application.
 
+To handle keyboard events, it is recommended that you use any of the available plugins. The @asicupv/paella-extra-plugins package provides a plugin that implements both basic handling of typical keyboard events and a help menu listing the options supported by the plugin.
+
 ### Progress indicator plugins
 
 In `paella-core` 1.x, a plugin system allowed developers to draw custom content on top of the progress bar using a canvas element (Progress Indicator Plugins). However, this feature was only used for displaying the slide time markers, and its complexity made it difficult to adapt to different visual styles using CSS. The API was limited to drawing content using the canvas context, which restricted its flexibility. Progress Indicator Plugins Limitations:
